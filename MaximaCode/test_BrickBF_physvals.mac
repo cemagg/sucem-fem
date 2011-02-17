@@ -1,0 +1,15 @@
+load("OneBrick")$
+load("BrickCoords")$
+load("HexaBasisFunction")$
+
+grd_subs:el_grd_lam_sublist(get_verts(bricks[1], mesh_verts))$
+
+make_physvals(BFs, test_lams_subs_, grd_subs_):=makelist(makelist(
+    subst(ls,bf),ls,test_lams_subs_),bf, express(subst(grd_subs_,BFs)))$
+
+efs_physvals:make_physvals(onef_efs, test_lams_subs, grd_subs)$
+
+efs_physvals_D:make_physvals(D_onef_efs, test_lams_subs, grd_subs)$
+
+twof_ffs_physvals:make_physvals(twof_ffs, test_lams_subs, grd_subs)$
+twof_ffs_physvals_D:make_physvals(D_twof_ffs, test_lams_subs, grd_subs)$

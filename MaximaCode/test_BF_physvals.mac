@@ -1,0 +1,32 @@
+load("CommonSimplexStuff.mac")$
+load("BasisFunction.mac")$
+load("FlatTet.mac")$
+calc_xyz(tetmat, lam):=rest((tetmat.lam)[1])$
+fixup_zero(val):=if val=0 then([0,0,0]) else (val)$
+tv:get_verts(tet_verts, mesh_verts)$
+tetmat:simplex_tetmat(tv)$
+lam_xyz:lam_det(tetmat)$
+grd_lam_xyz:ev(express(vectorsimp(map("grad", lam_xyz))), diff)$
+physvals_from_BF_list(tv, BFs, lams):=block(
+  [tetfuns:map(lambda([BF],to_var_list(bf_gen_tet(tv, BF))),BFs),
+   physvals],
+  physvals:map(lambda([BF], map(lambda([lam], fixup_zero(BF(lam))), lams)),
+    tetfuns),
+  ev(express(physvals)))$
+  
+
+onef_efs_R1_physvals:physvals_from_BF_list(tv, onef_efs_R1, lams)$
+onef_efs_G1_physvals:physvals_from_BF_list(tv, onef_efs_G1, lams)$
+onef_ffs_R2_physvals:physvals_from_BF_list(tv,
+  facetrips_to_flatlist(onef_ffs_R2), lams)$
+
+D_onef_efs_R1_physvals:physvals_from_BF_list(tv, D_onef_efs_R1, lams)$
+D_onef_efs_G1_physvals:physvals_from_BF_list(tv, D_onef_efs_G1, lams)$
+D_onef_ffs_R2_physvals:physvals_from_BF_list(tv,
+  facetrips_to_flatlist(D_onef_ffs_R2), lams)$
+
+twof_ffs_0_bfs_tet:map(lambda([BF], bf_gen_tet(tv, BF)), facefuns)$
+twof_ffs_0_physvals:map(lambda([BF],
+    map(lambda([lam], fixup_zero(BF(lam))), lams)),
+  twof_ffs_0_bfs_tet)$
+twof_ffs_0_physvals:express(ev(twof_ffs_0_physvals))$

@@ -1,0 +1,9 @@
+/* Give the extended Chebyshev points over the interval [0,1] according to
+rieben04 */
+X_interp(p):=makelist(-cos((2*i+1)*%pi/(2*p+2))/(2*cos(%pi/(2*p+2))) + 1/2, i,
+0, p)$
+
+make_polys(X, x):=makelist(lreduce("*", makelist((x-Xj)/(Xi-Xj), Xj,
+      filter(X, lambda([XX], not XX=Xi)))),
+    Xi, X)$
+

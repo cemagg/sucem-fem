@@ -1,0 +1,36 @@
+get_verts(nodes, mesh_verts):=makelist(mesh_verts[i], i, nodes)$
+/* Get dx dy dz for brick element given its vertices. */
+el_xyz_deltas(bv):=[(bv[5]-bv[1])[1], (bv[3]-bv[1])[2], (bv[2]-bv[1])[3]]$
+el_lam_sublist(brick_verts):=block([o:brick_verts[1], d_xyz:el_xyz_deltas(brick_verts),
+  indep, all_lams],
+  indep:([x,y,z]-o)/d_xyz,
+  all_lams:append(indep, 1-indep),
+  makelist(concat(lam,i)=all_lams[i],i,1,length(all_lams)))$
+el_xyz(brick_verts):=block([o:brick_verts[1], d_xyz:el_xyz_deltas(brick_verts)],
+  [lam1, lam2, lam3]*d_xyz + o)$
+
+el_grd_lam_sublist(brick_verts):=block([subl:el_lam_sublist(brick_verts), undiffed],
+  undiffed:makelist(grad(concat(lam,i))=subst(subl,
+      express(grad(concat(lam,i)))),i,1,6),
+  ev(undiffed, diff))$
+
+el_jacobian_matrix(brick_verts):=block([dxyz:el_xyz_deltas(brick_verts),r,gm],
+  r:[lam1, lam2, lam3]*dxyz,
+  local(gm), gm[i,j]:=diff(r[j],concat(lam,i)),
+  genmatrix(gm, 3, 3))$
+
+gen_brickfns(BFs, brick_verts):=subst(el_grd_lam_sublist(brick_verts), BFs)$
+
+no_test_steps:3$
+steps:setify(makelist(i/no_test_steps, i,0, no_test_steps))$
+test_lams:makelist(append(l, 1-l), l,
+  listify(cartesian_product(steps, steps, steps)))$
+
+test_lams_subs:makelist(makelist(concat(lam,i)=tl[i],i,1,6),tl,test_lams)$
+
+brick_local_faceedges:[[9,6,10,5],
+                       [9,2,11,1],
+                       [5,3,7,1], 
+                       [11,8,12,7],
+                       [10,4,12,3],
+                       [6,4,8,2]]$

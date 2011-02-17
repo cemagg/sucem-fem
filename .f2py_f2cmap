@@ -1,0 +1,4 @@
+{
+'real':{'SP':'float', 'DP':'double'},
+'integer':{'I4B':'int'},
+}

@@ -1,0 +1,19 @@
+load("pdiff")$
+load("dblint")$
+kill(A,E,H,x,y,z,Phi, mu, epsilon, d, x, y, z, r, I, l, k, nabla)$
+scalefactors([x,y,z])$  /* Set up Cartesian coordinate system */
+declare([A, E, H], nonscalar)$
+depends([A,E,H], [r, theta, phi, t])$
+declare([Phi, mu, epsilon, d, x, y, z, r, I, l, k, nabla], scalar)$
+declare([mu, epsilon, d, x, y, z, r, l, k, nabla], real)$
+assume(r>=0)$
+assume(x^2+y^2+z^2>0)$
+assume(x^2+z^2>0)$
+assume(y^2+z^2>0)$
+assume(sin(theta) >= 0)$
+
+A_cart:[0,0,mu*I*l*exp(-%i*k*r)/(4*%pi*r)]$
+A_rect:ev(A_cart, r:sqrt(x^2+y^2+z^2))$
+H:fullratsimp(ev(express(curl(A_rect)), diff)/mu)$
+E:fullratsimp(ev(express(curl(H)), diff)/%i/k/sqrt(mu*epsilon)/epsilon)$
+

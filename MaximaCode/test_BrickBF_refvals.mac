@@ -1,0 +1,14 @@
+load("OneBrick")$
+load("BrickCoords")$
+load("HexaBasisFunction")$
+
+onef_fun_refvals(fns):=subst(
+  [grad(lam1)=[1,0,0],grad(lam2)=[0,1,0],grad(lam3)=[0,0,1]], fns)$
+
+twof_fun_refvals(fns):=express(subst(
+    [grad(lam2)~grad(lam3)=[1,0,0],
+    grad(lam1)~grad(lam3)=[0,-1,0],
+    grad(lam1)~grad(lam2)=[0,0,1]], fns))$
+
+twof_ffs_refvals:makelist(makelist(subst(ls,bf), ls, test_lams_subs), bf,
+  twof_fun_refvals(remove_dependent(twof_ffs)))$

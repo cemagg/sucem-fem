@@ -1,0 +1,122 @@
+Description of the meshes in this directory
+===========================================
+
+rect1x0.5x0.75.geo
+------------------
+
+1x0.5*0.75m rectangular mesh, gmsh format. Generated meshes are:
+
+rect1x0.5x0.75-0.femmesh -- h = 1/9
+-1 -- h = 1/12
+-2 -- h = 1/24
+-3 -- h = 1/36
+-0-smaller-1 -- h = 1/8
+-0-smaller-2 -- h = 1/7
+-0-smaller-3 -- h = 1/6
+-0-smaller-4 -- h = 1/5
+-0-smaller-5 -- h = 1/4
+
+sphere.geo
+----------
+1m diameter sphere, gmsh format. Generated meshes are:
+
+sphere-8.femmesh -- h = 1/8
+-4 -- h = 1/4
+
+wg_hcyl_pin_[123]_h[hdiv]_*:
+------------------
+
+the choice of 1,2,3 corresponds to half cylindrical pin in WR90 geometry 1-3.
+_refinedX is append if specific mesh refinements were made. The hdiv parameter
+refers to the the nominal mesh size of the structured mesh, where h = a/hdiv
+with a the wide diameter of the waveguide (22.86 mm for WR90). Unless otherwise
+specified, r_e (the minimum freespace around the pin within the hybrid mesh) is
+taken as r_e = .25*h unless otherwise stated.
+
+refined1 (with  hcyl_pin_1 so far) has a characteristic length 0.002 on the
+nodes making up the flat face of the pin and 0.001 on the nodes making up the
+vertical line joining the two pin-arcs. The same 0.001 characteristic length is
+also used selectively on the PEC WG wall closest to the pin.
+
+wg_lech03fig7_h[hdiv]_*
+-----------------------
+
+Similar to wg_hcyl_pin_ above, using the two-post geometry from the lech03
+paper, fig7. Used ElementCloseDeadElements class to find hybird elements using
+r_e of .25*h and 5 step element subdivision in the x and z direction closes
+point search.
+
+Other meshes
+------------
+
+And stuff? 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Some legacy weird-shit that might be usefull:
+
+Some info extracted from the ouput file for the test tet within tet
+mesh.
+
+Unconstrained edges:
+                                           Connected Faces
+DOF    Edge no.      Node 1      Node 2  face 1	 face 2  face 3  face 4
+1           6           6           7	 3	 4	 25      26  
+2          11           5           7    7	 8	 26      27
+3          15           7           8    11	 12	 25	 27
+4          19           5           6    15	 16	 26	 28
+5          22           5           8    19	 20	 27	 28
+6          24           6           8    23	 24	 25	 28
+
+Unconstrained Faces (and the unconstrained connected edges). Note the
+edge order here follows the node order of the face. The element local
+edge numbers as returned by LOCAL_FACEEDGES has edge_2 and edge_3
+transposed. 
+DOF   Face_no.  edge_1  edge_2  edge_3
+1     3		  6(1)
+2     4		  6(1)
+3     7		  11(2)
+4     8		  11(2)
+5     11		  15(3)
+6     12		  15(3)
+7     15		  19(4)
+8     16		  19(4)
+9     19		  22(5)
+10    20		  22(5)
+11    23		  24(6)
+12    24   		  24(6)
+13    25	6(1)	  15(3)	  24(6)
+14    26	19(4)	  6(1)    11(2)
+15    27	11(2)	  15(3)	  22(5)
+16    28	19(4)	  24(6)	  22(5)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

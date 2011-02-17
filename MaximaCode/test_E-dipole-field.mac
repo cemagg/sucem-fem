@@ -1,0 +1,69 @@
+kill(all)$
+load("vect")$
+load("E-dipole-field")$
+load("waveforms")$
+
+/* Test points along +ve y axis */
+/*test_pts:makelist([i*1/10, %pi/2, %pi/2], i, 1, 30)$ */
+test_pts:[[5875/10000, %pi/2, %pi/2],
+          [1125/10000, %pi/2, %pi/2]]$
+mu:1$
+epsilon:1$
+c:1/sqrt(mu*epsilon)$
+fc:1$ /* gaussian pulse center frequency */
+d:1/fc/c/40$ /* dipole length 1/40 of a wavelength */
+sigma:d_gpulse_sigma_fc(fc)$
+/* As chosed by the python code for -80 dB cutoff */
+/* m: rationalize(0.75553829078006451)$ */
+/* As chosed by the python code for -60 dB cutoff */
+m: rationalize(0.66936756182490342)$
+
+
+/* q (charge) is the integral of current, with an initial value of 0 at t=0 */
+q_expr:ev(gpulse) - ev(gpulse, t:0)$
+i_expr:ev(d_gpulse)$
+
+/*
+q(t):= if t > 0 then (ev(q_expr)) else (0)$
+i(t):= if t > 0 then (ev(i_expr)) else (0)$
+*/
+
+/* Setting the functions to zero for t < 0 would require the use of a dirac delta
+   at t=0 for i(t), and the derivative of a dirac delta for diff(i, t) which is
+   undefined. Leaving the finite values for t < 0 assumes that we started with a
+   finite amount of charge at t = -inf, and that the system has been operational
+   since t = -inf.
+
+   Setting the driving fuctions to 0 for t < 0, ignoring the dirac deltas may or
+   may not be a good idea but is harder to implement analytically.
+
+   If instead nothing is done, there will be finite but small, aparantly
+   anti-causal fields existing at points where t - r/c < 0. Where t - r/c > 0
+   the fields should be exactly correct regardless of the treatment. Perhaps it
+   would be better to set E = 0 at all the points where t - r/c < 0.
+*/
+
+q(t):=ev(q_expr)$
+i(t):=ev(i_expr)$
+
+E_fun_(t, r, theta, phi):= if (t-r/c) >= 0 then (ev(E)) else ([0,0,0])$
+E_fun(t, sphcoords):=apply(E_fun_, append([t], sphcoords))$
+
+linspace(start, stop, no_pts):=makelist(
+  start+i*(stop-start)/(no_pts-1), i, 0, no_pts-1)$
+
+time_pts: linspace(0, 25/10, 191)$
+E_vals:map(lambda([pt], makelist(bfloat(E_fun(t, pt)), t, time_pts)), test_pts), fpprec:24$
+
+scatter1 (xy) := ([n: length (xy)],
+                 plot2d ([[parametric, '(xy[fix(i)][1]),
+                          '(xy[fix(i)][2]), [i, 1, n], [nticks, n]]],
+                        [gnuplot_curve_styles, ["with lines", 3]]))$
+
+scatter2 (x,y) := ([n: length (x)],
+                 plot2d ([[parametric, '(x[fix(i)]), '(y[fix(i)]),
+                          [i, 1, n], [nticks, n]]], 
+                        [gnuplot_curve_styles, ["with lines", 3]]))$
+
+E_th:makelist(-x[2]/d,x,E_vals[1])$
+E_th_2:makelist(-x[2]/d,x,E_vals[2])$ 

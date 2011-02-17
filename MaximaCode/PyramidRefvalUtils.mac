@@ -1,0 +1,17 @@
+fixup_zero(val):=if val=0 then([0,0,0]) else (val)$
+
+onef_fun_refvals(fns):=subst(
+  [lam1=lams[1], lam2=lams[2], lam3=lams[3], lam4=lams[4], lam5=lams[5]],
+  subst([grad(lam1)=[1,0,0],grad(lam2)=[0,1,0],
+    grad(lam3)=[-1,0,-1],grad(lam4)=[0,-1,-1],
+    grad(lam5)=[0,0,1]], fns))$
+
+
+twof_fun_refvals(fns):=block([expandplus:true], makelist(fixup_zero(fn), fn, subst(
+  [lam1=lams[1], lam2=lams[2], lam5=lams[5]],
+  ev(subst([grad(lam1)~grad(lam2)='v3,grad(lam1)~grad(lam5)=-'v2,
+    grad(lam2)~grad(lam5)='v1],
+    apply_repeatedly(vectorsimp,
+      (subst([lam3=1-lam1-lam5, lam4=1-lam2-lam5],fns)))),
+  v1:[1,0,0], v2:[0,1,0], v3:[0,0,1]))))$
+

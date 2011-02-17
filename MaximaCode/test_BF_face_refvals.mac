@@ -1,0 +1,17 @@
+load("test_BF_refvals")$
+
+get_face_edgefuns(edgefuns, faceno):=makelist(
+  edgefuns[i], i, local_faceedges[faceno])$
+
+face_perms:[[1,2,3,4],[1,2,4,3],[1,4,2,3],[4,1,2,3]]$
+perm_face_refval:lambda([refval, face_perm], makelist(refval[i],i,face_perm))$
+perm_face_refvals(refvals, face_perm):=map(lambda([refval],
+    perm_face_refval(refval, face_perm)), refvals)$
+make_face_refvals(face1_refvals, face_perms):=makelist(makelist(
+    perm_face_refvals(refvals, face_perm), refvals, face1_refvals),
+  face_perm, face_perms)$
+
+onef_efs_R1_face_refvals:make_face_refvals(make_refval_list(
+    get_face_edgefuns(onef_efs_R1,1), onef_refval, tri_1_lams),
+  face_perms)$
+

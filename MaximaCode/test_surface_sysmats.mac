@@ -1,0 +1,26 @@
+/*load("CommonSimplexStuff")$
+load("tet_intgration_utils")$
+load("SysmatUtils")$
+load("BasisFunction")$ */
+/* load("test_Tet_sysmats")$ */
+load("FlatTet")$
+
+
+remove_2D_depvars(bfs):=vectorsimp(ev(bfs, lam3:1-lam2-lam1))$
+get_f_edgefuns(bfs, f_edges):=makelist(bfs[i],i,f_edges)$
+get_f_facefuns(bfs, fno):=apply(append, bfs[fno])$
+
+faceno:1$
+f_edges:face_edges[faceno]$
+
+onef_R1_febfs:remove_2D_depvars(get_f_edgefuns(onef_efs_R1, f_edges))$
+onef_G1_febfs:remove_2D_depvars(get_f_edgefuns(onef_efs_G1, f_edges))$
+onef_G2_febfs:remove_2D_depvars(get_f_edgefuns(onef_efs_G2, f_edges))$
+onef_G3_febfs:remove_2D_depvars(get_f_edgefuns(onef_efs_G3, f_edges))$
+onef_G4_febfs:remove_2D_depvars(get_f_edgefuns(onef_efs_G4, f_edges))$
+onef_G5_febfs:remove_2D_depvars(get_f_edgefuns(onef_efs_G5, f_edges))$
+
+onef_R2_ffbf:remove_2D_depvars(get_f_facefuns(onef_ffs_R2, faceno))$
+onef_R3_ffbf:remove_2D_depvars(get_f_facefuns(onef_ffs_R3, faceno))$
+onef_R4_ffbf:remove_2D_depvars(get_f_facefuns(onef_ffs_R4, faceno))$
+onef_R5_ffbf:remove_2D_depvars(get_f_facefuns(onef_ffs_R5, faceno))$

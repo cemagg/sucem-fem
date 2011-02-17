@@ -1,0 +1,32 @@
+load("more_vect")$
+kill(x,y,z,u1,u2,u3,lam1,lam2,lam3,lam4,lam5,n0,n1,n2,n3,n4,g1,g2,g3,l1,l2,l3,r,r_u,J)$
+depends([x,y,z],[u1, u2, u3])$
+depends([lam1, lam2, lam3, lam4, lam5], [x,y,z])$
+declare([x,y,z,u1,u2,u3], scalar)$
+declare([lam1, lam2, lam3, lam4, lam5], scalar)$
+declare([n0,n1,n2,n3,n4], nonscalar)$
+declare([l1,l2,l3,g1,g2,g3], nonscalar)$
+declare([r,r_u], nonscalar)$
+declare(J, scalar)$
+
+/* Using zgainski96's node ordering convention */
+shapefns_z:factor(ev(1/4*[(1+uz1)*(1+uz2) - u3 + uz1*uz2*u3/(1-u3),
+                        (1+uz1)*(1-uz2) - u3 - uz1*uz2*u3/(1-u3),
+                        (1-uz1)*(1-uz2) - u3 + uz1*uz2*u3/(1-u3),
+                        (1-uz1)*(1+uz2) - u3 - uz1*uz2*u3/(1-u3),
+                        4*u3], uz1:2*u1-1+u3, uz2:2*u2-1+u3))$
+
+shapefns_z_l:block(
+  [shape_subs:[[], [lam2=1-lam4-lam5],
+   [lam1=1-lam3-lam5, lam2=1-lam4-lam5],
+   [lam1=1-lam3-lam5], []],
+   tl:subst([u1=lam1, u2=lam2, u3=lam5], shapefns_z)],
+  factor(makelist(subst(shape_subs[i], tl[i]), i, 1, 5)))$ 
+
+shapefns:makelist(shapefns_z[i], i, [3,4,2,1,5])$
+shapefns_l:makelist(shapefns_z_l[i], i, [3,4,2,1,5])$
+
+r:lreduce("+", makelist(shapefns_l[i]*concat('n,i-1), i, 1, 5))$
+r_u: ev(r, lam1:u1, lam2:u2, lam5:u3, lam3:1-u1-u3, lam4:1-u2-u3)$
+
+load("PyramCoordUtils")$

@@ -1,0 +1,13 @@
+symvert:matrix( 
+  [x1, y1, z1],
+  [x2, y2, z2],
+  [x3, y3, z3],
+  [x4, y4, z3])$
+
+xyz:[1, x, y, z]$
+
+tetmat:simplex_tetmat(symvert)$
+
+lambdas: lam_det(tetmat)$
+grd_lam:map("grad", fullratsimp(lambdas))$
+grd_lam:ev(express(grd_lam), diff)$

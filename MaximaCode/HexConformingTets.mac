@@ -1,0 +1,100 @@
+load("CommonSimplexStuff")$
+scalefactors([x,y,z])$ /* Set up Cartesian coordinate system */
+
+simplex_tetmat (tet_verts) :=
+  /* Return the simplex coefficient matrix
+
+  [[1, x1, y1, z1],
+   [1, x2, y2, z2],
+   [1, x3, y3, z3],
+   [1, x4, y4, z3]]
+
+  with x1 referring to the x-coordinate of the first simplex vertex.
+
+    inputs:
+
+   tet_verts -- List of tetrahedron's vertex co-ordinates
+    
+  */
+  block (local (coord_mat),
+     coord_mat [i,j] := tet_verts[i][j],
+     addcol (columnvector ([1,1,1,1]), genmatrix (coord_mat, 4, 3)))$
+
+lam_in(tetmat):=block([dot_commutative,lm],
+  noncommutative_dot_enter(),
+  lm:fullratsimp(invert(transpose(tetmat)).[1,x,y,z]),
+  noncommutative_dot_exit,
+  makelist(lm[i][1],i,1,length(lm)))$
+
+xyz(tet_verts):=makelist(concat(lam, i),i,1,4).tet_verts$
+
+get_grd_lams(tetmat):=ev(express(vectorsimp(map("grad", lam_in(tetmat)))), diff)$
+
+intg_tri1(fn):=integrate(fullratsimp(integrate(subst([z=0],fn), y, 0,ev(x/dx*dy))), x, 0, dx)$
+intg_tri2(fn):=integrate(fullratsimp(integrate(subst([z=0],fn), x, 0,ev(y/dy*dx))), y, 0, dy)$
+
+intg_rect(fns):=factor(intg_tri1(fns[1])+intg_tri2(fns[2]))$
+
+x1:0 $ y1:0 $
+n1:[x1,y1,0] $ n2:n1 + [0,dy,0] $ n3: n1 + [dx,0,0] $ n4: n1 + [dx,dy,0]$
+n5:[xa,ya,za]$
+declare([n1,n2,n3,n4,n5], nonscalar)$
+declare([x,y,z], scalar)$
+declare([x1,y1,dx,dy,xa,ya,za], scalar)$
+
+tet1_verts:[n1,n3,n4,n5] $ tet2_verts:[n1,n2,n4,n5]$
+
+tet1_mat:simplex_tetmat(tet1_verts) $ tet2_mat:simplex_tetmat(tet2_verts) $ 
+tet1_lams:lam_in(tet1_mat) $ tet2_lams:lam_in(tet2_mat)$
+tet1_gds:get_grd_lams(tet1_mat) $ tet2_gds:get_grd_lams(tet2_mat)$
+
+
+wx1: [tet1_lams[1]*tet1_gds[2] - tet1_lams[2]*tet1_gds[1], [0,0,0]]$
+wy1: [tet1_lams[2]*tet1_gds[3] - tet1_lams[3]*tet1_gds[2], [0,0,0]]$
+w0d: [tet1_lams[1]*tet1_gds[3] - tet1_lams[3]*tet1_gds[1],
+     tet2_lams[1]*tet2_gds[3] - tet2_lams[3]*tet2_gds[1]]$
+w1d: [tet1_lams[1]*tet1_gds[3] + tet1_lams[3]*tet1_gds[1],
+     tet2_lams[1]*tet2_gds[3] + tet2_lams[3]*tet2_gds[1]]$
+wx2: [[0,0,0], tet2_lams[2]*tet2_gds[3] - tet2_lams[3]*tet2_gds[2]]$
+wy2: [[0,0,0], tet2_lams[1]*tet2_gds[2] - tet2_lams[2]*tet2_gds[1]]$
+
+assume(dx >0) $ assume(dy > 0)$
+lx: n1-n3 $ lx: sqrt(lx.lx) $
+ly: n1-n2 $ ly: sqrt(ly.ly) $
+ld: n4-n1 $ ld: sqrt(ld.ld) $
+
+wx1_m:wx1 + a0*w0d + a1*w1d$
+wx2_m:wx2 + b0*w0d + b1*w1d$
+wy1_m:wy1 + c0*w0d + c1*w1d$
+wy2_m:wy2 + d0*w0d + d1*w1d$
+
+wbx1_o: (1-y/dy)*(1-z)*[1/dx,0,0] $ wbx2_o:y/dy*(1-z)*[1/dx,0,0]$
+wby1_o:x/dx*(1-z)*[0,1/dy,0] $ wby2_o: (1-x/dx)*(1-z)*[0,1/dy,0]$
+wbx1:[wbx1_o, wbx1_o] $ wbx2:[wbx2_o, wbx2_o]$
+wby1:[wby1_o, wby1_o] $ wby2:[wby2_o, wby2_o]$
+
+n:express((n3-n1)~(n4-n3)) $ n:n/sqrt(n.n)$
+cross_n(fn):=express(n~fn)$
+dot(exa, exb):=[exa[1].exb[1], exa[2].exb[2]]$
+face_tang(fn):=ev(map(cross_n, fn), z:0)$
+
+t_wbx1: face_tang(wbx1)$
+t_wbx2: face_tang(wbx2)$
+t_wby1: face_tang(wby1)$
+t_wby2: face_tang(wby2)$
+
+t_wx1_m: face_tang(wx1_m)$
+t_wx2_m: face_tang(wx2_m)$
+t_wy1_m: face_tang(wy1_m)$
+t_wy2_m: face_tang(wy2_m)$
+eqns:apply(append, apply(
+    append, [t_wbx1-t_wx1_m, t_wbx2-t_wx2_m, t_wby1-t_wy1_m, t_wby2-t_wy2_m]))$
+
+soln:solve(eqns, [a0,a1,b0,b1,c0,c1,d0,d1])$
+
+tet_integrator(fn):= integrate(
+  integrate(
+    integrate(fn, lam3, 0, 1-lam1-lam2),
+    lam2, 0, 1-lam1),
+  lam1, 0, 1)$
+

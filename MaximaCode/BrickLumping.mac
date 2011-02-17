@@ -1,0 +1,42 @@
+load("HexaBasisFunction")$
+load("BrickCoords")$
+load("BrickSysmatUtils")$
+
+
+gs_x:1 $ gs_y:2 $ gs_z:3 $
+
+unit_sublis:[grad(lam1)=[1/gs_x,0,0], grad(lam2)=[0,1/gs_y,0], grad(lam3)=[0,0,1/gs_z]]$
+BFs:subst(unit_sublis, remove_dep_vars(onef_efs))$
+BFs_D:express(subst(unit_sublis, remove_dep_vars(vectorsimp(D_onef_efs))))$
+
+twof_BFs:express(subst(unit_sublis, remove_dep_vars(twof_ffs)))$
+
+J:matrix([gs_x,0,0], [0,gs_y,0], [0,0,gs_z])$
+M:make_locmat(BFs, J)$
+S:make_locmat(BFs_D, J)$
+
+trapz_pts:listify(cartesian_product({lam1=0,lam1=1},{lam2=0,lam2=1},{lam3=0,lam3=1}))$
+trapz_integrator(fn):=1/8*lreduce("+", map(lambda([trapz_pt], subst(trapz_pt, fn)),
+    trapz_pts))$
+make_locmat_trapz(BFlist, J):=make_locmat_generic(BFlist, J, trapz_integrator)$
+make_proj_locmat_trapz(BFlist_i, BFlist_j, J):=make_proj_locmat_generic(
+  BFlist_i, BFlist_j, J, trapz_integrator)$
+M_trapz:make_locmat_trapz(BFs, J)$
+S_trapz:make_locmat_trapz(BFs_D, J)$
+
+noncommutative_dot_enter()$
+
+M_b:make_locmat(twof_BFs, J)$
+P_mu:make_proj_locmat(BFs_D, twof_BFs, J)$
+noncommutative_dot_enter()$
+S_P_mu_M_b:P_mu.(M_b^^-1).transpose(P_mu)$
+C:(M_b^^-1).transpose(P_mu)$
+
+
+M_b_trapz:make_locmat_trapz(twof_BFs, J)$
+P_mu_trapz:make_proj_locmat_trapz(BFs_D, twof_BFs, J)$
+S_P_mu_M_b_trapz:P_mu_trapz.(M_b_trapz^^-1).transpose(P_mu_trapz)$
+C_trapz:(M_b_trapz^^-1).transpose(P_mu_trapz)$
+
+
+noncommutative_dot_exit()$

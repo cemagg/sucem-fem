@@ -1,0 +1,126 @@
+/* Testing Galerkin Projection of known function onto BFs */
+
+domain:complex$
+load("test_sysmats")$
+load("FlatTet")$
+local_RHS(tet_verts, basis_set, proj_fun):=block(
+  [vol:tet_vol(tet_verts), verts:tet_verts, tmp],
+  tmp:map(
+    lambda([bf],
+      intg_simplex_fun_tet2(
+        lambda([lam],
+          /* lam.verts gets x,y,z i.t.o. the simplex coordinates */
+          bf_gen_tet(tet_verts, bf)(lam).proj_fun(lam.verts)))*vol
+        ), basis_set),
+    map(lambda([x], fullratsimp(trigreduce(expand(ev(x, demoivre:true))))), tmp)
+    )$
+
+mag_squared:lambda([vec], vec.vec)$
+err_intg(tets, mesh_verts, reconstructed, match_fun):=
+lreduce("+", makelist(tet_vol(get_verts(tets[el_no], mesh_verts))*intg_simplex_fun_tet2(
+      lambda([lam_], ev(mag_squared(
+            reconstructed[el_no] - match_fun(lam.get_verts(tets[el_no], mesh_verts))),
+          lam:lam_))),
+    el_no, 1, length(tets)))$
+
+reconstruct_el:lambda([elmap, tet, mesh_verts, basis_set, DOFs], lreduce("+",
+    makelist(DOFs[elmap[i]]*bf_gen_tet2(get_verts(tet, mesh_verts), basis_set[i]),
+      i, 1, length(basis_set))
+    ))$
+reconstruct(tets, mesh_verts, basis_set, el_dofmaps, DOFs):=makelist(fullratsimp(
+    reconstruct_el(el_dofmaps[el_no], tets[el_no], mesh_verts, basis_set, DOFs))
+  ,el_no, 1, length(tets))$
+
+
+match_fun: lambda([r], [%e^(-%i*k*r[3]), 0, 0])$
+match_fun_k1: lambda([r], [rectform(%e^(-%i*r[3])), 0, 0])$
+tet:tets[1]$
+tet_verts:get_verts(tet, mesh_verts)$
+basis_set:to_var_list(onef_efs_R1)$
+RHS:local_RHS(tet_verts, basis_set, match_fun)$
+RHS_r:bfloat(realpart(factor(RHS))), k:1, fpprec:32$
+RHS_i:bfloat(imagpart(factor(RHS))), k:1, fpprec:32$
+
+load("TwoTets.mac")$
+mass_mat: calc_self_proj_mat(matinfos[1], tets, mesh_verts)[2]$
+basis_set: onef_1_mixed_bfs$
+print("loc_RHSs")$
+loc_RHSs: map(lambda([tet], matrix(local_RHS(get_verts(tet, mesh_verts), basis_set, match_fun))),
+  tets), k:1$
+print("loc_RHSs done")$
+glob_RHS: make_global(loc_RHSs, "+", [[1], [1]], onef_dofmap_1_mixed)$
+glob_RHS_r:bfloat(realpart(factor(glob_RHS[1]))), k:1, fpprec:32$
+glob_RHS_i:bfloat(imagpart(factor(glob_RHS[1]))), k:1, fpprec:32$
+solved: expand(bfloat(expand(mass_mat^^-1 . glob_RHS))), k:1, fpprec:32$
+
+el_dofmaps:onef_dofmap_1_mixed$
+all_doflen:twoDmax(el_dofmaps)$
+DOFs:makelist(i, i, 1, all_doflen) + %i*makelist(all_doflen-i,i,1,all_doflen)$
+
+reconstructed:reconstruct(tets, mesh_verts, basis_set, el_dofmaps, DOFs)$
+
+RMS_err:bfloat(sqrt(abs(rectform(
+        err_intg(tets, mesh_verts, reconstructed, match_fun_k1))))), fpprec:32$
+
+grd_symb:makelist(makelist(concat('gl, i, j), j, 1, 3), i, 1, 4)$
+reconstruct_el_symb:lambda([basis_set], lreduce("+",
+    makelist(concat(eldof, i)*bf_gen2(grd_symb, basis_set[i]),
+      i, 1, length(basis_set))
+    ))$
+
+calc_grads:lambda([tets, mesh_verts],
+  ev(express(
+      makelist(map("grad", fullratsimp(lam_det(simplex_tetmat(get_verts(tet, mesh_verts))))),
+        tet, tets)), diff))$
+
+sym_verts:makelist(makelist(concat('v, i, j), j, 1, 3), i, 1, 4)$
+err_intg_symb(el_recon_symb, match_fun):=intg_simplex_fun_tet2(
+      lambda([lam_], ev(mag_squared(
+            el_recon_symb - match_fun(lam.sym_verts)),
+          lam:lam_)))$
+sym_reconstructed:reconstruct_el_symb(basis_set)$
+sym_err:err_intg_symb(sym_reconstructed, match_fun_k1)$
+print("rectforming sym_err")$
+sym_err:rectform(sym_err)$
+
+cgs:calc_grads(tets, mesh_verts)$
+
+sub_tet(tet_verts, grd_lam, sym_err, DOFs):=block([
+  subs:append(makelist(concat('eldof,i)=DOFs[i],i,1,length(DOFs)),
+      apply(append, makelist(makelist(
+            concat('gl, i, j)=grd_lam[i][j], j, 1, 3), i, 1, 4)))],
+    subst(subs, sym_err))$
+
+
+load("+exportmesh.mac")$
+imp_reconstructed:reconstruct(tets, mesh_verts, basis_set, dofmap, DOFs)$
+err_f:makelist(mag_squared(ev(imp_reconstructed[el_no] -
+      match_fun_k1(lam.get_verts(tets[el_no], mesh_verts)),
+      lam:[x1,x2,x3,1-x1-x2-x3])),
+  el_no, 1, length(tets))$
+tet_vols:makelist(tet_vol(get_verts(tets[el_no], mesh_verts)), el_no, 1, length(tets))$
+
+/*
+tet_errs:makelist(intg_fun_tet3(err_f[el_no])*tet_vols[el_no], el_no, 1, length(tets))$
+err:sqrt(expand(abs(lreduce("+", tet_errs))))$
+*/
+/*
+r:err_intg(tets, mesh_verts, reconstructed, ev(match_fun, k:1))
+
+r:err_intg(tets, mesh_verts, reconstructed_symb, match_fun_k1)$
+r:expand(r)$
+r:rectform(r)$
+
+%i*sin((34037595938027*x3)/6154596958582590-(863833069661327*x2)/6222711301569210-(863833069661327*x1)/6222711301569210-99614657/338602740)*x3
+
+
+
+*/
+
+/*
+
+intg_simplex_fun_tet2(lambda([lam_],mag_squared(ev(reconstructed_imp[el_no] - match_fun_k1(lam.get_verts(tets[el_no], mesh_verts)),lam:lam_))))
+
+f:lambda([lam_], ev(reconstructed_imp[el_no] - match_fun_k1(lam.get_verts(tets[el_no], mesh_verts)),  lam:lam_, el_no:1))
+
+*/

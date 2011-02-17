@@ -1,0 +1,38 @@
+load("zgainski_shapefun")$
+load("SixPyram")$
+load("SysmatUtils")$
+
+intg_pyr(fn):=integrate(integrate(integrate(fn,u1,0,1-u3),u2,0,1-u3),u3,0,1)$
+
+make_locmat(BFlist, J):=make_locmat_generic(BFlist, J, intg_pyr)$
+make_locmats(BFlist, pyr_verts):=makelist(
+  make_locmat(subs_verts(BFlist, verts), subs_verts(J, verts)), verts, pyr_verts)$
+
+/*vol: integrate(integrate(integrate(subs_verts(J, el_ verts[1]),u1,0,1-u3),u2,0,1-u3),u3,0,1)$*/
+ 
+
+/*
+tst_fns_u:makelist(subs_u(subs_grds_lam(fn)), fn, onef_efs)$
+D_tst_fns_u:makelist(subs_u(subs_grds_lam(fn)), fn, D_onef_efs)$
+*/
+
+
+test_elverts:el_verts[1]$
+
+el_J:subs_verts(J, test_elverts)$
+el_r:subs_verts(r, test_elverts)$
+el_ru:subs_verts(r_u, test_elverts)$
+el_l:makelist(subs_verts(lfn, test_elverts), lfn, [l1,l2,l3])$
+el_g:makelist(subs_verts(gfn, test_elverts), gfn, [g1,g2,g3])$
+
+
+edges: subs_verts([e1,e2,e3,e4,e5,e6,e7,e8], test_elverts)$
+
+
+N1:shapefns_z[1]$ /*node 4 for my convention */
+N1_g:post_crl_simplify(grad(N1))$
+el_N1_g:subs_verts(subs_grds(N1_g), test_elverts)$
+N5:shapefns_z[5]$
+N5_g:post_crl_simplify(grad(N5))$
+el_N5_g:subs_verts(g3, test_elverts)$
+el_e8_fn:N1*el_N5_g - N5*el_N1_g$

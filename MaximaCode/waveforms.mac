@@ -1,0 +1,13 @@
+ft(expr,t,f):=integrate(expr*exp(-%i*2*%pi*f*t),t,-inf,inf)$
+
+gpulse:%e^(-(t-m)^2/(2*sigma^2))$
+d_gpulse: -((t-m)*%e^(-(t-m)^2/(2*sigma^2)))/sigma^2$
+d_d_gpulse: ((t-m)^2/sigma^4-1/sigma^2)*%e^(-(t-m)^2/(2*sigma^2))$
+assume(sigma > 0)$
+
+/* Calculate sigma for a given center frequency */
+d_gpulse_sigma_fc(fc):=1/2/%pi/fc$
+
+for p in ['gpulse, 'd_gpulse, 'd_d_gpulse] do (
+  concat(p, _ft)::trigsimp(abs(ft(ev(ev(p), m:0), t, f))))$
+

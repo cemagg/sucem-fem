@@ -1,0 +1,24 @@
+load("more_vect")$
+
+declare([n1,n2,n3, n4],nonscalar)$
+declare([lam1,lam2,lam3,lam4], scalar)$
+depends([x,y,z], [u1,u2,u3])$
+
+n1:[0,0,0]$
+n2:[nx,0,0]$
+n3:[0,ny,0]$
+n4:[0,0,nz]$
+
+lam1:u1$ lam2:u2$ lam3:u3$
+lam4:1-lam1-lam2-lam3$
+
+r:lam1*n1 + lam2*n2 + lam3*n3 + lam4*n4$
+
+l1: diff(r, u1)$
+l2: diff(r, u2)$
+l3: diff(r, u3)$
+J:fullratsimp(express(l1.(l2~l3)))$
+
+g1:express(l2~l3)/J$
+g2:express(l3~l1)/J$
+g3:express(l1~l2)/J$

@@ -1,0 +1,46 @@
+mesh_verts:matrix([-1/2,  1/2, -1/2],
+                  [ 1/2,  1/2,  1/2],
+                  [ 1/2, -1/2, -1/2],
+                  [-1/2, -1/2,  1/2],
+                  [-1/2, -1/2, -1/2])$
+
+edge_verts:[[1, 2],
+            [1, 3],
+            [1, 4],
+            [2, 3],
+            [2, 4],
+            [3, 4],
+            [1, 5],
+            [3, 5],
+            [4, 5]]$
+
+face_verts:[[1, 2, 3],
+            [1, 2, 4],
+            [1, 3, 4],
+            [2, 3, 4],
+            [1, 3, 5],
+            [1, 4, 5],
+            [3, 4, 5]]$
+
+face_centroids:makelist(lreduce("+", get_verts(fverts, mesh_verts))/3,
+  fverts, face_verts)$
+
+
+edge_vecs:makelist(get_edge_vec(e, mesh_verts), e, edge_verts)$
+
+tets:[[1,2,3,4],
+[1,3,4,5]]$
+
+tet_faces:[[1, 2, 3, 4],
+           [3, 5, 6, 7]]$
+face_tets:[[1], [1], [1, 2], [1], [2], [2], [2]]$
+outward_normals: makelist(get_outward_normals(get_verts(tet, mesh_verts)), tet, tets)$
+
+boundary_faces:[1, 2, 4, 5, 6, 7]$
+boundary_face_outward_normals:makelist([0,0,0], i, 1, length(face_verts))$
+for tet_i:1 thru length(tets) do(
+  for tet_face_e in enumerate(tet_faces[tet_i]) do(block(
+      [loc_face_no:tet_face_e[1], faceno:tet_face_e[2]],
+      if member(faceno, boundary_faces) then(
+        boundary_face_outward_normals[faceno]:outward_normals[tet_i][loc_face_no])))
+  )$

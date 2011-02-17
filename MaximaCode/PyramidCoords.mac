@@ -1,0 +1,24 @@
+load("more_vect")$
+kill(x,y,z,u1,u2,u3,lam1,lam2,lam3,lam4,lam5,n0,n1,n2,n3,n4,g1,g2,g3,l1,l2,l3,r,r_u,J)$
+depends([x,y,z],[u1, u2, u3])$
+depends([lam1, lam2, lam3, lam4, lam5], [x,y,z])$
+declare([x,y,z,u1,u2,u3], scalar)$
+declare([lam1, lam2, lam3, lam4, lam5], scalar)$
+declare([n0,n1,n2,n3,n4], nonscalar)$
+declare([l1,l2,l3,g1,g2,g3], nonscalar)$
+declare([r,r_u], nonscalar)$
+declare(J, scalar)$
+
+shapefns: [lam3*lam4/(1-lam5), lam2*lam3/(1-lam5), lam1*lam4/(1-lam5),
+           lam1*lam2/(1-lam5), lam5]$
+shapefns_l:shapefns$
+shapefns_u:ev(shapefns, lam1:u1, lam2:u2, lam5:u3, lam3:1-u1-u3, lam4:1-u2-u3)$
+
+r:(shapefns[4]*n3 + shapefns[3]*n2  + shapefns[1]*n0 + shapefns[2]*n1
+  + shapefns[5]*n4)$
+
+r_u: ev(r, lam1:u1, lam2:u2, lam5:u3, lam3:1-u1-u3, lam4:1-u2-u3)$
+
+
+
+load("PyramCoordUtils")$

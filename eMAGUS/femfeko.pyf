@@ -1,0 +1,751 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module femfeko ! in 
+    interface  ! in :femfeko
+        module nrtype ! in :femfeko:nrtype.f90
+            integer parameter,optional :: sp=4
+            real(kind=4) parameter,optional :: eps_0=8.8541878176e-12
+            complex(kind=4) parameter,optional :: j=(0.0, 1.0)
+            integer parameter,optional :: i4b=selected_int_kind(9)
+            real(kind=4) parameter,optional :: z_zero=376.73
+            integer parameter,optional :: spc=4
+            integer parameter,optional,depend(i4b) :: ptr=4
+            integer parameter,optional :: lgt=4
+            real(kind=4) parameter,optional :: c_0=299792500.0
+            real(kind=4) parameter,optional,depend(pi) :: d2r=0.0174532925199
+            real(kind=4) parameter,optional :: eps=1e-05
+            real(kind=4) parameter,optional,depend(pi) :: mu_0=1.25663706144e-06
+            complex(kind=4) parameter,optional :: zero_c=(0.0, 0.0)
+            integer parameter,optional :: dpc=8
+            integer parameter,optional :: dp=8
+            real(kind=4) parameter,optional,depend(pi) :: r2d=57.2957795131
+            integer parameter,optional :: i2b=selected_int_kind(4)
+            real(kind=4) parameter,optional :: pi=3.14159265359
+            integer parameter,optional :: i1b=selected_int_kind(2)
+        end module nrtype
+        module problem_info ! in :femfeko:problem_info.f90
+            use debugvar
+            use nrtype
+            logical(kind=4) :: cmplx_eigen_analysis
+            logical(kind=4) :: bandrenum
+            logical(kind=4) :: coax_whitney
+            integer(kind=4) :: max_boundaries
+            integer(kind=4) :: max_edges
+            logical(kind=4) :: real_eigen_analysis
+            integer(kind=4) :: hierarchal_order
+            logical(kind=4) parameter,optional :: max_present_mixed=.false.
+            logical(kind=4) :: compute_eigenmodes
+            logical(kind=4) :: mixed_order_flag
+            character(len=8) parameter,optional :: revision_number='patch-14'
+            integer(kind=4) parameter,optional :: optionlength=60
+            logical(kind=4) :: gw_compute_s_params
+            logical(kind=4) :: bandrenum_store
+            logical(kind=4) :: curvilinear
+            logical(kind=4) :: coupled_td_analysis
+            integer(kind=4) parameter,optional :: max_quad_tri_rules=25
+            logical(kind=4) :: on_screen_reporting
+            logical(kind=4) :: gw_analysis
+            integer(kind=4) :: max_nodes
+            logical(kind=4) :: adaptive_analysis
+            logical(kind=4) :: all_curvilinear
+            logical(kind=4) :: fd_scat_analysis
+            integer(kind=4) parameter,optional :: elem_tet_matrix_size=30
+            logical(kind=4) :: pec_ground
+            logical(kind=4) :: cbaa_analysis
+            integer(kind=4) :: max_faces
+            integer(kind=4) parameter,optional :: max_present_order=2
+            integer(kind=4) parameter,optional :: elem_tri_matrix_size=12
+            logical(kind=4) :: sparse
+            logical(kind=4) :: scale_by_edge_length
+            logical(kind=4) :: td_analysis
+            character(len=8) parameter,optional :: last_changed='20050422'
+            integer(kind=4) :: analysis_counter
+            integer(kind=4) parameter,optional :: filenamelength=128
+            logical(kind=4) :: output_element_data
+            logical(kind=4) :: write_mesh
+            logical(kind=4) :: output_element_shape
+            logical(kind=4) :: execute
+            logical(kind=4) :: use_pre_conditioner
+            integer(kind=4) :: max_elements
+            character(len=24) parameter,optional :: version_number='1.00--neilen-0.0'
+            logical(kind=4) :: cubature
+            integer(kind=4) :: element_type
+            integer(kind=4) :: max_ports
+            integer(kind=4) :: solver_type
+            integer(kind=4) :: num_analysis
+            integer(kind=4) parameter,optional :: run_label_num_lines=5
+            integer(kind=4) parameter,optional :: run_label_line_length=78
+        end module problem_info
+        module femfeko ! in :femfeko:femfeko.f90
+            use probe_feed
+            use adaptive_fem
+            use problem_info
+            use feminterface,,only: iter_solve,fd_scat_pre_x_vec,input_element_orders,assign_face_and_edge_orders,fd_scat_bvector_tot,td_sysmat,eigen_sysmat,td_matrix_allocate,number_dof,fd_scat_matrix_allocate,td_timestep,control_adaptive,fd_scat_inc_scat,direct_solve,fd_scat_bvector_scat,mesh_info_write,reorder
+            use inc_field
+            use quad_tables
+            use gw_data
+            use coax_feed
+            use cbaa_data
+            use cbaa_sys,,only: cbaa_boundary_search,cbaa_matrix_allocate,cbaa_make_coax_bvector,coax_boundary_search,cbaa_preprocessing,cbaa_count_aperture_dofs,cbaa_sysmat
+            use parseinput,,only: mesh_format=>mesh_type
+            use gw_sys,,only: port_boundary_search,gw_matrix_allocate,gw_preprocessing,gw_sysmat
+            use output_error
+            use math_tools,,only: time_difference
+            use far_field_data
+            use unit_numbers
+            use matrix
+            use frequency_data
+            use geometry
+            use output_data
+            use boundary_conditions
+            use scattering_analysis_data
+            use eigen_analysis_data
+            use near_field_data
+            use nrtype
+            use material_properties
+            real(kind=4) :: admin_time
+            real(kind=4) :: reading_time
+            integer(kind=4) :: debug_counter
+            real(kind=4) :: fe_time
+            integer(kind=4) :: theta_total_points
+            real(kind=4) :: t_pw
+            integer(kind=4) :: kedge
+            integer(kind=4) :: phi_total_points
+            integer(kind=4) dimension(8) :: time_start
+            real(kind=4) :: e_pwe
+            real(kind=4) :: ff_time
+            real(kind=4) :: phase_pw
+            integer(kind=4) dimension(8) :: time1
+            integer(kind=4) dimension(8) :: time2
+            integer(kind=4) :: freqcount
+            real(kind=4) :: timer3
+            character(len=78) dimension(5) :: run_label
+            real(kind=4) :: mag_pwe
+            integer(kind=4) :: analysis_count
+            real(kind=4) :: postcalc_time
+            real(kind=4) :: timer2
+            real(kind=4) :: total_time
+            real(kind=4) :: matbuild_time
+            integer(kind=4) :: ios
+            real(kind=4) :: solution_time
+            integer(kind=4) :: bw
+            integer(kind=4) :: jj
+            character(len=128) :: infilename
+            real(kind=4) :: geoprocess_time
+            integer(kind=4) :: cardj
+            integer(kind=4) :: cardi
+            real(kind=4) :: p_pw
+            integer(kind=4) :: cardcount
+            integer(kind=4) :: k
+            real(kind=4) :: exbuild_time
+            integer(kind=4) :: port_counter
+            integer(kind=4) dimension(2) :: excitation_counters
+            integer(kind=4) :: debug_temp
+            integer(kind=4) :: s
+            integer(kind=4) dimension(8) :: time_finish
+            integer(kind=4) :: max_analysis_loop
+            real(kind=4) :: temp_time
+            subroutine run_femfeko ! in :femfeko:femfeko.f90:femfeko
+            end subroutine run_femfeko
+        end module femfeko
+        module geometry ! in :femfeko:geometry.f90
+            use nrtype
+            use output_error,,only: error_femfeko
+            use scattering_analysis_data,,only: sph_radius
+            use problem_info
+            use math_tools,,only: find_in_list,cross_product,det_dim3,det_dim4
+            use unit_numbers
+            integer(kind=4) parameter,optional :: homog_medium=1
+            integer(kind=4) allocatable,dimension(:,:) :: faceconnectelem
+            integer(kind=4) :: num_edges
+            integer(kind=4) :: num_elements
+            real(kind=4) :: avg_edge_length
+            integer(kind=4) :: num_nodes
+            integer(kind=4) :: num_bcs
+            integer(kind=4) allocatable,dimension(:,:) :: edgeconnectelem
+            integer(kind=4) allocatable,dimension(:) :: node_ind
+            integer(kind=4) allocatable,dimension(:) :: node_ptr
+            integer(kind=4) allocatable,dimension(:,:) :: faceconnectface
+            logical(kind=4) :: pml_present
+            integer(kind=4) :: num_faces
+            integer(kind=4) allocatable,dimension(:,:) :: edgeconnectedge
+            type meshinfo_type ! in :femfeko:geometry.f90:geometry
+                integer(kind=4) :: num_nodes
+                integer(kind=4) :: num_elements
+                integer(kind=4) :: num_edges
+                integer(kind=4) :: num_pec_edges
+                integer(kind=4) :: num_faces
+                integer(kind=4) :: num_pec_faces
+                integer(kind=4) :: num_bcs
+            end type meshinfo_type
+            type element_info_type ! in :femfeko:geometry.f90:geometry
+                integer(kind=4) :: num
+                integer(kind=4) :: order
+                logical(kind=4) :: mixed_order
+            end type element_info_type
+            type vertex ! in :femfeko:geometry.f90:geometry
+                real(kind=8) dimension(3) :: coord
+                integer(kind=4) :: bc_type
+                logical(kind=4) :: free
+            end type vertex
+            type element ! in :femfeko:geometry.f90:geometry
+                integer(kind=4) dimension(4) :: nodes
+                integer(kind=4) :: order
+                logical(kind=4) :: mixed
+                integer(kind=4) :: material
+                integer(kind=4) dimension(6) :: edges
+                integer(kind=4) dimension(4) :: faces
+                integer(kind=4) dimension(4) :: connect2elem
+                integer(kind=4) dimension(4) :: connect2face
+                integer(kind=4) dimension(4) :: hash
+                real(kind=4) :: residual
+                real(kind=4) :: sigma_x
+                real(kind=4) :: sigma_y
+                real(kind=4) :: sigma_z
+                real(kind=4) :: se_x
+                real(kind=4) :: se_y
+                real(kind=4) :: se_z
+                real(kind=4) :: te_x
+                real(kind=4) :: te_y
+                real(kind=4) :: te_z
+                integer(kind=4) dimension(6) :: mid_point_nodes
+            end type element
+            type edge ! in :femfeko:geometry.f90:geometry
+                integer(kind=4) dimension(2) :: nodes
+                integer(kind=4) :: order
+                logical(kind=4) :: mixed
+                logical(kind=4) :: coax_aperture
+                integer(kind=4) :: coaxnumber
+                logical(kind=4) :: free
+                logical(kind=4) :: scat_tot_boundary
+                logical(kind=4) :: pec
+                logical(kind=4) :: cbaa_aperture
+                logical(kind=4) :: dirichlet
+                logical(kind=4) :: port
+                integer(kind=4) :: portnumber
+                logical(kind=4) :: abc
+                integer(kind=4) :: abcnumber
+            end type edge
+            type face ! in :femfeko:geometry.f90:geometry
+                integer(kind=4) dimension(3) :: nodes
+                integer(kind=4) :: order
+                logical(kind=4) :: mixed
+                logical(kind=4) :: coax_aperture
+                integer(kind=4) :: coaxnumber
+                logical(kind=4) :: free
+                logical(kind=4) :: scat_tot_boundary
+                logical(kind=4) :: curvilinear
+                logical(kind=4) :: pec
+                logical(kind=4) :: cbaa_aperture
+                logical(kind=4) :: dirichlet
+                logical(kind=4) :: port
+                integer(kind=4) :: portnumber
+                real(kind=4) :: residual
+                logical(kind=4) :: abc
+                integer(kind=4) :: abcnumber
+            end type face
+            type bc ! in :femfeko:geometry.f90:geometry
+                real(kind=4) dimension(4,3) :: corner
+                integer(kind=4) :: type_bn
+                integer(kind=4) :: port_num
+                integer(kind=4) :: abc_num
+            end type bc
+            type perfectlymatchedlayer ! in :femfeko:geometry.f90:geometry
+                integer(kind=4) :: m
+                real(kind=4) :: sigma_max
+                real(kind=4) :: thickness
+                logical(kind=4) :: absorb_x
+                logical(kind=4) :: absorb_y
+                logical(kind=4) :: absorb_z
+                logical(kind=4) :: full
+                real(kind=4) :: x_min
+                real(kind=4) :: y_min
+                real(kind=4) :: z_min
+                real(kind=4) :: x_plus
+                real(kind=4) :: y_plus
+                real(kind=4) :: z_plus
+            end type perfectlymatchedlayer
+            function gradient_lambda(element_num,normalize) ! in :femfeko:geometry.f90:geometry
+                use problem_info
+                use math_tools,,only: det_dim3
+                use unit_numbers
+                use nrtype
+                integer(kind=4) intent(in) :: element_num
+                logical(kind=4) intent(in) :: normalize
+                real(kind=4) dimension(4,3) :: gradient_lambda
+            end function gradient_lambda
+            function simplex_coordinates(element_num,x,y,z) ! in :femfeko:geometry.f90:geometry
+                use problem_info
+                use output_error,,only: error_femfeko
+                use unit_numbers
+                use nrtype
+                integer(kind=4) intent(in) :: element_num
+                real(kind=4) intent(in) :: x
+                real(kind=4) intent(in) :: y
+                real(kind=4) intent(in) :: z
+                real(kind=4) dimension(4) :: simplex_coordinates
+            end function simplex_coordinates
+            function xyz_coordinates(element_num,lambda) ! in :femfeko:geometry.f90:geometry
+                use output_error,,only: error_femfeko
+                use unit_numbers
+                use nrtype
+                integer(kind=4) intent(in) :: element_num
+                real(kind=4) dimension(4),intent(in) :: lambda
+                real(kind=4) dimension(3) :: xyz_coordinates
+            end function xyz_coordinates
+            function xyz_to_elnum(xco,yco,zco) ! in :femfeko:geometry.f90:geometry
+                use nrtype
+                real(kind=4) intent(in) :: xco
+                real(kind=4) intent(in) :: yco
+                real(kind=4) intent(in) :: zco
+                integer(kind=4) :: xyz_to_elnum
+            end function xyz_to_elnum
+        end module geometry
+        subroutine fem_fieldcalc(xob,yob,zob,e_xyz,h_xyz,eigen_mode) ! in :femfeko:post_pro.f90
+            use matrix
+            use nrtype
+            use basis_function,,only: evaluate_elemental_functions
+            use geometry
+            use scattering_analysis_data
+            use problem_info
+            use feminterface,,only: local_to_global_index_tet,local_to_global_index_pre_tet
+            real(kind=4) intent(in) :: xob
+            real(kind=4) intent(in) :: yob
+            real(kind=4) intent(in) :: zob
+            complex(kind=4) dimension(3),intent(out) :: e_xyz
+            complex(kind=4) dimension(3),intent(out) :: h_xyz
+            integer(kind=4) optional,intent(in) :: eigen_mode
+        end subroutine fem_fieldcalc
+        module adaptive_fem ! in :femfeko:datastrc.f90
+            use nrtype
+            real(kind=4) allocatable,dimension(:) :: residuals_elements
+            real(kind=4) allocatable,dimension(:) :: diameters_elements
+            real(kind=4) allocatable,dimension(:) :: diameters_faces
+            real(kind=4) allocatable,dimension(:) :: error_indicators
+            real(kind=4) allocatable,dimension(:) :: residuals_faces
+            integer(kind=4) allocatable,dimension(:) :: sorted_order
+            integer(kind=4) allocatable,dimension(:) :: error_level_flags
+            type ad_card_record ! in :femfeko:datastrc.f90:adaptive_fem
+                integer(kind=4) :: file_orders
+                integer(kind=4) :: analysis_type
+                integer(kind=4) :: upgrade_type
+                real(kind=4) :: relative_res
+                real(kind=4) :: frac_upgrade
+            end type ad_card_record
+        end module adaptive_fem
+        module bandwidth ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) :: ku
+            integer(kind=4) :: kl
+        end module bandwidth
+        module boundary_conditions ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) :: num_abcs
+            integer(kind=4) :: a9_counter
+            integer(kind=4) :: ab_counter
+            integer(kind=4) :: num_ports
+            integer(kind=4) :: num_a9_cards
+            integer(kind=4) :: num_dpoints
+            integer(kind=4) :: dp_counter
+            type port ! in :femfeko:datastrc.f90:boundary_conditions
+                integer(kind=4) :: bc_number
+                integer(kind=4) :: type_bn
+                complex(kind=4) :: excitation
+                real(kind=4) :: a
+                real(kind=4) :: b
+                real(kind=4) :: x0
+                real(kind=4) :: y0
+                real(kind=4) :: z_coord
+                real(kind=4) dimension(3) :: normal
+                real(kind=4) dimension(3) :: tangent
+                real(kind=4) dimension(4,4) :: t
+                real(kind=4) dimension(4,4) :: t_inv
+            end type port
+            type abc ! in :femfeko:datastrc.f90:boundary_conditions
+                integer(kind=4) :: label
+                integer(kind=4) :: bc_num
+                integer(kind=4) :: type_bn
+                real(kind=4) dimension(3) :: normal
+                real(kind=4) :: yc
+                real(kind=4) :: r
+            end type abc
+            type cubicbox ! in :femfeko:datastrc.f90:boundary_conditions
+                character(len=5) :: s1
+                character(len=5) :: s2
+            end type cubicbox
+            type dpoint ! in :femfeko:datastrc.f90:boundary_conditions
+                character(len=5) :: name
+                real(kind=4) dimension(3) :: coords
+            end type dpoint
+            type a9_card_record ! in :femfeko:datastrc.f90:boundary_conditions
+                integer(kind=4) :: anfl
+                integer(kind=4) :: port_num
+                integer(kind=4) :: port_type
+                real(kind=4) :: re_excitation
+                real(kind=4) :: im_excitation
+                real(kind=4) dimension(3) :: normal
+                real(kind=4) dimension(3) :: tangent
+                integer(kind=4) :: analysis_no
+            end type a9_card_record
+        end module boundary_conditions
+        module cbaa_data ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) :: l_max
+            integer(kind=4) allocatable,dimension(:) :: gr_matindex
+            integer(kind=4) :: gr_num
+            integer(kind=4) :: num_apelements
+            real(kind=4) :: d_max
+            integer(kind=4) allocatable,dimension(:) :: which_local_face
+            complex(kind=4) allocatable,dimension(:) :: cbaa_be_val
+            logical(kind=4) :: cbaa_fmm_debug
+            logical(kind=4) :: cbaa_fmm_storage
+            integer(kind=4) :: max_groups
+            real(kind=4) allocatable,dimension(:,:) :: k_dirs
+            complex(kind=4) allocatable,dimension(:,:) :: cbaa_elemvec_term1
+            complex(kind=4) allocatable,dimension(:,:,:) :: cbaa_elemvec_term2
+            integer(kind=4) allocatable,dimension(:) :: edge_grnum
+            integer(kind=4) allocatable,dimension(:) :: gredge_colind
+            complex(kind=4) allocatable,dimension(:,:,:) :: cbaa_groupmat
+            integer(kind=4) allocatable,dimension(:) :: gredge_rowind
+            integer(kind=4) :: ap_dof
+            integer(kind=4) allocatable,dimension(:) :: cbaa_be_colind
+            real(kind=4) :: k0_fmm
+            integer(kind=4) allocatable,dimension(:) :: cbaa_be_rowind
+            integer(kind=4) :: num_k_dirs
+            real(kind=4) dimension(4) :: ap_dims
+            integer(kind=4) allocatable,dimension(:,:) :: which_local_edges
+            integer(kind=4) allocatable,dimension(:) :: ap_elnumbers
+            complex(kind=4) allocatable,dimension(:,:) :: cbaa_be_mat
+            integer(kind=4) :: gr_numx
+            complex(kind=4) allocatable,dimension(:,:) :: temp_be_mat
+            real(kind=4) :: gr_dim
+            real(kind=4) :: farinteract_min
+        end module cbaa_data
+        module coax_feed ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) :: ax_counter
+            integer(kind=4) :: num_ax_cards
+            type ax_card_record ! in :femfeko:datastrc.f90:coax_feed
+                integer(kind=4) :: anfl
+                integer(kind=4) :: coaxdir
+                real(kind=4) dimension(3) :: coaxcentre
+                real(kind=4) dimension(3) :: coaxend
+                real(kind=4) :: coax_a
+                real(kind=4) :: coax_b
+                real(kind=4) :: coax_iabs
+                real(kind=4) :: coax_iphase
+                real(kind=4) :: coaxlen
+                real(kind=4) :: coax_eps
+                real(kind=4) :: coax_mu
+                integer(kind=4) dimension(12) :: coaxedges
+                integer(kind=4) :: coaxedges_num
+                complex(kind=4) :: coax_zin1
+                complex(kind=4) :: coax_zin2
+                real(kind=4) dimension(3) :: normal
+                real(kind=4) :: z_c
+                complex(kind=4) :: v_plus
+                complex(kind=4) :: v_minus
+                complex(kind=4) :: v_tot
+            end type ax_card_record
+        end module coax_feed
+        module far_field_data ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) :: num_ff_cards
+            integer(kind=4) :: ff_counter
+            type ff_card_record ! in :femfeko:datastrc.f90:far_field_data
+                real(kind=4) :: theta0
+                real(kind=4) :: phi0
+                real(kind=4) :: dtheta
+                real(kind=4) :: dphi
+                integer(kind=4) :: ffreq
+                integer(kind=4) :: ntheta
+                integer(kind=4) :: nphi
+                integer(kind=4) :: rige
+                integer(kind=4) :: analysis_no
+            end type ff_card_record
+        end module far_field_data
+        module gw_data ! in :femfeko:datastrc.f90
+            use nrtype
+            complex(kind=4) allocatable,dimension(:,:) :: s_params
+            integer(kind=4) :: num_wg_modes_n
+            integer(kind=4) :: num_wg_modes_m
+            integer(kind=4) :: mode_n
+            integer(kind=4) :: mode_m
+        end module gw_data
+        module inc_field ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) :: a0_counter
+            integer(kind=4) :: num_a0_cards
+            type a0_card_record ! in :femfeko:datastrc.f90:inc_field
+                integer(kind=4) :: anfl
+                integer(kind=4) :: nthei
+                integer(kind=4) :: nphii
+                real(kind=4) :: eir1
+                real(kind=4) :: eir2
+                real(kind=4) :: eir3
+                real(kind=4) :: eir4
+                real(kind=4) :: eir5
+                real(kind=4) :: dthei
+                real(kind=4) :: dphii
+                integer(kind=4) :: analysis_no
+            end type a0_card_record
+        end module inc_field
+        module matrix ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) allocatable,dimension(:) :: row_ind
+            real(kind=4) allocatable,dimension(:) :: luval
+            integer(kind=4) allocatable,dimension(:) :: urowind
+            real(kind=4) allocatable,dimension(:,:) :: tb_mat
+            real(kind=4) allocatable,dimension(:) :: temp_vec_real
+            real(kind=8) allocatable,dimension(:) :: asparse_skyline
+            real(kind=4) allocatable,dimension(:) :: tsparse
+            integer(kind=4) allocatable,dimension(:) :: renumbered_pre_e1
+            complex(kind=4) allocatable,dimension(:) :: work_c
+            real(kind=8) allocatable,dimension(:) :: b_vec_dp
+            real(kind=4) allocatable,dimension(:,:) :: c_mat
+            real(kind=4) allocatable,dimension(:) :: u_nmin1
+            real(kind=4) allocatable,dimension(:) :: crsval
+            integer(kind=4) :: restart_gmres
+            real(kind=4) allocatable,dimension(:) :: psi_z_nplus1
+            real(kind=4) :: sigma2
+            complex(kind=4) allocatable,dimension(:) :: ssparse_c
+            real(kind=4) allocatable,dimension(:) :: asparse
+            complex(kind=4) allocatable,dimension(:) :: b_vec_c
+            integer(kind=4) allocatable,dimension(:) :: renumbered_f3
+            complex(kind=4) allocatable,dimension(:) :: lower_tri
+            real(kind=4) allocatable,dimension(:,:) :: b_mat
+            real(kind=4) allocatable,dimension(:) :: u_nplus1
+            real(kind=4) allocatable,dimension(:) :: psi_x_nplus1
+            real(kind=4) allocatable,dimension(:) :: f_nplus1
+            integer(kind=4) allocatable,dimension(:) :: ucolind
+            integer(kind=4) allocatable,dimension(:) :: dof_type
+            integer(kind=4) :: ncv
+            real(kind=4) allocatable,dimension(:) :: psi_y_nplus1
+            integer(kind=4) allocatable,dimension(:) :: renumbered_pre_e2
+            integer(kind=4) allocatable,dimension(:) :: renumbered_pre_e3
+            integer(kind=4) allocatable,dimension(:) :: col_ind
+            complex(kind=4) allocatable,dimension(:) :: tsparse_c
+            real(kind=8) allocatable,dimension(:) :: rwrk
+            real(kind=8) allocatable,dimension(:) :: asparse_dp
+            complex(kind=4) allocatable,dimension(:,:) :: a_mat_c
+            real(kind=4) :: max_iter_factor
+            integer(kind=4) allocatable,dimension(:) :: ipiv
+            real(kind=4) allocatable,dimension(:) :: work
+            integer(kind=4) allocatable,dimension(:) :: iwrk
+            real(kind=4) allocatable,dimension(:) :: b_vec
+            integer(kind=4) allocatable,dimension(:) :: crsupper_row
+            integer(kind=4) :: mode
+            integer(kind=4) :: nconv_eigenvalues
+            real(kind=4) allocatable,dimension(:) :: psi_x_n
+            real(kind=4) allocatable,dimension(:) :: f_n
+            complex(kind=4) allocatable,dimension(:,:) :: t_mat_c
+            integer(kind=4) :: maxitr
+            real(kind=4) allocatable,dimension(:) :: upperval
+            real(kind=4) allocatable,dimension(:,:) :: sb_mat
+            real(kind=4) allocatable,dimension(:,:) :: a_mat
+            real(kind=4) allocatable,dimension(:,:) :: t_mat
+            real(kind=4) allocatable,dimension(:) :: psi_z_n
+            integer(kind=4) allocatable,dimension(:) :: renumbered_pre_f3
+            integer(kind=4) allocatable,dimension(:) :: renumbered_pre_f2
+            integer(kind=4) allocatable,dimension(:) :: renumbered_pre_f1
+            real(kind=4) allocatable,dimension(:) :: lowerval
+            integer(kind=4) allocatable,dimension(:) :: crsupper_col
+            complex(kind=4) allocatable,dimension(:) :: workvec1
+            real(kind=4) allocatable,dimension(:,:) :: s_mat
+            real(kind=8) allocatable,dimension(:) :: x_vec_dp
+            complex(kind=4) allocatable,dimension(:) :: workvec2
+            logical(kind=4) :: rvec
+            real(kind=4) allocatable,dimension(:) :: u_n
+            character :: bmat
+            real(kind=4) allocatable,dimension(:) :: bsparse
+            real(kind=4) :: sigma
+            complex(kind=4) allocatable,dimension(:) :: eigenvalues_c
+            character*2 :: which
+            integer(kind=4) :: nev
+            complex(kind=4) allocatable,dimension(:) :: asparse_c
+            real(kind=4) allocatable,dimension(:) :: csparse
+            complex(kind=4) allocatable,dimension(:,:) :: s_mat_c
+            complex(kind=4) allocatable,dimension(:) :: x_pre_vec_c
+            integer(kind=4) allocatable,dimension(:) :: iaudiag
+            complex(kind=4) allocatable,dimension(:) :: x_vec_c
+            complex(kind=4) allocatable,dimension(:) :: diagonal
+            integer(kind=4) allocatable,dimension(:) :: upper_colind
+            integer(kind=4) allocatable,dimension(:) :: upper_rowind
+            real(kind=4) allocatable,dimension(:) :: eigenvalues
+            integer(kind=4) allocatable,dimension(:) :: renumbered_f1
+            integer(kind=4) allocatable,dimension(:) :: renumbered_e1
+            integer(kind=4) allocatable,dimension(:) :: renumbered_e2
+            integer(kind=4) allocatable,dimension(:) :: renumbered_e3
+            real(kind=4) allocatable,dimension(:,:) :: eigenvectors
+            real(kind=4) allocatable,dimension(:) :: s_min_sigt
+            complex(kind=4) allocatable,dimension(:) :: full_x_vec_c
+            integer(kind=4) allocatable,dimension(:) :: pre_dof_type
+            complex(kind=4) allocatable,dimension(:,:) :: eigenvectors_c
+            integer(kind=4) allocatable,dimension(:) :: renumbered_f2
+            integer(kind=4) :: dof
+            real(kind=4) :: residual_norm
+            integer(kind=4) :: num_nonzeros_sky
+            real(kind=4) allocatable,dimension(:) :: psi_y_n
+            integer(kind=4) :: pre_dof
+            real(kind=4) allocatable,dimension(:) :: coupled_td_x_vec
+            real(kind=4) allocatable,dimension(:) :: f_nmin1
+            real(kind=4) allocatable,dimension(:) :: ssparse
+        end module matrix
+        module near_field_data ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) :: fe_counter
+            logical(kind=4) :: field_averaging
+            integer(kind=4) :: num_fe_cards
+            real(kind=4) :: eps_field_averaging
+            type fe_card_record ! in :femfeko:datastrc.f90:near_field_data
+                real(kind=4) :: delta_x
+                real(kind=4) :: delta_y
+                real(kind=4) :: delta_z
+                real(kind=4) :: x0
+                real(kind=4) :: y0
+                real(kind=4) :: z0
+                integer(kind=4) :: felkor
+                integer(kind=4) :: feltyp
+                integer(kind=4) :: n_x
+                integer(kind=4) :: n_y
+                integer(kind=4) :: n_z
+                integer(kind=4) :: analysis_no
+            end type fe_card_record
+        end module near_field_data
+        module probe_feed ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) :: a8_counter
+            integer(kind=4) :: num_a8_cards
+            logical(kind=4) :: probe_present
+            type a8_card_record ! in :femfeko:datastrc.f90:probe_feed
+                integer(kind=4) :: anfl
+                real(kind=4) :: prabs
+                real(kind=4) :: prphase
+                real(kind=4) :: prlen
+                real(kind=4) :: prx0
+                real(kind=4) :: pry0
+                real(kind=4) :: prz0
+                real(kind=4) :: prrad
+                integer(kind=4) :: prdir
+                complex(kind=4) :: prvolt
+                integer(kind=4) :: analysis_no
+            end type a8_card_record
+        end module probe_feed
+        module renumbering ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) :: minpos
+            real(kind=4) dimension(3) :: lengths
+            real(kind=4) dimension(3) :: min_array
+            real(kind=4) dimension(3) :: max_array
+            integer(kind=4) :: midpos
+            integer(kind=4) :: debug_var_int
+            real(kind=4) dimension(3) :: length_array
+            logical(kind=4) :: ascending
+            integer(kind=4) :: maxpos
+        end module renumbering
+        module unit_numbers ! in :femfeko:datastrc.f90
+            use nrtype
+            integer(kind=4) parameter,optional :: feko_out=14
+            integer(kind=4) parameter,optional :: fnfout=12
+            integer(kind=4) parameter,optional :: fileout=11
+            integer(kind=4) parameter,optional :: meshin=10
+            integer(kind=4) parameter,optional :: meshout=16
+            integer(kind=4) parameter,optional :: auxinfile=15
+            integer(kind=4) parameter,optional :: infile=9
+            integer(kind=4) parameter,optional :: testfile=13
+        end module unit_numbers
+        module geomwrap ! in :femfeko:geomwrap.f90
+            use geometry
+            use nrtype
+            integer(kind=4) allocatable,dimension(:) :: node_element_ptr
+            integer(kind=4) allocatable,dimension(:,:) :: element_nodes
+            integer(kind=4) parameter,optional :: elfaces=4
+            real(kind=8) allocatable,dimension(:,:) :: vertex_coords
+            integer(kind=4) allocatable,dimension(:,:) :: face_nodes
+            integer(kind=4) allocatable,dimension(:,:) :: element_faces
+            integer(kind=4) parameter,optional :: facenodes=3
+            integer(kind=4) allocatable,dimension(:,:) :: element_connect2elem
+            integer(kind=4) parameter,optional :: edgenodes=2
+            integer(kind=4) allocatable,dimension(:) :: node_elements
+            integer(kind=4) allocatable,dimension(:,:) :: element_edges
+            integer(kind=4) allocatable,dimension(:,:) :: edge_nodes
+            integer(kind=4) parameter,optional :: eledges=6
+            integer(kind=4) parameter,optional :: elnodes=4
+            integer(kind=4) parameter,optional :: spacedim=3
+            integer(kind=4) allocatable,dimension(:,:) :: element_connect2face
+            subroutine init_geom ! in :femfeko:geomwrap.f90:geomwrap
+            end subroutine init_geom
+        end module geomwrap
+        module twoform_vbf ! in :femfeko:twoform_vbf.f90
+            use nrtype
+            function twoform_vbf_face(vbf_type,lambda,grad_lambda,facenodes) ! in :femfeko:twoform_vbf.f90:twoform_vbf
+                integer(kind=4) intent(in) :: vbf_type
+                real(kind=4) dimension(4),intent(in) :: lambda
+                real(kind=4) dimension(4,3),intent(in) :: grad_lambda
+                integer(kind=4) dimension(3),intent(in) :: facenodes
+                real(kind=4) dimension(3) :: twoform_vbf_face
+            end function twoform_vbf_face
+        end module twoform_vbf
+        module inv_curvi ! in :femfeko:basisfun.f90
+            use debugvar
+            use unit_numbers
+            use nrtype
+            integer(kind=4) parameter,optional :: ndim=3
+            integer :: mpinfo
+            real(kind=4) dimension(3) :: func
+            integer parameter,optional :: mpn=3
+            real(kind=4) dimension(10) :: ynod
+            real(kind=4) dimension(10) :: znod
+            double precision dimension(33) :: mpwa
+            real(kind=4) :: tol_xx
+            real(kind=4) dimension(10) :: xnod
+            real(kind=4) dimension(3) :: r_vec_m
+            real(kind=4) :: tol_func
+            integer(kind=4) parameter,optional :: lwork=3
+            integer parameter,optional,depend(mpn) :: mplwa=33
+            real(kind=4) dimension(3,3) :: jacob_func
+            integer(kind=4) parameter,optional :: ntrial=20000
+            real(kind=4) dimension(3) :: temp_work
+            double precision dimension(3) :: mpfvec
+            integer(kind=4) :: iter
+            integer(kind=4) :: info
+            integer(kind=4) dimension(3) :: temp_ipiv
+            real(kind=4) dimension(3) :: delta_xx
+            double precision dimension(3) :: xmp
+            double precision parameter,optional :: mptol=1e-06
+        end module inv_curvi
+        module basis_function ! in :femfeko:basisfun.f90
+            use geometry
+            use problem_info
+            use quad_tables
+            use math_tools,,only: cross_product,vector_length
+            use nrtype
+            function vbf(vbf_type,lambda,grad_lambda,node1,node2,node3) ! in :femfeko:basisfun.f90:basis_function
+                use problem_info
+                use nrtype
+                integer(kind=4) intent(in) :: vbf_type
+                real(kind=4) dimension(4),intent(in) :: lambda
+                real(kind=4) dimension(4,3),intent(in) :: grad_lambda
+                integer(kind=4) intent(in) :: node1
+                integer(kind=4) intent(in) :: node2
+                integer(kind=4) optional,intent(in) :: node3
+                real(kind=4) dimension(3) :: vbf
+            end function vbf
+        end module basis_function
+        module parseinput ! in :femfeko:parseinput.f90
+            use problem_info
+            character(len=128) public :: outfilename
+            character(len=128) public :: fekoout_filename
+            character(len=128) private :: aux_inputfilename
+            character(len=60) public :: mesh_type
+            character(len=128) public :: meshfilename
+            character(len=78) public,dimension(5) :: run_label
+            character(len=128) public :: meshout_filename
+            character(len=128) public :: extra_meshfilename
+        end module parseinput
+    end interface 
+end python module femfeko
+
+! This file was auto-generated with f2py (version:2_4770).
+! See http://cens.ioc.ee/projects/f2py2e/

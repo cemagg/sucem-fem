@@ -1,0 +1,36 @@
+make_locmat_generic(BFlist, J, integrator):=block([J_det:abs(determinant(J)), 
+  ij:length(BFlist), gm],
+  local(gm),
+  gm[i,j]:=integrator(BFlist[i].BFlist[j]*J_det),
+  genmatrix(gm, ij, ij))$
+
+make_proj_locmat_generic(BFlist_i, BFlist_j, J, integrator):=block([
+  J_det:abs(determinant(J)), 
+  li:length(BFlist_i), lj:length(BFlist_j), gm
+  ],
+  local(gm),
+  gm[i,j]:=integrator(BFlist_i[i].BFlist_j[j]*J_det),
+  genmatrix(gm, li, lj))$
+
+make_global(tetmats, op, dofmaps_i, dofmaps_j):=block
+  ([tetno, tetmat, ii, jj, i, j, globmat, zero_gen],
+   zero_gen[i,j]:=0,
+   nodofs_i:twoDmax(dofmaps_i),
+   nodofs_j:twoDmax(dofmaps_j),
+   print(nodofs_i, nodofs_j),
+   globmat:genmatrix(zero_gen, nodofs_i, nodofs_j),
+   tetno:0,
+   for tetmat in tetmats
+     do(tetno:tetno+1,
+        dofmap_i:dofmaps_i[tetno],
+        dofmap_j:dofmaps_j[tetno],
+        ii:0,
+        for i in dofmap_i
+          do(ii:ii+1,jj:0, for j in dofmap_j
+               do(jj:jj+1, globmat[i,j]:lreduce(op, [globmat[i,j],tetmat[ii,jj]])
+                 )
+            )
+       ),
+   globmat)$
+
+make_global_add_symm(tetmats, dofmap):=make_global(tetmats, "+", dofmap, dofmap)$

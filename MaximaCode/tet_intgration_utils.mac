@@ -1,0 +1,64 @@
+intg_simplex_fun_tet:lambda([f],
+  f:ev(f([x1,x2,x3,1-x1-x2-x3])),
+  integrate(
+    integrate(
+      integrate(express(ev(f)), x3, 0, 1-x1-x2),
+      x2, 0, 1-x1),
+    x1, 0, 1))$
+
+intg_simplex_fun_tet2(f):=block([f:ev(f([x1,x2,x3,1-x1-x2-x3])), i1, i2, i3],
+  /* Same as intg_simplex_fun_tet except it manually substitutes the integral
+  limits rather than using integrate() with limits. This seems to prevent
+  spurious asksign questions in some cases.
+  */
+  print("doing an integral"),
+  i3:integrate(express(ev(f)), x3),
+  print("done i3"),
+  i2:integrate(ev(i3, x3:1-x1-x2) - ev(i3, x3:0), x2),
+  print("done i2"),
+  i1:integrate(ev(i2, x2:1-x1) - ev(i2, x2:0), x1),
+  print("done i1"),
+  ev(i1, x1:1) - ev(i1, x1:0)
+  )$
+
+intg_fun_tet3(f):=block([tmp, i1, i2, i3],
+
+/* Same as intg_simplex_fun_tet2 except it expects the substitution
+   lam:[x1,x2,x3, 1-x1-x2-x3] to have been performed  */
+  print("doing an integral"),
+  i3:integrate(f, x3),
+  print("done i3"),
+  i2:integrate(ev(i3, x3:1-x1-x2) - ev(i3, x3:0), x2),
+  print("done i2"),
+  i1:integrate(ev(i2, x2:1-x1) - ev(i2, x2:0), x1),
+  print("done i1"),
+  tmp:ev(i1, x1:1) - ev(i1, x1:0),
+  expand(tmp) 
+  )$
+
+
+
+tet_vol(tet_verts):=block(
+/* This function actually calculates 6x the tet's volume. It seems an
+interesting cancellation of errors are occuring. I must have assumed that my
+tet-integration has unit volume, but in fact it is over a right-handed unit tet
+with volume of 1/6. Must look further into this */
+[tetverts:tet_verts, volmat],
+  volmat:matrix(tetverts[1]-tetverts[2],tetverts[2]-tetverts[3],
+    tetverts[3]-tetverts[4]),
+  abs(determinant(volmat)))$
+
+tet_to_face_coords(face_i):=block(
+  [i:1, l:[], other:local_face_opposite_nodes[face_i]],
+  for j:1 thru 4 do(
+    l:append(l,[if j#other then (i:i+1,concat('l,i-1)) else (0)])),
+  l)$
+
+/* Integrates a 3D simplex function on face_i of a tet */
+intg_simplex_fun_tri(fn, face_i):=block(
+  [f:express(ev(fn(tet_to_face_coords(face_i)),eval))],
+  print(f),
+  2*integrate(integrate(
+      subst([l3=1-l2-l1],f), l2, 0, 1-l1),
+    l1, 0, 1)
+  )$

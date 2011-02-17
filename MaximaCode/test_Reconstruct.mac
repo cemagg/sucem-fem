@@ -1,0 +1,31 @@
+/* Remember to load("vect") when starting the maxima session */
+/* You need to add this to the run path the first time */
+/*file_search_maxima:cons("/home/brick/akademie/NewCode/working/MaximaTests/###.{mac,mc}",*/
+/*                        file_search_maxima)$*/
+load("CommonSimplexStuff.mac")$
+load("TwoTets.mac")$
+
+dif:tet_verts[2]-tet_verts[5]$
+xyzs:makelist(tet_verts[5]+i/10*dif, i, 0, 10)$
+tet_coords:[]$
+tet_vals_oneform:[]$
+tet_vals_twoform:[]$
+for tet in tets
+  do (load("MeshStuff.mac"),
+      load("BasisFunction.mac"),
+      doxyz:xyzs,
+      for xyz in xyzs
+        do if not xyz_in_tet(xyz) then doxyz:delete(xyz, doxyz),
+      edgevals:map(lambda([xyz],
+                          lreduce("+",
+                                  map(lambda([f], f(fn_lambda(xyz))), edgefuns))
+                         ), doxyz),
+      tet_vals_oneform:append(tet_vals_oneform, [edgevals]),
+      facevals:map(lambda([xyz],
+                          lreduce("+",
+                                  map(lambda([f], f(fn_lambda(xyz))), facefuns))
+                         ), doxyz),
+      tet_vals_twoform:append(tet_vals_twoform, [facevals]),
+      tet_coords:append(tet_coords, [doxyz])
+     )$
+

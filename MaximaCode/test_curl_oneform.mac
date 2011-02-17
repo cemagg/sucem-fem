@@ -1,0 +1,37 @@
+/* Remember to load("vect") when starting the maxima session */
+/* You need to add this to the run path the first time */
+/*file_search_maxima:append(file_search_maxima,
+  [sconcat("/home/brick/akademie/NewCode/working/MaximaTests/###.{mac,mc}")])$ */
+
+load("CommonSimplexStuff.mac")$
+/*load("TwoTets.mac")$*/
+
+/* tet:tets[2]$ */
+load("FlatTet.mac")$
+load("MeshStuff.mac")$
+load("BasisFunction.mac")$
+tet_facefuns:map(lambda([facefun], facefun(el_lambda)), facefuns)$
+tet_edgefuns:map(lambda([edgefun], edgefun(el_lambda)), edgefuns)$
+tet_edgefuns_curl:map(lambda([fun], ev(express(curl(fun)), diff)),
+                     tet_edgefuns)$
+el_curl_edgefuns:fullratsimp
+  (ev(lreduce("+",
+              map(lambda([i], e[i]*tet_edgefuns_curl[i]), [1,2,3,4,5,6])
+             )
+     )
+  )$
+
+el_field_facefuns:fullratsimp
+  (ev(lreduce("+",
+              map(lambda([i], f[i]*tet_facefuns[i]), [1,2,3,4])
+             )
+     )
+  )$
+ff:[
+e[1] + e[4] - e[2],
+e[1] + e[5] - e[3],
+e[2] + e[6] - e[3],
+e[4] + e[6] - e[5]]$
+el_curl_facefuns:(subst([f=ff], el_field_facefuns))$
+el_curl_facefuns:ev(el_curl_facefuns)$
+el_curl_facefuns:fullratsimp(el_curl_facefuns)$

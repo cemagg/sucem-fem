@@ -1,0 +1,6 @@
+load("CommonSimplexStuff.mac")$
+load("FlatTet.mac")$
+load("MeshStuff.mac")$
+
+twoform_coords_gen[i,j] := grd_lambda[i] ~ grd_lambda[j]$
+twoform_coords: express(genmatrix(twoform_coords_gen, 4, 4))$

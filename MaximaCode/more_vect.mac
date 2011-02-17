@@ -1,0 +1,76 @@
+kill(xx, yy, zz, aa, bb, cc, aa_scp)$
+matchdeclare ([xx], scalar_not1p, [yy, zz],  nonscalarp, [aa, bb], all, cc, constantp)$
+scalar_not1p (e) := e # 1 and scalarp (e)$
+matchdeclare (aa_scp, scalarproductp)$
+scalarproduct2p (e) := not atom(e) and op(e) = "*" and length (e) = 2$
+scalarproductp(e) := not atom(e) and op(e) = "*" and length(e) >= 2 and scalarp(e) 
+and scalarp (first (e)) and scalarp (second (e))$
+
+/* curl(s*V) = s*curl(V) - V ~ grad(s), where s is a scalar, V vector */
+simp : false$
+tellsimpafter (curl (xx*yy), xx*(curl yy) - yy~(grad xx))$ 
+tellsimpafter ((xx * yy) ~ aa, xx * (yy ~ aa))$
+tellsimpafter (aa ~ (xx * yy), xx * (aa ~ yy))$
+simp : true$
+declare (["grad", "laplacian", "curl"], nonscalar)$
+declare (["curl", "grad", "div"], additive)$
+
+/* div(s*V) = s*div(V) + V.grad(s) */
+simp: false$
+tellsimpafter (div (xx*yy), xx*(div yy) + yy.(grad xx))$
+simp: true$
+
+/* div(A~B) = B.(curl A) - A.(curl B) */
+simp: false$
+tellsimpafter (div(yy ~ zz), zz.(curl yy) - yy.(curl zz))$
+simp: true$
+
+
+/* grad(f*g) = f*grad(g) + g*grad(f) */
+simp: false$
+tellsimpafter (grad (aa_scp), first (aa_scp) * grad (rest (aa_scp)) + rest
+(aa_scp) * grad (first(aa_scp)))$
+simp: true$
+
+/* a.(a ~ b ) = 0 */
+tellsimpafter(yy.(yy ~ zz), 0)$
+
+/* differentials of constant values */
+
+tellsimpafter(grad (cc), 0)$
+tellsimpafter(div (cc), 0)$
+tellsimpafter(curl(cc), 0)$
+
+
+
+
+simp:false$
+matchdeclare ([ww_sn1,xx_sn1], scalar_not1p, cc_spp, scalarpowerp)$
+matchdeclare ([ww_snr,xx_snr], scalar_nonratp, cc_rfp, ratfunp)$
+scalar_nonratp(e):= (atom(e) or not operatorp(e, "//")) and scalarp(e)$
+defmatch (scalarpowerp, ww_sn1^xx_sn1)$
+/*
+Expand grad(x^n) until the only remaining terms inside grad() operators is (x^1)
+*/
+defrule(expand_grd_powers, grad(cc_spp), ww_sn1*grad(ww_sn1^(xx_sn1-1))
+  + ww_sn1^(xx_sn1-1)*grad(ww_sn1))$
+simp:true$
+
+/*
+Expand grad(f/g) until the only remaining terms inside grad() are
+free of rational terms
+*/
+defmatch (ratfunp, ww_snr/xx_snr)$
+defrule(expand_grd_rat, grad(cc_rfp),
+  (xx_snr*grad(ww_snr) - ww_snr*grad(xx_snr))/xx_snr^2)$
+
+/* Simplify the type of functions typically result after the application of an
+exterior derivative
+*/
+post_crl_simplify(expr):=block([expandcurl:true, expandplus:true, tmp],
+  tmp:apply_repeatedly(vectorsimp, expand(expr)),
+  tmp:apply1(tmp, expand_grd_rat),
+  tmp:apply_repeatedly(vectorsimp, expand(tmp)),
+  tmp:apply1(tmp, expand_grd_powers),
+  tmp:apply_repeatedly(vectorsimp, expand(tmp)),
+  expand(tmp))$

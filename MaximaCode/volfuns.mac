@@ -1,0 +1,14 @@
+R_vol(p):=block([i_max:p-3, BFs],
+  BFs:makelist(makelist(tmp[i][j],j,0,i*2+2),i,0,i_max),
+  for i:0 thru i_max do(
+    BFs[i+1][2*i+2+1]:(lam3*lam4*lam1*grad(lam2))*lam3^(p-3-i)*lam4^i,
+    for j:0 thru i do(
+      BFs[i+1][j+1]:(lam1*lam2*lam3*grad(lam4))*lam1^(p-3-i)*lam2^(i-j)*lam3^j,
+      BFs[i+1][i+1+j+1]:(lam2*lam3*lam4*grad(lam1))*lam2^(p-3-i)*lam3^(i-j)*lam4^j)
+    ),
+  flatten(BFs))$
+
+V(p,i,j):=(lam1*lam2*lam3*lam4)*lam1^(p-4-i)*lam2^(i-j)*lam3^j$
+
+G_vol(p):=block([i_max:p-3],
+  flatten(makelist(makelist(grad(V(p+1,i,j)),j,0,i),i,0,i_max)))$

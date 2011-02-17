@@ -1,0 +1,41 @@
+/* Remember to load("vect") when starting the maxima session */
+/* You need to add this to the run path the first time */
+/*file_search_maxima:cons("/home/brick/akademie/NewCode/working/MaximaTests/###.{mac,mc}",*/
+/*                        file_search_maxima)$*/
+
+fn1:1 + l1 + l1^2 + l2 + l2^2 + l3 + l3^2$
+
+fn2: 1*l1 + 2*l1**2 + 3*l2 + 4*l2**2 + 1 
+  + 5*l3 + 6*l3**2 + 7*l4 + 8*l4**2 
+  + 1*l1*l2 + 2*l1*l3 + 3*l1*l4 
+  - 4*l2*l3 - 5*l2*l4 - 6*l3*l4$
+
+fn_lambda(xyz):=subst([x=xyz[1],y=xyz[2],z=xyz[3]], el_lambda)$
+
+integrate_tet(fn):=6*integrate(
+               integrate(
+                         integrate(subst([l4=(1-l1-l2-l3)], fn), l3, 0, 1-l2-l1),
+                         l2, 0, 1-l1),
+               l1, 0, 1)$
+
+homog_fun_tri(p):=lsum(x,x,apply(append, makelist(
+      makelist(l1^i*l2^j*l3^(p-i-j), j, 0, p-i), i, 0, p)))$
+
+fn_tri_0: homog_fun_tri(0)$
+fn_tri_1: fn_tri_0 - homog_fun_tri(1)$
+fn_tri_2: fn_tri_1 + homog_fun_tri(2)$
+fn_tri_3: fn_tri_2 - homog_fun_tri(3)$
+fn_tri_4: fn_tri_3 + homog_fun_tri(4)$
+fn_tri_5: fn_tri_4 - homog_fun_tri(5)$
+fn_tri_6: fn_tri_5 + homog_fun_tri(6)$
+fn_tri_7: fn_tri_6 - homog_fun_tri(7)$
+fn_tri_8: fn_tri_7 + homog_fun_tri(8)$
+fn_tri_9: fn_tri_8 - homog_fun_tri(9)$
+fn_tri_10: fn_tri_9 + homog_fun_tri(10)$
+
+integrate_tri(fn):=2*integrate(integrate(
+    subst([l4=0, l3=1-l2-l1], fn), l2, 0, 1-l1),
+  l1, 0, 1)$
+
+fns_tri: makelist(concat('fn_tri_,i), i, 0, 10)$
+tri_intgs: map(integrate_tri, ev(fns_tri))$

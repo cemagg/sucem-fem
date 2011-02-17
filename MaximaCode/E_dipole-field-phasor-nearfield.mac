@@ -1,0 +1,14 @@
+load("E_dipole-field-phasor")$
+
+test_pt:[1,0,0]$
+mu:1$
+epsilon:1$
+c:1/sqrt(mu*epsilon)$
+l:1$
+I:1$
+f_max: 1$ f_min:1/4$
+freqs:linspace(f_min, f_max, 101)$
+ks:freqs*2*%pi$
+
+E_vals:makelist(ev(E, x:test_pt[1], y:test_pt[2], z:test_pt[3], k:kk), kk, ks)$
+E_vals:float(realpart(E_vals)) + %i*float(imagpart(E_vals))$

@@ -1,0 +1,3 @@
+bf_to_J(fns):=block([expandall:true, tmp],
+                    tmp:ev(fns),
+                    subst([grad(lam1).grad(lam2)~grad(lam3)=det(J^^-1)], tmp))$

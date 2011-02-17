@@ -1,0 +1,1 @@
+G_edge(p):=grad(lam1*lam2*(lam1-lam2)^(p-1))$

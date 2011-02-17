@@ -1,0 +1,50 @@
+load("PyramidBasisFunction")$
+load("SixPyrams")$
+load("SysmatUtils")$
+
+intg_pyr(fn):=integrate(integrate(integrate(fn,u1,0,1-u3),u2,0,1-u3),u3,0,1)$
+
+make_locmat(BFlist, J):=make_locmat_generic(BFlist, J, intg_pyr)$
+make_locmats(BFlist, pyr_verts):=makelist(
+  make_locmat(subs_verts(BFlist, verts), subs_verts(J, verts)), verts, pyr_verts)$
+
+/*vol: integrate(integrate(integrate(subs_verts(J, el_ verts[1]),u1,0,1-u3),u2,0,1-u3),u3,0,1)$*/
+ 
+
+/*
+tst_fns_u:makelist(subs_u(subs_grds_lam(fn)), fn, onef_efs)$
+D_tst_fns_u:makelist(subs_u(subs_grds_lam(fn)), fn, D_onef_efs)$
+*/
+tst_fns_u:makelist(subs_u(subs_grds_lam(fn)), fn, p1_bfs)$
+D_tst_fns_u:makelist(subs_u(subs_grds_lam(fn)), fn, D_p1_bfs)$
+
+test_elverts:[el_verts[1]]$
+
+locmat_oneform_mass:make_locmats(tst_fns_u, test_elverts)$
+locmat_subfns:makelist(subs_verts(tst_fns_u, verts), verts, test_elverts)$
+locmat_J:makelist(subs_verts(J, verts), verts, test_elverts)$
+
+fns:locmat_subfns[1]$
+J_abs:abs(locmat_J[1])$
+M:locmat_oneform_mass[1]$
+recon_fn:u1*[x1, y1, z1] + u2*[x2, y2, z2] + u3*[x3, y3, z3] + [x0, y0, z0] $
+el1_rhs:makelist(intg_pyr(J_abs*fn.recon_fn), fn, fns)$
+noncommutative_dot_enter()$
+res:fullratsimp((M^^-1).el1_rhs)$
+noncommutative_dot_exit()$
+recon:fullratsimp(lreduce("+", makelist(res[i][1]*fns[i], i, 1, length(res))))$
+
+
+/*
+locmat_oneform_stiffness:make_locmats(D_tst_fns_u, test_elverts)$
+
+*/
+
+u_to_r_1:subs_verts(r_u, el_verts[1])$
+u_to_r_3:subs_verts(r_u, el_verts[3])$
+r_to_u_1_sub:solve([x=u_to_r_1[1], y=u_to_r_1[2], z=u_to_r_1[3]], [u1, u2, u3])[1]$
+r_to_u_3_sub:solve([x=u_to_r_3[1], y=u_to_r_3[2], z=u_to_r_3[3]], [u1, u2, u3])[1]$
+u_1:subst(r_to_u_1_sub, [u1, u2, u3])$
+u_3:subst(r_to_u_3_sub, [u1, u2, u3])$
+
+

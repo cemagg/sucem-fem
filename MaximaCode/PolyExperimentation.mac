@@ -1,0 +1,10 @@
+polybase_n(n):=makelist(x^i,i,0,n)$
+
+p_basis_nD(base_1D, n):=makelist(lreduce("*", l), l,
+  listify(apply(cartesian_product,
+      map(setify, makelist(subst([x=concat(x,i)], base_1D), i, 1, n)))))$
+
+polybase_2_1D: polybase_n(2)$
+P_basis_2D:p_basis_nD(polybase_2_1D, 2)$
+
+base_rep(fn, pbase):=

@@ -1,0 +1,19 @@
+load("PyramidBasisFunction")$
+load("SixPyrams")$
+
+make_physfuns(fns):=block(
+  [grd_subs:subst([grad(lam1)='g1, grad(lam2)='g2,
+    grad(lam3)=-'g1-'g3, grad(lam4)=-'g2-'g3, grad(lam5)='g3],
+    fns)],
+  subst(
+    [lam1=lams[1], lam2=lams[2], lam3=lams[3], lam4=lams[4], lam5=lams[5]],
+    grd_subs))$
+
+onef_efs_physfuns:make_physfuns(onef_efs)$
+D_onef_efs_physfuns:make_physfuns(D_onef_efs)$
+
+onef_efs_physvals:makelist(makelist(makelist(ev(fn, lams:l), l, test_pyr_lams),
+  fn, subs_verts(ev(onef_efs_physfuns), verts)), verts, el_verts)$
+
+D_onef_efs_physvals:makelist(makelist(makelist(ev(fn, lams:l), l, test_pyr_lams),
+  fn, subs_verts(ev(D_onef_efs_physfuns), verts)), verts, el_verts)$

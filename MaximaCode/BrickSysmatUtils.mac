@@ -1,0 +1,12 @@
+load("SysmatUtils")$
+
+remove_dep_vars(BFs):=subst([lam4=1-lam1, lam5=1-lam2, lam6=1-lam3],BFs)$
+
+brick_integrator(fn):=integrate(integrate(integrate(
+        fn, lam3, 0, 1),
+      lam2, 0, 1), lam1, 0, 1)$
+
+make_locmat(BFlist, J):=make_locmat_generic(BFlist, J, brick_integrator)$
+make_proj_locmat(BFlist_i, BFlist_j, J):=make_proj_locmat_generic(
+  BFlist_i, BFlist_j, J, brick_integrator)$
+

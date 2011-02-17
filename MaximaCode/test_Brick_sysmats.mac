@@ -1,0 +1,51 @@
+load("HexaBasisFunction")$
+load("BrickCoords")$
+load("BrickSysmatUtils")$
+
+reffuns:remove_dep_vars(onef_efs)$
+reffuns_D:remove_dep_vars(vectorsimp(D_onef_efs))$
+
+test_locmat_onebrick(BFlist):=(load("OneBrick"), 
+  make_locmats(BFlist, makelist(get_verts(brick, mesh_verts), brick, bricks)))$
+
+
+test_globmat_twobrick(BFlist, dofmap):=(load("TwoBricks"),
+  locmats: make_locmats(BFlist, makelist(get_verts(brick, mesh_verts), brick, bricks)),
+  make_global(locmats, "+", dofmap, dofmap))$
+  
+
+make_locmats(BFlist, bricks_verts):=makelist(
+  make_locmat(express(gen_brickfns(BFlist, bv)), el_jacobian_matrix(bv)),
+    bv, bricks_verts)$
+
+make_proj_locmats(BFlist_i, BFlist_j, bricks_verts):=makelist(
+  make_proj_locmat(express(gen_brickfns(BFlist_i, bv)),
+    express(gen_brickfns(BFlist_j, bv)),
+    el_jacobian_matrix(bv)),
+  bv, bricks_verts)$
+
+
+onef_dofmap_1_mixed:[[1,2,3,4,7,8,11,12,15,16,18,19],
+                     [3,4,5,6,9,10,13,14,16,17,19,20]]$
+
+/* Known good result for test_globmat_twobrick(reffuns, onef_dofmap_1_mixed); */
+
+goodmat:matrix([1/9,1/18,1/18,1/36,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1/18,1/9,1/36,1/18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1/18,1/36,2/9,1/9,1/18,1/36,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1/36,1/18,1/9,2/9,1/36,1/18,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1/18,1/36,1/9,1/18,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,1/36,1/18,1/18,1/9,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,1/9,1/18,0,0,1/18,1/36,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,1/18,1/9,0,0,1/36,1/18,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,1/9,1/18,0,0,1/18,1/36,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,1/18,1/9,0,0,1/36,1/18,0,0,0,0,0,0],[0,0,0,0,0,0,1/18,1/36,0,0,1/9,1/18,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,1/36,1/18,0,0,1/18,1/9,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,1/18,1/36,0,0,1/9,1/18,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,1/36,1/18,0,0,1/18,1/9,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/9,1/18,0,1/18,1/36,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/18,2/9,1/18,1/36,1/9,1/36],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/18,1/9,0,1/36,1/18],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/18,1/36,0,1/9,1/18,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/36,1/9,1/36,1/18,2/9,1/18],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/36,1/18,0,1/18,1/9])$
+
+good_projmat:matrix([0,0,0,0,1/18,-1/18,1/36,-1/36,-1/18,1/18,-1/36,1/36],[-2/9,2/9,-1/9,1/9,0,0,0,0,2/9,1/9,-2/9,-1/9],[1/2,1/4,-1/2,-1/4,-1/2,-1/4,1/2,1/4,0,0,0,0],[0,0,0,0,1/36,-1/36,1/18,-1/18,-1/36,1/36,-1/18,1/18],[-1/9,1/9,-2/9,2/9,0,0,0,0,1/9,2/9,-1/9,-2/9],[1/4,1/2,-1/4,-1/2,-1/4,-1/2,1/4,1/2,0,0,0,0])$
+
+print(is (test_globmat_twobrick(reffuns, onef_dofmap_1_mixed)=goodmat))$
+load("OneBrick")$
+D_onef_reffuns:remove_dep_vars(D_onef_efs)$
+twof_reffuns:remove_dep_vars(twof_ffs)$
+print(is(make_proj_locmats(
+      twof_reffuns, D_onef_reffuns, [get_verts(bricks[1], mesh_verts)])[1]
+    = good_projmat))$
+
+/* E.G.
+
+Calculate global mass matrix on twotet mesh:
+
+gm: test_globmat_twobrick(reffuns, onef_dofmap_1_mixed);
+
+*/

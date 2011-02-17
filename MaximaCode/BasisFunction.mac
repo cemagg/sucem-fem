@@ -1,0 +1,199 @@
+load("more_vect")$ 
+load("CommonBasisFunctionStuff")$
+load("facefuns")$
+load("edgefuns")$
+load("volfuns")$
+declare([lam1, lam2, lam3, lam4], scalar)$
+depends([lam1, lam2, lam3, lam4], [x,y,z])$
+expandall:true$
+simp:false$
+matchdeclare ([ww_sn1,xx_sn1], scalar_not1p, cc_spp, scalarpowerp)$
+defmatch (scalarpowerp, ww_sn1^xx_sn1)$
+defrule(expand_grd_powers, grad(cc_spp), ww_sn1*grad(ww_sn1^(xx_sn1-1))
+        + ww_sn1^(xx_sn1-1)*grad(ww_sn1))$
+simp:true$
+maxorder:5$
+
+ef1:grad(lam2)*lam1 - grad(lam1)*lam2$
+ef2:grad(lam3)*lam1 - grad(lam1)*lam3$
+ef3:grad(lam4)*lam1 - grad(lam1)*lam4$
+ef4:grad(lam3)*lam2 - grad(lam2)*lam3$
+ef5:grad(lam4)*lam2 - grad(lam2)*lam4$
+ef6:grad(lam4)*lam3 - grad(lam3)*lam4$
+ef_names:makelist(concat(ef,i), i, 1, 6)$
+efs:ev(ef_names)$
+D_efs:ev(map("curl", ef_names))$
+D_efs:ev(D_efs)$
+onef_efs_R1:efs$
+D_onef_efs_R1:D_efs$
+/* simp_BFs attempts to simplify a list of basis functions down to terms in grad(lami),
+   i = 1 ... 4, such that there are no powers of lami higher than 1 inside a grad() */
+simp_BFs(BFs):=apply_repeatedly(vectorsimp,
+  apply1(apply_repeatedly(vectorsimp, expand(BFs)), expand_grd_powers))$
+/* curl_simplify generates the curl of a list of one-form basis functions and tries
+   to simplify it down to a workable form */
+crl_simplify(BFs):=block([crl_lst:apply_repeatedly(vectorsimp,expand(map("curl", BFs)))],
+  crl_lst:apply_repeatedly(vectorsimp, apply1(crl_lst,expand_grd_powers)),
+    facsum(crl_lst, grad(lam1)~grad(lam2), grad(lam1)~grad(lam3), grad(lam1)~grad(lam4),
+           grad(lam2)~grad(lam3), grad(lam2)~grad(lam4), grad(lam3)~grad(lam4)))$
+
+/* subs_element_entities applies the substitutions to transform a basis function
+   defined for the primary face/edge to the other edges/faces. The user needs to
+   pass in the correct substitutions as subs. */
+subs_element_entities(ent_BF, subs):=block([fun_list:[ent_BF]],
+  append(fun_list,
+    map(lambda([subs], sublis(subs,fun_list[1])), subs)))$
+/* make_facefuns calls subs_element_entities with the required substitutions to
+   make basis functions for each face */
+make_facefuns(facefun_triplets):=block([face_subs],
+  /* Substitutions that transform a face function defined for a face consisting of
+  node 1,2 and 3 to the remaining three faces, using our local node numbering
+  scheme */
+  face_subs:[[lam3=lam4],
+  [lam2=lam3, lam3=lam4],
+  [lam1=lam2, lam2=lam3, lam3=lam4]],
+  subs_element_entities(simp_BFs(facefun_triplets), face_subs))$
+facefun_crls(facefuns):=map(
+  lambda([x], map(lambda([y], crl_simplify(y)), x)), facefuns)$
+/* apply_repeatedly applies xform to arg until it stops changing and returns the result */
+/* note, next is a Maxima keyword, hence the varname nxt. */
+/* facetrips_to_flatlist converts face basis-functions from the
+   bfs[faceno][tripno][funno] format to a flat list like this:
+
+   [face1_trip1_fun1, face2_trip1_fun1, ... face4_trip1_fun1,
+    face1_trip1_fun2, face2_trip1_fun2, ... face4_trip1_fun2,
+    ....
+    face1_tripi_fun1, face2_tripi_fun2, ...                  ]
+
+   Assumes the structure for each face is identical.
+*/
+facetrips_to_flatlist(face_trip_funs):=block([face, triplet, trifun, funlist:[]],
+  for triplet:1 thru length(face_trip_funs[1]) do(
+    for tripfun:1 thru length(face_trip_funs[1][triplet]) do(
+      for face:1 thru 4 do(
+        funlist:append(funlist, [face_trip_funs[face][triplet][tripfun]])))),
+  funlist)$
+
+
+/* Substitutions that transform an edge function for an edge consisting of
+   nodes 1 and 2 to the remaining 5 edges using out local node numbering scheme */
+edge_subs:[[lam2=lam3],
+           [lam2=lam4],
+           [lam1=lam2, lam2=lam3],
+           [lam1=lam2, lam2=lam4],
+           [lam1=lam3, lam2=lam4]]$
+
+/* Generate gradient edge functions in variables onef_efs_Gxx where xx is the
+order of the functions */
+
+for i:1 thru maxorder do(
+  bfs:concat('onef_efs_G,i),
+  bfs::subs_element_entities(simp_BFs(G_edge(i)), edge_subs),
+  D_bfs:concat('D_, bfs),
+  D_bfs::crl_simplify(ev(bfs)) 
+  )$
+
+/* Generate rotational and gradient face functions in variables
+resp. onef_ffs_Rxx and onef_ffs_Gxx where xx is the order of the functions */
+
+for i:2 thru maxorder do(
+  for funtype in ['R, 'G] do(
+    bfs:concat(onef_ffs_,funtype,i),
+    bfs::make_facefuns(concat(funtype,'_,face)(i)),
+    D_bfs:concat('D_, bfs),
+    D_bfs::facefun_crls(ev(bfs))))$
+
+for i:3 thru maxorder do(
+  for funtype in ['R, 'G] do(
+    bfs:concat(onef_vfs_,funtype,i),
+    bfs::simp_BFs(concat(funtype,'_,vol)(i)),
+    D_bfs:concat('D_, bfs),
+    D_bfs::crl_simplify(ev(bfs))))$
+
+
+ff1:2*(lam1*grad(lam2)~grad(lam3) +
+  lam2*grad(lam3)~grad(lam1) +
+  lam3*grad(lam1)~grad(lam2))$
+
+ff2:2*(lam1*grad(lam2)~grad(lam4) +
+  lam2*grad(lam4)~grad(lam1) +
+  lam4*grad(lam1)~grad(lam2))$
+
+ff3:2*(lam1*grad(lam3)~grad(lam4) +
+  lam3*grad(lam4)~grad(lam1) +
+  lam4*grad(lam1)~grad(lam3))$
+
+ff4:2*(lam2*grad(lam3)~grad(lam4) +
+  lam3*grad(lam4)~grad(lam2) +
+  lam4*grad(lam2)~grad(lam3))$
+ff_names:makelist(concat(ff,i),i,1,4)$
+ffs:ev(ff_names)$
+D_ffs:vectorsimp(ev(map("div", ff_names)))$
+D_ffs:ev(D_ffs)$
+
+twof_1_mixed:ffs$
+D_twof_1_mixed:D_ffs$
+
+/*D_ffs_J:bf_to_J(D_ffs)$ */
+to_var_list(fn):=block([lamsubs:append(makelist(grad(concat('lam,i))=grd_lam[i],i,1,4),
+                                           makelist(concat('lam,i)=lam[i],i,1,4)),
+                        lam],
+                       subst(lamsubs, ev(fn)))$
+to_grad_var_list(fn):=subst(makelist(grad(concat('lam,i))=grd_lam[i],i,1,4),
+                            ev(fn))$
+
+bf_gen(grd_lam_, bf):=buildq([grd_lam_, bf],
+                            lambda([lam], subst([grd_lam=grd_lam_],bf))
+                           )$
+bf_gen_tet_x(tet_verts, bf, bf_genfun):=
+  block([grd_lam:map("grad", fullratsimp(lam_det(simplex_tetmat(tet_verts))))],
+        grd_lam:ev(express(grd_lam), diff),
+        bf_genfun(grd_lam, bf))$
+
+bf_gen_tet:lambda([tet_verts, bf], bf_gen_tet_x(tet_verts, bf, bf_gen))$
+
+bf_gen2:lambda([grd_lam_,bf], ev(bf, grd_lam:grd_lam_))$
+bf_gen_tet2:lambda([tet_verts, bf], bf_gen_tet_x(tet_verts, bf, bf_gen2))$
+
+
+facefun1:2*(lam[1]*grd_lam[2]~grd_lam[3] +
+            lam[2]*grd_lam[3]~grd_lam[1] +
+            lam[3]*grd_lam[1]~grd_lam[2])$
+
+facefun2:2*(lam[1]*grd_lam[2]~grd_lam[4] +
+            lam[2]*grd_lam[4]~grd_lam[1] +
+            lam[4]*grd_lam[1]~grd_lam[2])$
+
+facefun3:2*(lam[1]*grd_lam[3]~grd_lam[4] +
+            lam[3]*grd_lam[4]~grd_lam[1] +
+            lam[4]*grd_lam[1]~grd_lam[3])$
+
+facefun4:2*(lam[2]*grd_lam[3]~grd_lam[4] +
+            lam[3]*grd_lam[4]~grd_lam[2] +
+            lam[4]*grd_lam[2]~grd_lam[3])$
+
+edgefuns:map(lambda([x], concat(edgefun,x)), [1,2,3,4,5,6])$
+facefuns:map(lambda([x], concat(facefun,x)), [1,2,3,4])$
+facefuns:ev(facefuns)$
+
+conv_to_pythonform(BF):=block([subs:[lam1=l1, lam2=l2, lam3=l3, lam4=l4,
+  grad(l1)=gv1, grad(l2)=gv2,grad(l3)=gv3, grad(l4)=gv4,
+  gv1~gv2=cv12, gv1~gv3=cv13, gv1~gv4=cv14, gv2~gv3=cv23, gv2~gv4=cv24, gv3~gv4=cv34]],
+  fortran(facsum(subst(subs, BF),
+      gv1,gv2,gv3,gv4,cg1,cv12,cv13,cv14,cv23,cv24,cv34)))$
+
+conv_to_pythonform_nofort(BF):=block([subs:[lam1=l1, lam2=l2, lam3=l3, lam4=l4,
+  grad(l1)=gv1, grad(l2)=gv2,grad(l3)=gv3, grad(l4)=gv4,
+  gv1~gv2=cv12, gv1~gv3=cv13, gv1~gv4=cv14, gv2~gv3=cv23, gv2~gv4=cv24, gv3~gv4=cv34]],
+  facsum(subst(subs, BF),
+      gv1,gv2,gv3,gv4,cg1,cv12,cv13,cv14,cv23,cv24,cv34))$
+
+
+norot:p*(2*p+7)*(p+1)/6+3$
+norot_per_edge_tot:1$
+norot_per_face_tot:(p-1)*(p+2)/2$
+norot_per_vol_tot:(p-2)*(p-1)*(2*p+3)/6$
+nograd:(p+2)*(p+3)*(p+4)/6-4$
+nograd_per_edge_tot:p$
+nograd_per_face_tot:p*(p-1)/2$
+nograd_per_vol_tot:p*(p-1)*(p-2)/6$

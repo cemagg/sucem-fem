@@ -1,0 +1,14 @@
+&INPUTFILE meshfilename = 'test_tet.fek',
+extra_meshfilename = 'test_tet.femmesh',
+run_label(1) = '  ', 
+mesh_type = 'oldfeknative'
+aux_inputfilename = 'test_tet.aux' /
+&PROBLEM
+OUTPUT_ELEMENT_DATA=.F.,
+solution_type = 'coupled time domain',
+element_order = 'CTLN',
+SPARSE = .T.,
+solver = 'LU',
+ON_SCREEN_REPORTING = .T.,
+USE_PRE_CONDITIONER = .F./
+&OUTPUTFILE  outfilename = '+test_tet.out'/
