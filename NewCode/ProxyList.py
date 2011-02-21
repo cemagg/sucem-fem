@@ -117,7 +117,6 @@ def %s(self):
                          '<'+clsname+' attribute '+attr+' getter method>',
                          'exec'))
 
-
         def __init__(self, attrs=None, *names, **kwargs):
             """
 
@@ -190,10 +189,13 @@ def %s(self):
         ProxyItem.proxy_attrs = tuple(attrs.keys())
     except AttributeError:
         ProxyItem.proxy_attrs = tuple(attrs)
+    if hasattr(ProxyItem, 'clsname') or hasattr(ProxyItem, 'attr') \
+       or hasattr(ProxyItem, 'attr'):
+        raise Exception("I was under the impression that these attributes should not exist")
     # Delete unnecesary class attributes
-    del ProxyItem.clsname
-    del ProxyItem.attrs
-    del ProxyItem.attr
+    # del ProxyItem.clsname
+    # del ProxyItem.attrs
+    #del ProxyItem.attr
     return ProxyItem
 
 class ProxyList(object):
