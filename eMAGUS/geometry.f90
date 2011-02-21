@@ -2199,8 +2199,8 @@ SUBROUTINE MID_EDGE_NODES(element_num,x,y,z)
       IF(faces(elements(element_num)%faces(iface))%curvilinear) THEN
         EDGE_LOOP: DO iedge = 1,3
           edgenodes = GLOBAL_EDGENODES(element_num,faceedges(iedge))          
-          r1 = SQRT((vertices(edgenodes(1))%coord(1))**2+(vertices(edgenodes(1))%coord(2))**2+(vertices(edgenodes(1))%coord(3))**2)   		   
-          r2 = SQRT((vertices(edgenodes(2))%coord(1))**2+(vertices(edgenodes(2))%coord(2))**2+(vertices(edgenodes(2))%coord(3))**2)   		   
+          r1 = SQRT((vertices(edgenodes(1))%coord(1))**2+(vertices(edgenodes(1))%coord(2))**2+(vertices(edgenodes(1))%coord(3))**2)
+          r2 = SQRT((vertices(edgenodes(2))%coord(1))**2+(vertices(edgenodes(2))%coord(2))**2+(vertices(edgenodes(2))%coord(3))**2)
           IF (ABS(r1-sph_radius).GT.0.001_SP*sph_radius.OR.ABS(r2-sph_radius).GT.0.001_SP*sph_radius) THEN ! Double-check...
             STOP 'IE IN ROUTINE JACOBIAN_POLY2; RADIUS OF A CURVILINEAR ELEMENT IS INCORRECT'
           END IF

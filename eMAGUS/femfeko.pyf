@@ -747,5 +747,5 @@ python module femfeko ! in
     end interface 
 end python module femfeko
 
-! This file was auto-generated with f2py (version:2_4770).
+! This file was auto-generated with f2py (version:2).
 ! See http://cens.ioc.ee/projects/f2py2e/

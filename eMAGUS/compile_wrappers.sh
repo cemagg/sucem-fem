@@ -8,8 +8,8 @@ mv femfeko.so femfeko.so.old
 #f2py --fcompiler=intel -lminpack -larpack -llapack -lf77blas -lumfpack -lamd \
 #-c femfeko.pyf *.o 
 # For new f2py
-f2py --fcompiler=intelem -lminpack -larpack -llapack -lf77blas -lumfpack -lamd \
--c femfeko.pyf *.o 
+# f2py --fcompiler=intelem -lminpack -larpack -llapack -lf77blas -lumfpack -lamd \
+# -c femfeko.pyf *.o 
 # Try with gfortran
-#f2py --fcompiler=gnu95 -lminpack -larpack -llapack -lf77blas -lumfpack -lamd \
-#-c femfeko.pyf *.o 
+f2py --fcompiler=gnu95 -lminpack -larpack -llapack -lf77blas -lumfpack -lamd \
+-c femfeko.pyf *.o 
