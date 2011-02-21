@@ -1,6 +1,6 @@
 from __future__ import division
 
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 import numpy as N
 from NewCode.Utilities import Struct, partial
 from NewCode.tests import xfail
@@ -9,7 +9,7 @@ from NewCode.tests.PyramMeshes import SixPyram
 from NewCode.DifferentialForm.BasisFunction import PyramOneform
 import pyram_oneform_vals, pyram_oneform_interp_vals
 
-class _test_basisfunctions(NumpyTestCase):
+class _test_basisfunctions(TestCase):
     TestMesh = SixPyram
     def setUp(self):
         self.lams = self.TestMesh.test_local_coords

@@ -1,5 +1,5 @@
 from __future__ import division
-from numpy.testing import NumpyTestCase, assert_array_equal, \
+from numpy.testing import TestCase, assert_array_equal, \
      assert_array_almost_equal, assert_almost_equal, assert_equal
 import numpy as N
 from scipy import sparse 
@@ -15,7 +15,7 @@ from NewCode.DifferentialForm import PyramDiscretiser, PyramDiscretiserEntities
 from NewCode.Meshes import BrickMesh, PyramMesh
 import SystemMatrixValues, BrickSystemMatrixValues, PyramSystemMatrixValues
 
-class test_matrices(NumpyTestCase):
+class test_matrices(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(TwoTets.listmesh)
 
@@ -241,7 +241,7 @@ class test_boundary_matrix(test_matrices):
         assert_array_almost_equal(lm1, des_lm_1, decimal=15)
         
 
-class test_insert_global(NumpyTestCase):
+class test_insert_global(TestCase):
     def test_one_index(self):
         # Permutation for "element" 1
         perm_el1 = (N.arange(2), N.array([2,1], int))
@@ -263,7 +263,7 @@ class test_insert_global(NumpyTestCase):
     def test_two_indices(self):
         pass
 
-class _test_BrickMatrices(NumpyTestCase):
+class _test_BrickMatrices(TestCase):
     def setUp(self):
         self.testMesh = self.TestMesh()
         self.mesh = BrickMesh.Mesh(self.testMesh.listmesh)
@@ -439,7 +439,7 @@ class test_BrickMatrices_TwoBrick(_test_BrickMatrices):
         actual_mat = SystemMatrix.projection_matrix(disc.D(), disc2)
         assert_almost_equal(actual_mat.toarray(), desired_mat, decimal=14)
         
-class _test_PyramMatrices(NumpyTestCase):
+class _test_PyramMatrices(TestCase):
     TestMesh = SixPyram
     
     def setUp(self):

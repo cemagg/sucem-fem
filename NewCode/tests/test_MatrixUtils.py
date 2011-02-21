@@ -1,12 +1,12 @@
 from __future__ import division
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from numpy import array
 import numpy as N
 from scipy import sparse
 from scipy.sparse.linalg import iterative
 from NewCode import MatrixUtils
 
-class test_MatrixSolver(NumpyTestCase):
+class test_MatrixSolver(TestCase):
 
     def setUp(self):
         self.tol = 1e-10
@@ -33,7 +33,7 @@ class test_MatrixSolver(NumpyTestCase):
                                   tol=self.tol)[0]
                      )
         
-class test_merge_sparse_blocks(NumpyTestCase):
+class test_merge_sparse_blocks(TestCase):
     A = N.array([[1  ,2,  0,2.5,1.1],
                  [0  ,3,1.5,  0,3.5],
                  [2.1,0,  4,  1,1.3],

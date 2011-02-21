@@ -1,14 +1,14 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from NewCode.tests.TestMeshes import InscribedTetMesh, TwoTets
 from NewCode.tests import xfail
 from NewCode import Mesh, SubDimMesh
 from NewCode.DifferentialForm import SubDimDiscretiserEntities, Discretiser
 from NewCode.DifferentialForm import SubDimDiscretiser, allfree
 
-class _basetest_PformSubDimDiscretiser(NumpyTestCase):
+class _basetest_PformSubDimDiscretiser(TestCase):
     testMesh = None                     
     p = None                            # p-form
     fs = None                           # Face selector function for submesh

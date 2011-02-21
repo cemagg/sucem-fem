@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.Utilities import Struct
 from NewCode.tests.TestMeshes import FlatTet, TwoTets
@@ -10,7 +10,7 @@ from NewCode import Mesh
 from NewCode.DifferentialForm import Discretiser, DiscretiserEntities 
 from NewCode.DifferentialForm import Permuter
 
-class test_Permuter(NumpyTestCase):
+class test_Permuter(TestCase):
     PermuterClass = Permuter.Permuter
     def setUp(self):
         self.elm = Struct(edgenos=N.arange(6), facenos=N.arange(4),
@@ -104,7 +104,7 @@ class test_Permuter(NumpyTestCase):
         assert_equal(dofs, N.zeros(13))
         assert_equal(dofs.dtype, N.float64)
                      
-class test_PermuterWithEntities(NumpyTestCase):
+class test_PermuterWithEntities(TestCase):
     PermuterClass = Permuter.Permuter
     freefun = staticmethod(
         lambda ent: not (len(ent.nodes) == 2 and ent.index == 8

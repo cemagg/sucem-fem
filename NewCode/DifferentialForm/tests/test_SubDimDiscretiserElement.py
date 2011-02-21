@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.Utilities import Struct
 from NewCode.tests import xfail
@@ -10,7 +10,7 @@ from NewCode.DifferentialForm import BasisFunction, DiscretiserElement
 from NewCode import Integration, Mesh, SubDimMesh, ProxyList
 from NewCode.DifferentialForm import SubDimDiscretiserElement
 
-class _basetest_PformSubDimElement(NumpyTestCase):
+class _basetest_PformSubDimElement(TestCase):
     testMesh = None
     SubDimElementClass = SubDimDiscretiserElement.PformSubDimElement
     desiredEntityNames = ('node', 'edge', 'face')
@@ -52,7 +52,7 @@ class basetest_PformSubDimElementInscribed(_basetest_PformSubDimElement):
         assert_equal(self.instList[:].superLocalFaceno, [0,0,0])
         assert_equal(self.instList[:].superElement+1, [2,4, 5])
 
-class test_getFuncsPerEntity(NumpyTestCase):
+class test_getFuncsPerEntity(TestCase):
     def test_getFuncsPerEntity(self):
         assert_equal(SubDimDiscretiserElement.OneformSubDimElement.getFuncsPerEntity(
             ['e1f1', 'e2f1', 'e1f2', 'e2f2', 'e1f3', 'e2f3'], 2),

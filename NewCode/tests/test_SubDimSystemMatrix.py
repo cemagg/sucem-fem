@@ -1,5 +1,5 @@
 from __future__ import division
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 import numpy as N
 from scipy import sparse 
 
@@ -10,7 +10,7 @@ from NewCode import SystemMatrix, Mesh, SubDimMesh
 from NewCode.DifferentialForm import Discretiser, DiscretiserEntities
 from NewCode.DifferentialForm import SubDimDiscretiser, SubDimDiscretiserEntities
 
-class test_matrices(NumpyTestCase):
+class test_matrices(TestCase):
     faceSelector = staticmethod(lambda face: 1 in face.connect2elem)
     freefun = staticmethod(lambda x: True)
     def setUp(self):

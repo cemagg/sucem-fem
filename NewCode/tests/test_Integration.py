@@ -1,10 +1,10 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from NewCode import Integration
 
-class test_quad_tet(NumpyTestCase):
+class test_quad_tet(TestCase):
     def test_quadratic(self):
         def quad_fun(l):
             return l[0] + l[0]**2 + l[1] + l[1]**2 + l[2] + l[2]**2 + 1
@@ -14,7 +14,7 @@ class test_quad_tet(NumpyTestCase):
     def test_ordertest(self):
         self.assertRaises(KeyError, Integration.quad_tet, lambda x: x, 3)
         
-class test_TetIntegrator(NumpyTestCase):
+class test_TetIntegrator(TestCase):
     quad_fun = lambda self, l: 1*l[0] + 2*l[0]**2 + 3*l[1] + 4*l[1]**2 + 1 \
                + 5*l[2] + 6*l[2]**2 + 7*l[3] + 8*l[3]**2 \
                + 1*l[0]*l[1] + 2*l[0]*l[2] + 3*l[0]*l[3] \
@@ -38,7 +38,7 @@ class test_TetIntegrator(NumpyTestCase):
         funvals = N.array([self.quad_fun(pt) for pt in self.inst2.evalPoints()])
         assert_almost_equal(self.inst2.integrateFun(funvals), 131/20)
         
-class test_TetProdIntegrator(NumpyTestCase):
+class test_TetProdIntegrator(TestCase):
     quad_fun = test_TetIntegrator.quad_fun.im_func
 
     def test_intg_2(self):
@@ -47,7 +47,7 @@ class test_TetProdIntegrator(NumpyTestCase):
         assert_almost_equal(intg.integrateFun(funvals), 131/20)
 
 
-class _test_PyramIntegrator(NumpyTestCase):
+class _test_PyramIntegrator(TestCase):
     test_fun = lambda coord: None
     desired_test_intg_val = None
     integrator = Integration.PyramIntegrator
@@ -67,7 +67,7 @@ class test_PyramIntegrator_2_2(_test_PyramIntegrator):
     desired_test_intg_val = 21/180
     no_pts = (2,2)
     
-class _test_HexaIntegrator(NumpyTestCase):
+class _test_HexaIntegrator(TestCase):
     third_order_fun = staticmethod(
         lambda x: -3*x[0]**3*x[1]**3*x[2]**3+2*x[0]**2*x[1]**3*x[2]**3-2*x[1]**3*x[2]**3-2*x[0]**2*x[1]**2*x[2]**3+3*x[0]*x[1]**2*x[2]**3+x[1]**2*x[2]**3+3*x[0]**3*x[1]*x[2]**3+x[0]**2*x[1]*x[2]**3-x[0]*x[1]*x[2]**3-3*x[1]*x[2]**3-x[0]**3*x[2]**3-3*x[0]**2*x[2]**3+2*x[0]*x[2]**3+3*x[0]**3*x[1]**3*x[2]**2+x[0]**2*x[1]**3*x[2]**2-x[0]*x[1]**3*x[2]**2-3*x[1]**3*x[2]**2-x[0]**3*x[1]**2*x[2]**2-3*x[0]**2*x[1]**2*x[2]**2+2*x[0]*x[1]**2*x[2]**2+2*x[0]**3*x[1]*x[2]**2-2*x[0]*x[1]*x[2]**2+3*x[1]*x[2]**2-2*x[0]**3*x[2]**2+3*x[0]**2*x[2]**2+x[0]*x[2]**2-x[2]**2+2*x[0]**3*x[1]**3*x[2]-2*x[0]*x[1]**3*x[2]+3*x[1]**3*x[2]-2*x[0]**3*x[1]**2*x[2]+3*x[0]**2*x[1]**2*x[2]+x[0]*x[1]**2*x[2]-x[1]**2*x[2]+x[0]**3*x[1]*x[2]-x[0]**2*x[1]*x[2]-3*x[0]*x[1]*x[2]+2*x[1]*x[2]-3*x[0]**3*x[2]+2*x[0]**2*x[2]-2*x[2]+x[0]**3*x[1]**3-x[0]**2*x[1]**3-3*x[0]*x[1]**3+2*x[1]**3-3*x[0]**3*x[1]**2+2*x[0]**2*x[1]**2-2*x[1]**2-2*x[0]**2*x[1]+3*x[0]*x[1]+x[1]+3*x[0]**3+x[0]**2-x[0]-3)
 
@@ -110,7 +110,7 @@ class test_HexaLobattoIntegrator(_test_HexaIntegrator):
         # 2 point rule has order 1, should not be able to integrate properly
         self.assert_(N.abs(inst.integrateFun(funvals) - -551/192) > .2)
         
-class test_QuadIntegrator(NumpyTestCase):
+class test_QuadIntegrator(TestCase):
     third_order_fun = staticmethod(
         lambda x: -2*x[0]**3*x[1]**3+x[0]**2*x[1]**3-3*x[0]*x[1]**3-3*x[0]**3*x[1]**2+3*x[0]*x[1]**2-x[1]**2+3*x[0]**3*x[1]-x[0]**2*x[1]+2*x[0]*x[1]-2*x[1]+2*x[0]**3-2*x[0]**2+x[0]-3)
     def test_intg(self):
@@ -120,7 +120,7 @@ class test_QuadIntegrator(NumpyTestCase):
         assert_almost_equal(inst.integrateFun(funvals), -83/24, decimal=15)
     
 
-class test_TriIntegrator(NumpyTestCase):
+class test_TriIntegrator(TestCase):
     quad_fun = staticmethod(lambda l: 1*l[0] + 2*l[0]**2 + 3*l[1] + 4*l[1]**2 + 1 \
                + 5*l[2] + 6*l[2]**2 + 1*l[0]*l[1] + 2*l[0]*l[2] \
                - 4*l[1]*l[2]) 
@@ -156,7 +156,7 @@ class test_TriIntegrator(NumpyTestCase):
         self._test_integ(self.tenth_order_fun, Integration.TriIntegrator(10),
                          6179/13200, decimal=16)
 
-class test_gauss_lobatto_coeffs(NumpyTestCase):
+class test_gauss_lobatto_coeffs(TestCase):
     x_3 = N.array([ -1.0, -0.447213595499958, 0.447213595499958, 1.0], N.float64)
     w_3 = N.array([1/6, 5/6, 5/6, 1/6], N.float64)
     x_5 = N.array([-1.000000000000000,

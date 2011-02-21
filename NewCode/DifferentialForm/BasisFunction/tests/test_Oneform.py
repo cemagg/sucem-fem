@@ -1,14 +1,14 @@
 # Makes 1/2 (etc.) return floating point rather than 0.
 from __future__ import division
 
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 import numpy as N
 from NewCode import Mesh
 from NewCode.Utilities import Struct
 from NewCode.DifferentialForm.BasisFunction import Oneform
 from NewCode.tests import xfail
 
-class test_basisfunctions(NumpyTestCase):
+class test_basisfunctions(TestCase):
     def setUp(self):
         self.local_edgenodes = Mesh.Element.LOCAL_EDGENODES
         self.local_facenodes = Mesh.Element.LOCAL_FACENODES
@@ -146,7 +146,7 @@ class test_basisfunctions(NumpyTestCase):
                             decimal=15)
         #assert_equal(Oneform.volfunsG5_D, (Oneform.zero_D,)*len(Oneform.volfunsG5))
 
-class test_basis_set(NumpyTestCase):
+class test_basis_set(TestCase):
     def test_1_mixed(self):
         bset = Oneform.basis_set(1, mixed=True)
         # Check default value of mixed

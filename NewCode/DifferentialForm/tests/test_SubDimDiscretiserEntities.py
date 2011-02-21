@@ -1,13 +1,13 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from NewCode.tests.TestMeshes import InscribedTetMesh
 from NewCode.tests import xfail
 from NewCode import Mesh, SubDimMesh
 from NewCode.DifferentialForm import SubDimDiscretiserEntities, DiscretiserEntities
 
-class test_SubDimDiscretiserEntities(NumpyTestCase):
+class test_SubDimDiscretiserEntities(TestCase):
     def setUp(self):
         self.superMesh = Mesh.Mesh(InscribedTetMesh.listmesh)
         fs = lambda face: 10 in face.connect2elem # Faces of the center-tet

@@ -1,14 +1,14 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from NewCode.tests.BrickMeshes import FourBricks
 from NewCode.tests import xfail
 from NewCode import BrickSubDimMesh
 from NewCode.Meshes import BrickMesh
 from NewCode.DifferentialForm import BrickSubDimDiscretiserEntities, BrickDiscretiserEntities
 
-class test_SubDimDiscretiserEntities(NumpyTestCase):
+class test_SubDimDiscretiserEntities(TestCase):
     def setUp(self):
         self.superMesh = BrickMesh.Mesh(FourBricks.listmesh)
         fs = lambda face: face.index == 15

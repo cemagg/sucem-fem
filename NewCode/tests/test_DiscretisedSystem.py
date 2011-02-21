@@ -1,14 +1,14 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from NewCode.Utilities import Struct
 from NewCode import DiscretisedSystem as DS
 from NewCode import Mesh, DifferentialForm
 from NewCode.DifferentialForm import Discretiser
 from NewCode.tests.TestMeshes import TwoTets, InscribedTetMesh
 
-class test_VectorWaveEigen(NumpyTestCase):
+class test_VectorWaveEigen(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(TwoTets.listmesh)
         self.eigsys=DS.VectorWaveEigen(self.mesh,1, BC=lambda *x: True)
@@ -44,7 +44,7 @@ class test_VectorWaveEigen(NumpyTestCase):
         self.assert_(calc is self.eigsys.stiffnessMatrix()) # test caching
         
 
-class test_AudioEigen(NumpyTestCase):
+class test_AudioEigen(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(TwoTets.listmesh)
         self.eigsys=DS.AudioEigen(self.mesh,1, BC=lambda *x: True)
@@ -74,7 +74,7 @@ class test_AudioEigen(NumpyTestCase):
                             decimal=13)
         self.assert_(calc is self.eigsys.stiffnessMatrix()) # test caching
 
-class test_CoupledFirstOrderSystem(NumpyTestCase):
+class test_CoupledFirstOrderSystem(TestCase):
     def setUp(self):
         self.mesh = mesh = Mesh.Mesh(InscribedTetMesh.listmesh)
         cb = DifferentialForm.constrained_on_boundary

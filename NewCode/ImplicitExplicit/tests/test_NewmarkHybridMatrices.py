@@ -1,6 +1,6 @@
 from __future__ import division
 
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from scipy import sparse
 
@@ -44,7 +44,7 @@ class test_HybridBlockMats(_FourBrickLinearHybridBlockMatrix):
         self.verify_block_mat('B', self.block_mats['B'], self.inst, HybridMatrices)
         
 
-class test_HybridMergedMats(NumpyTestCase):
+class test_HybridMergedMats(TestCase):
     def setUp(self):
         class MockHybridBlockMats(object):
             discs = HybridMatrices.discs

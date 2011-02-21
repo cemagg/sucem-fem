@@ -1,7 +1,7 @@
 # Makes 1/2 (etc.) return floating point rather than 0.
 from __future__ import division
 
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 import numpy as N
 from NewCode.tests import xfail
 from NewCode.Utilities import Struct, partial
@@ -9,7 +9,7 @@ from NewCode.Meshes import BrickMesh
 from NewCode.DifferentialForm.BasisFunction import BrickOneform
 import brick_oneform_vals
 
-class _test_basisfunctions(NumpyTestCase):
+class _test_basisfunctions(TestCase):
     def setUp(self):
         self.facedual_edge_numbering = BrickMesh.Element.FACEDUAL_EDGE_NUMBERING
         no_steps = 3
@@ -83,7 +83,7 @@ class test_rieben04_basisfunctions(_test_basisfunctions):
                             brick_oneform_vals.rieben04_2m_volfns_D,
                             decimal=15)
 
-class test_basis_set(NumpyTestCase):
+class test_basis_set(TestCase):
     def test_1_mixed(self):
         bset = BrickOneform.basis_set(1, mixed=True)
         # Check default value of mixed

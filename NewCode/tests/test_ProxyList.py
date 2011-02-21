@@ -1,4 +1,4 @@
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from itertools import izip
 import sys
 #
@@ -6,7 +6,7 @@ import sys
 #
 from NewCode import ProxyList
 
-class test_ProxyList(NumpyTestCase):
+class test_ProxyList(TestCase):
     def setUp(self):
         self.test_attrs = {'colour' : ['blue', 'black', 'white', 'mauve'],
                       'id' : [1,2,3,4]}
@@ -55,7 +55,7 @@ class test_ProxyList(NumpyTestCase):
                      self.test_attrs)
 
 
-class test_Memoize_index(NumpyTestCase):
+class test_Memoize_index(TestCase):
     def setUp(self):
         self.test_attrs = {'colour' : ['blue', 'black', 'white', 'mauve'],
                            'id' : [1,2,3,4]}

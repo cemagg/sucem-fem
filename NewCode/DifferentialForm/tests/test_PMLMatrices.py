@@ -2,13 +2,13 @@ from __future__ import division
 
 import pickle, os
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.Utilities import Struct
 from NewCode.Meshes import BrickMesh, BrickMeshGen
 from NewCode.DifferentialForm import PMLMatrices, BrickDiscretiser, allfree
 
-class test_PMLMatrices(NumpyTestCase):
+class test_PMLMatrices(TestCase):
     h = 1.
     a,b,c = 1.,2.,3.
     no_PML_cells = 2

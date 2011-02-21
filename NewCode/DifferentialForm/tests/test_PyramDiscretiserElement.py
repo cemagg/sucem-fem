@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode import ProxyList
 from NewCode.Utilities import Struct
@@ -12,7 +12,7 @@ from NewCode.Meshes import PyramMesh
 from NewCode.DifferentialForm import PyramDiscretiserElement, PyramDiscretiserEntities
 import pyram_physvals
 
-class _basetest_PformElement(NumpyTestCase):
+class _basetest_PformElement(TestCase):
     PformElementClass = PyramDiscretiserElement.PformElement
     TestMesh = SixPyram
     class Intg(object):

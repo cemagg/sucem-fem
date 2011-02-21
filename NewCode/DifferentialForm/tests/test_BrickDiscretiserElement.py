@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.Utilities import Struct
 from NewCode.tests.BrickMeshes import OneBrick
@@ -11,7 +11,7 @@ from NewCode.DifferentialForm import BrickDiscretiserElement
 
 import BrickPhysvals
 
-class basetest_PformElement(NumpyTestCase):
+class basetest_PformElement(TestCase):
     TestMesh = OneBrick
     PformElementClass = BrickDiscretiserElement.PformElement
     class Intg(object):

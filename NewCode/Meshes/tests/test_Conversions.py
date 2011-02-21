@@ -1,14 +1,14 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.tests.PyramMeshes import SixPyram
 from NewCode.tests.TetMeshes import SixPyramConverted
 
 from NewCode.Meshes import Conversions
 
-class test_pyramid2tet(NumpyTestCase):
+class test_pyramid2tet(TestCase):
     pyram_testmesh = SixPyram
     tet_testmesh = SixPyramConverted
 

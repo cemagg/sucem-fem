@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.Meshes import BrickMesh
 from NewCode.ImplicitExplicit.NewmarkHybridSystem import NewmarkHybridSystem

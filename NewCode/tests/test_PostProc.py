@@ -1,6 +1,6 @@
 from __future__ import division
 
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from numpy import array, linspace, ones, float64, zeros, newaxis
 from itertools import izip
 
@@ -9,7 +9,7 @@ from NewCode import DifferentialForm
 from NewCode.DifferentialForm import Discretiser
 from NewCode.tests.TestMeshes import InscribedTetMesh, TwoTets
 
-class test_LocatePoints(NumpyTestCase, InscribedTetMesh):
+class test_LocatePoints(TestCase, InscribedTetMesh):
     postpro_coords = zeros((21,3), float64)
     postpro_coords[:,2] = linspace(-1/2, 1/2, 21)
 
@@ -24,7 +24,7 @@ class test_LocatePoints(NumpyTestCase, InscribedTetMesh):
                                 global_coord, decimal=16)
             
             
-class test_ReconstructPoints(NumpyTestCase, TwoTets):
+class test_ReconstructPoints(TestCase, TwoTets):
     def setUp(self):
         self.mesh = Mesh.Mesh(self.listmesh)
         self.disc1 = Discretiser.setup_PformDiscretiser(self.mesh, 1)
@@ -52,7 +52,7 @@ class test_ReconstructPoints(NumpyTestCase, TwoTets):
         assert_almost_equal(PostProc.ReconstructPoints(self.disc2_dofs, self.test_coords),
                             self.twoform_desired_vals, decimal=15)
 
-class test_misc(NumpyTestCase):
+class test_misc(TestCase):
     def test_MakeLine(self):
         startpt = array([-0.5, -0.5, -0.75])
         endpt = array([ 0.5,  0.5,  1])

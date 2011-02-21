@@ -1,11 +1,11 @@
 from __future__ import division
 
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_array_almost_equal,\
+from numpy.testing import TestCase, assert_array_equal, assert_array_almost_equal,\
      assert_almost_equal, assert_equal
 import numpy as N
 from NewCode import Utilities
 
-class test_Struct(NumpyTestCase):
+class test_Struct(TestCase):
     def setUp(self):
         self.data=dict(attr1='lala', attr2='lala2')
         self.struct=Utilities.Struct(**self.data)
@@ -33,7 +33,7 @@ class test_Struct(NumpyTestCase):
         assert_equal(self.struct, self.data)
         assert_equal(self.struct.attr4, 'def')
         
-class test_CacheLast(NumpyTestCase):
+class test_CacheLast(TestCase):
     class TestClass(object):
         __metaclass__ = Utilities.CacheLast
         @Utilities.CacheLast.CachedMethod
@@ -61,7 +61,7 @@ class test_CacheLast(NumpyTestCase):
         self.assert_(c2 is tc1.cached(2))
         assert_equal(tc2.cached(1), set([1]))
 
-class test_rechain(NumpyTestCase):
+class test_rechain(TestCase):
     def test_rechain(self):
         l1 = [0,1,2]
         l2 = ['a', 'b', 'c']
@@ -72,7 +72,7 @@ class test_rechain(NumpyTestCase):
         # Standard itertools.chain would generate an empty list here
         assert_equal([x for x in c], l1 + l2)
 
-class test_gen_lagrange_polys(NumpyTestCase):
+class test_gen_lagrange_polys(TestCase):
     def test_fns(self):
         interp_pts = [0, 1/3, 1/2, 1]
         fns = Utilities.gen_lagrange_polys(interp_pts)
@@ -83,7 +83,7 @@ class test_gen_lagrange_polys(NumpyTestCase):
                                   N.zeros((len(interp_pts), len(interp_pts) - 1)),
                                   decimal=14)
 
-class test_on_box_surf(NumpyTestCase):
+class test_on_box_surf(TestCase):
     eps_g = 1e-9
     a,b,c = 1,2,3
     tnds_a = N.array([[0,0,.5], [0,.5,0], [0.5,0,0]]) # False

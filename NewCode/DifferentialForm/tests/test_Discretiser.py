@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.DifferentialForm import Discretiser, DiscretiserEntities 
 from NewCode.DifferentialForm import BasisFunction
@@ -12,7 +12,7 @@ from NewCode.Utilities import Struct
 from NewCode.tests import xfail
 from NewCode.ProxyList import ProxyList, ItemClassFactory
 
-class test_PformDiscretiser(NumpyTestCase):
+class test_PformDiscretiser(TestCase):
     Permuter = Discretiser.Permuter
     def setUp(self):
         self.mesh=Mesh.Mesh(FlatTet.listmesh)
@@ -102,7 +102,7 @@ class test_PformDiscretiser_D(test_PformDiscretiser):
         self.assertRaises(AttributeError, getattr, inst, 'D')
         
 
-# class test_freefuns(NumpyTestCase, FlatTet):
+# class test_freefuns(TestCase, FlatTet):
 #     def setUp(self):
         
 #         self.mesh = Mesh.Mesh(self.listmesh)

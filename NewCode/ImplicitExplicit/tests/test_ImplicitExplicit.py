@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.Utilities import Struct
 from NewCode.tests.BrickMeshes import TestBrick
@@ -29,7 +29,7 @@ class FourBricksLinear(TestBrick):
                      [1,6,0], [1,6,3],
                      [1,8,0], [1,8,3]], N.float64)
 
-class _FourBrickLinearTestInfo(NumpyTestCase):
+class _FourBrickLinearTestInfo(TestCase):
     TestMesh = FourBricksLinear
     implicitElements = set([0,1])
     dt = 1/33

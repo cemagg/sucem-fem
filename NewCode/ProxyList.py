@@ -189,13 +189,12 @@ def %s(self):
         ProxyItem.proxy_attrs = tuple(attrs.keys())
     except AttributeError:
         ProxyItem.proxy_attrs = tuple(attrs)
-    if hasattr(ProxyItem, 'clsname') or hasattr(ProxyItem, 'attr') \
-       or hasattr(ProxyItem, 'attr'):
+    if hasattr(ProxyItem, 'clsname') or hasattr(ProxyItem, 'attrs'):
         raise Exception("I was under the impression that these attributes should not exist")
     # Delete unnecesary class attributes
     # del ProxyItem.clsname
     # del ProxyItem.attrs
-    #del ProxyItem.attr
+    del ProxyItem.attr
     return ProxyItem
 
 class ProxyList(object):

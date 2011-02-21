@@ -1,12 +1,12 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from NewCode.tests.TestMeshes import InscribedTetMesh
 from NewCode import Mesh, SubDimMesh
 from NewCode.DifferentialForm import Discretiser
 
-class test_SubMesh(NumpyTestCase):
+class test_SubMesh(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(InscribedTetMesh.listmesh)
 

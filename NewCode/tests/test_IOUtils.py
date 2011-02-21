@@ -1,12 +1,12 @@
 from __future__ import division
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 import numpy as N
 
 from NewCode.tests.TestMeshes import FlatTet, TwoTets
 from NewCode.tests import xfail
 from NewCode import IOUtils, Mesh
 
-class test_maxima_mesh(NumpyTestCase):
+class test_maxima_mesh(TestCase):
     def test_maxima_mesh(self):
         desired = """
 mesh_verts:rationalize(matrix(

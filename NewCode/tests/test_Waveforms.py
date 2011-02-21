@@ -1,10 +1,10 @@
 from __future__ import division
 
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 import numpy as N
 from NewCode import Waveforms
 
-class test_GaussianWavforms(NumpyTestCase):
+class test_GaussianWavforms(TestCase):
     def setUp(self):
         self.t = N.linspace(-5,5,21)
 
@@ -24,7 +24,7 @@ class test_GaussianWavforms(NumpyTestCase):
                             d_d_gaussian, decimal=15)
         
 
-class test_getGaussanWavforms(NumpyTestCase):
+class test_getGaussanWavforms(TestCase):
     def test_get_d_gaussian(self):
         dg = Waveforms.get_d_gaussian(fc=1.5, tpr=-60)
         desired =  [5.7164167941905139095e-3,2.208521453676490951e-1,2.3573720257103849219e0,5.7126415029641444359e0,-9.6292172325892394116e-1,-5.543988152495771877e0,-1.6660489421407833404e0]

@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.Utilities import Struct
 from NewCode.tests import xfail
@@ -11,7 +11,7 @@ from NewCode import Integration, BrickSubDimMesh, ProxyList
 from NewCode.Meshes import BrickMesh
 from NewCode.DifferentialForm import BrickSubDimDiscretiserElement
 
-class _basetest_PformSubDimElement(NumpyTestCase):
+class _basetest_PformSubDimElement(TestCase):
     testMesh = None
     SubDimElementClass = BrickSubDimDiscretiserElement.PformSubDimElement
     desiredEntityNames = ('node', 'edge', 'face')

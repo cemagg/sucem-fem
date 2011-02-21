@@ -1,13 +1,13 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode import ProxyList
 from NewCode.Meshes import PyramMesh, BrickMesh
 from NewCode.tests.PyramMeshes import SixPyram, TwelvePyram
 
-class test_GridGeneration(NumpyTestCase):
+class test_GridGeneration(TestCase):
     TestMesh = SixPyram
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -30,7 +30,7 @@ class test_GridGeneration(NumpyTestCase):
                                           offset=lm['GridOffset'])
     
 
-class _StructuredPyramEntityNodeGeneration(NumpyTestCase):
+class _StructuredPyramEntityNodeGeneration(TestCase):
     TestMesh = SixPyram
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -72,7 +72,7 @@ class _StructuredPyramEntityNodeGeneration(NumpyTestCase):
 class test_StructuredPyramEntityNodeGeneration(_StructuredPyramEntityNodeGeneration):
     pass
 
-class test_PyramElementEntityNumbers(NumpyTestCase):
+class test_PyramElementEntityNumbers(TestCase):
     TestMesh = SixPyram
     def setUp(self):
         self.testMesh = self.TestMesh()

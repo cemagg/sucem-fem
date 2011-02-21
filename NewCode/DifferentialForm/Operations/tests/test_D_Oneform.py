@@ -1,6 +1,6 @@
 from __future__ import division
 import random
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 import numpy as N
 
 from NewCode.tests.TestMeshes import TwoTets, FlatTet
@@ -13,7 +13,7 @@ from NewCode.Meshes import BrickMesh
 
 from NewCode.DifferentialForm.Operations import D_Oneform
 
-class test_Oneform_curlmat_CTLN(NumpyTestCase):
+class test_Oneform_curlmat_CTLN(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(TwoTets.listmesh)
         self.disc1 = Discretiser.setup_PformDiscretiser(self.mesh, 1)
@@ -35,7 +35,7 @@ class test_Oneform_curlmat_CTLN(NumpyTestCase):
         assert_array_equal(self.desired_mat,
                            CM.toarray())
 
-class test_BrickOneform_curlmat_CTLN(NumpyTestCase):
+class test_BrickOneform_curlmat_CTLN(TestCase):
     TestMesh = OneBrick
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -55,7 +55,7 @@ class test_BrickOneform_curlmat_CTLN(NumpyTestCase):
         CM = D_Oneform.D_oneform_brick(self.disc1, self.disc2)
         assert_almost_equal(self.desired_mat, CM.toarray(), decimal=15)
 
-class test_BrickOneform_curlmats(NumpyTestCase):
+class test_BrickOneform_curlmats(TestCase):
     """
     The approach here is a little different. Calculating all the matrices by
     hand is tedious and unnecesary when we know that the curl of 1-forms should
@@ -115,7 +115,7 @@ class test_BrickOneform_curlmats(NumpyTestCase):
         twof_curl_rep = N.array([dof2.reconstruct([i]*l_tl, tl) for i in (0,1)], N.float64)
         assert_almost_equal(twof_curl_rep, onef_curl, decimal=13)
 
-class test_Oneform_curlmats_base(NumpyTestCase):
+class test_Oneform_curlmats_base(TestCase):
     """
     The approach here is a little different. Calculating all the matrices by
     hand is tedious and unnecesary when we know that the curl of 1-forms should

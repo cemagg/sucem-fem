@@ -1,7 +1,7 @@
 # Makes 1/2 (etc.) return floating point rather than 0.
 from __future__ import division
 
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from numpy import array, arange, float64, int32
 
 from NewCode import Mesh
@@ -9,7 +9,7 @@ from NewCode.DifferentialForm.BasisFunction import Twoform
 from NewCode.Utilities import Struct
 from NewCode.tests.TestMeshes import FlatTet
 
-class test_basisfunctions(NumpyTestCase):
+class test_basisfunctions(TestCase):
     def setUp(self):
         self.local_facenodes = Mesh.Element.LOCAL_FACENODES
         
@@ -34,7 +34,7 @@ class test_basisfunctions(NumpyTestCase):
                               for facefun_g in Twoform.facefuns0_D)],
                             array([[6], [-6], [6], [-6]]), decimal=15)
 
-class test_basis_set(NumpyTestCase):
+class test_basis_set(TestCase):
     def test_1_mixed(self):
         bset = Twoform.basis_set(1, mixed=True)
         # Check default value of mixed

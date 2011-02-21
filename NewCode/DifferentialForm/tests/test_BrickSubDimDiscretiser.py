@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from NewCode.tests.BrickMeshes import FourBricks
 from NewCode.tests import xfail
 from NewCode import BrickSubDimMesh
@@ -9,7 +9,7 @@ from NewCode.Meshes import BrickMesh
 from NewCode.DifferentialForm import BrickSubDimDiscretiserEntities, BrickDiscretiser
 from NewCode.DifferentialForm import BrickSubDimDiscretiser
 
-class test_PformSubDimDiscretiser(NumpyTestCase):
+class test_PformSubDimDiscretiser(TestCase):
     def setUp(self):
         self.superMesh = BrickMesh.Mesh(FourBricks.listmesh)
         self.superDisc = BrickDiscretiser.setup_PformDiscretiser(

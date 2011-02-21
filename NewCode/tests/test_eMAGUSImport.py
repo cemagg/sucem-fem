@@ -1,4 +1,4 @@
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, \
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, \
      assert_equal, assert_array_almost_equal
 from numpy import array, float64, int32
 import sys, os
@@ -11,7 +11,7 @@ import NewCode.tests.TestMeshes as TestMeshes
 InscribedTetMesh = TestMeshes.InscribedTetMesh
 
 
-class test_eMAGUSImport(NumpyTestCase, InscribedTetMesh):
+class test_eMAGUSImport(TestCase, InscribedTetMesh):
     def setUp(self):
         InscribedTetMesh.setUp(self)
         self.benchmark_mesh=Mesh.Mesh(self.listmesh)

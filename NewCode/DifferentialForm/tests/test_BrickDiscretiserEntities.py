@@ -1,14 +1,14 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.tests.BrickMeshes import OneBrick, TwoBricks, FourBricks
 from NewCode.Meshes import BrickMesh
 from NewCode.DifferentialForm import constrained_on_boundary
 from NewCode.DifferentialForm import BrickDiscretiserEntities
 
-class test_DiscretiserEntities(NumpyTestCase):
+class test_DiscretiserEntities(TestCase):
     TestMesh = FourBricks
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -51,7 +51,7 @@ class test_DiscretiserEntities(NumpyTestCase):
         assert_equal(desired_list_repr, list_repr)        
 
 
-class test_freefuns(NumpyTestCase):
+class test_freefuns(TestCase):
     TestMesh = OneBrick
     def setUp(self):
         self.testMesh = self.TestMesh()

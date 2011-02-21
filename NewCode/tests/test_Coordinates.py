@@ -1,6 +1,6 @@
 from __future__ import division
 
-from numpy.testing import NumpyTestCase, assert_array_equal,\
+from numpy.testing import TestCase, assert_array_equal,\
      assert_array_almost_equal, assert_almost_equal, assert_equal
 import numpy as N
 #
@@ -11,7 +11,7 @@ from NewCode.tests.TestMeshes import FlatTet
 from NewCode.tests.BrickMeshes import OneBrick
 from NewCode.tests.PyramMeshes import SixPyram
 
-class test_SimplexCoord(NumpyTestCase, FlatTet):
+class test_SimplexCoord(TestCase, FlatTet):
     def setUp(self):
         nodeCoords = self.listmesh['Nodes'] 
         self.instance = Coordinates.SimplexCoord(nodeCoords=nodeCoords)
@@ -107,7 +107,7 @@ class test_SimplexCoord(NumpyTestCase, FlatTet):
         assert_equal(outel, [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15,
                              16, 19])
 
-class test_BrickCoord(NumpyTestCase):
+class test_BrickCoord(TestCase):
     TestMesh = OneBrick
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -177,7 +177,7 @@ class test_BrickCoord(NumpyTestCase):
             el.vol_coords2face_coords(i, ti) for i,ti in enumerate(test_inputs)],
             N.array([[1,2.]]*len(test_inputs)))
 
-class test_PyramCoord(NumpyTestCase):
+class test_PyramCoord(TestCase):
     TestMesh = SixPyram
     def setUp(self):
         self.testMesh = self.TestMesh()

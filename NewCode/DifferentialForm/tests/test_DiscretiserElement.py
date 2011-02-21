@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.Utilities import Struct
 from NewCode.tests.TestMeshes import FlatTet
@@ -10,7 +10,7 @@ from NewCode import Integration
 from NewCode.DifferentialForm import DiscretiserElement, DiscretiserEntities
 from NewCode.DifferentialForm.BoundaryConditions import allconstrained
 
-class test_volFreenos(NumpyTestCase):
+class test_volFreenos(TestCase):
     PformElementClass = DiscretiserElement.PformElement
     testMesh = FlatTet
 
@@ -38,7 +38,7 @@ class test_volFreenos(NumpyTestCase):
              }, mesh=mesh, freefun=None))
         assert_equal(inst.noFree, 1)
         
-class _basetest_PformElement(NumpyTestCase, FlatTet):
+class _basetest_PformElement(TestCase, FlatTet):
     PformElementClass = DiscretiserElement.PformElement
     class Intg(object):
         def evalPoints(self):

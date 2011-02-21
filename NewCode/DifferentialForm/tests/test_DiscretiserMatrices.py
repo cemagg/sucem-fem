@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from scipy.sparse.linalg import dsolve as linsolve
 
 from NewCode.tests.TestMeshes import TwoTets
@@ -11,7 +11,7 @@ from NewCode.MatrixUtils import Matrices
 from NewCode.DifferentialForm import Discretiser
 from NewCode.DifferentialForm import DiscretiserMatrices
 
-class test_DiscretiserMatrices(NumpyTestCase):
+class test_DiscretiserMatrices(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(TwoTets.listmesh)
         self.disc1, self.disc2 = map(

@@ -1,14 +1,14 @@
 from __future__ import division
 
 from numpy import zeros, array, arange, alltrue, float64, int32
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.tests.TestMeshes import InscribedTetMesh, FlatTet
 from NewCode import  Mesh
 from NewCode.DifferentialForm import constrained_on_boundary
 from NewCode.DifferentialForm import DiscretiserEntities
 
-class test_DiscretiserEntities(NumpyTestCase, InscribedTetMesh):
+class test_DiscretiserEntities(TestCase, InscribedTetMesh):
     def setUp(self):
         self.mesh = Mesh.Mesh(self.listmesh)
 
@@ -47,7 +47,7 @@ class test_DiscretiserEntities(NumpyTestCase, InscribedTetMesh):
                                               if onBoundary)
         assert_equal(desired_list_repr, list_repr)        
 
-class test_freefuns(NumpyTestCase, FlatTet):
+class test_freefuns(TestCase, FlatTet):
     def setUp(self):
         self.mesh = Mesh.Mesh(self.listmesh)
         # Make the boundary set more interesting, since the orignal mesh

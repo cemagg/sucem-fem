@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.tests.TestMeshes import FlatTet, TwoTets, InscribedTetMesh
 from NewCode.tests import xfail
@@ -18,7 +18,7 @@ def test_PformDiscretiserDOFs_init():
     assert_equal(inst.dofArray, N.float64)
     assert_equal(inst.dtype, N.float64)
 
-class test_PformDiscretiserRHS(NumpyTestCase):
+class test_PformDiscretiserRHS(TestCase):
     def setUp(self):
         mesh = Mesh.Mesh(TwoTets.listmesh)
         self.disc = Discretiser.setup_PformDiscretiser(mesh, form=1)
@@ -31,7 +31,7 @@ class test_PformDiscretiserRHS(NumpyTestCase):
         assert_almost_equal(self.inst.calcProjPointfunRHS(matchfun, r0),
                             desired_dofs, decimal=15)
         
-class test_PformDiscretiserDOFs(NumpyTestCase):
+class test_PformDiscretiserDOFs(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(TwoTets.listmesh)
 
@@ -54,7 +54,7 @@ class test_PformDiscretiserDOFs(NumpyTestCase):
                      disc1_D_dofs.matrix.mass().todense())
         self.assertRaises(ValueError, disc1_D_dofs.matrix.stiffness)
         
-class test_PformDiscretiserDOFs_hodge(NumpyTestCase):
+class test_PformDiscretiserDOFs_hodge(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(InscribedTetMesh.listmesh)
         self.disc1 = Discretiser.setup_PformDiscretiser(
@@ -113,7 +113,7 @@ class test_PformDiscretiserDOFs_hodge(NumpyTestCase):
         self.assertRaises(
             AssertionError, self.disc2_dofs.hodgeStar, disc1_wrongmesh)
 
-class test_Reconstruct(NumpyTestCase):
+class test_Reconstruct(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(FlatTet.listmesh)
 
@@ -142,7 +142,7 @@ class test_Reconstruct(NumpyTestCase):
                             decimal=13)
 
         
-class test_match_Oneform(NumpyTestCase):
+class test_match_Oneform(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(InscribedTetMesh.listmesh)
         (a,b,d) = (1.5, 1, 1)
@@ -176,7 +176,7 @@ class test_match_Oneform(NumpyTestCase):
         assert_almost_equal(self.inst.dofArray, desired_dofs,
                             decimal=15)
 
-class test_match_Oneform_complex(NumpyTestCase):
+class test_match_Oneform_complex(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(TwoTets.listmesh)
         self.disc = Discretiser.setup_PformDiscretiser(
@@ -205,7 +205,7 @@ class test_match_Oneform_complex(NumpyTestCase):
         assert_almost_equal(self.inst.matchErrRMS(self.matchfun), desired,
                             decimal=8)
 
-class test_match_Twoform(NumpyTestCase):
+class test_match_Twoform(TestCase):
     def setUp(self):
         self.mesh = Mesh.Mesh(InscribedTetMesh.listmesh)
         (a,b,d) = (1.5, 1, 1)

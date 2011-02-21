@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal,\
+from numpy.testing import TestCase, assert_array_equal,\
      assert_array_almost_equal,assert_almost_equal, assert_equal
 from numpy import array, float64, int32, sqrt
 import sys
@@ -14,7 +14,7 @@ import NewCode.tests.TestMeshes
 from NewCode.tests.TestMeshes import FlatTet, TwoTets, InscribedTetMesh
 
 
-class test_Mesh(NumpyTestCase, FlatTet):
+class test_Mesh(TestCase, FlatTet):
     def setUp(self):
         FlatTet.setUp(self)                     
         self.mesh=Mesh.Mesh(self.listmesh)
@@ -90,7 +90,7 @@ class test_Mesh(NumpyTestCase, FlatTet):
                            [edge.nodes for edge in edges.onBoundary])
         
 
-class test_MeshKDTree(NumpyTestCase):
+class test_MeshKDTree(TestCase):
     def setUp(self):
         self.mesh = Mesh.MeshWithKDTree(InscribedTetMesh.listmesh)
 
@@ -112,7 +112,7 @@ class test_MeshKDTree(NumpyTestCase):
         assert_almost_equal(self.mesh.maxEdgeLength, 1.41421356237,
                             decimal=11)
         
-class test_Mesh_TwoTets(NumpyTestCase):
+class test_Mesh_TwoTets(TestCase):
     def setUp(self):
         self.listmesh = TwoTets.listmesh
         self.mesh=Mesh.Mesh(self.listmesh)
@@ -130,7 +130,7 @@ class test_Mesh_TwoTets(NumpyTestCase):
                            [self.listmesh['Nodes'][elnodes].sum(axis=0)/4.
                             for elnodes in self.listmesh['ElementNodes']])
         
-class test_Mesh_Exeptions(NumpyTestCase):
+class test_Mesh_Exeptions(TestCase):
     def setUp(self):
         self.listmesh={}
         self.listmesh['ElementNodes']=array([[1,2,3,4]]) - 1
@@ -163,7 +163,7 @@ class test_Mesh_Exeptions(NumpyTestCase):
         self.listmesh['EdgeNodes'][0]=array([2,1]) - 1
         self.assertRaises(AssertionError, Mesh.Mesh, self.listmesh)
 
-class test_Mesh_Connection(NumpyTestCase, InscribedTetMesh):
+class test_Mesh_Connection(TestCase, InscribedTetMesh):
     def setUp(self):
         self.mesh = Mesh.Mesh(self.listmesh)
         # Arrays sourced from test_eMAGUSImport.py. Perhaps they should be put
@@ -239,7 +239,7 @@ class test_Mesh_Connection(NumpyTestCase, InscribedTetMesh):
         edges=self.mesh.edges
         assert_array_equal(edges[:].onBoundary, self.BoundaryEdges)
 
-class test_EntityClasses(NumpyTestCase, FlatTet):
+class test_EntityClasses(TestCase, FlatTet):
     def setUp(self):
         FlatTet.setUp(self)                     
         self.mesh=Mesh.Mesh(self.listmesh)
@@ -289,7 +289,7 @@ class test_EntityClasses(NumpyTestCase, FlatTet):
                           ,}
         assert_equal(edge_list_repr, self.edge.list_repr())
 
-class test_find_face_edges(NumpyTestCase, FlatTet):
+class test_find_face_edges(TestCase, FlatTet):
     def setUp(self):
         self.faces = Mesh.ProxyFaces(Mesh.Face({
             'nodes': self.listmesh['FaceNodes'],

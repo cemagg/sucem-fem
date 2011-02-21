@@ -1,14 +1,14 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.DifferentialForm import Discretiser, DiscretiserEntities
 from NewCode.DifferentialForm import DirechletDiscretiser
 from NewCode.tests.TestMeshes import FlatTet, TwoTets, InscribedTetMesh
 from NewCode import Mesh
 
-class test_DirechletDiscretiser(NumpyTestCase):
+class test_DirechletDiscretiser(TestCase):
     @staticmethod
     def freeFun(ent):
         ns = [1,2,3,5]

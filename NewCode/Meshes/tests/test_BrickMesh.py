@@ -1,13 +1,13 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 from NewCode.tests import xfail
 from NewCode.tests.BrickMeshes import OneBrick, TwoBricks, TwoBricksX, FourBricks
 from NewCode import ProxyList
 from NewCode.Meshes import BrickMesh
 
-class test_BrickElementLocalNumbering(NumpyTestCase):
+class test_BrickElementLocalNumbering(TestCase):
     def setUp(self):
         self.Element = BrickMesh.Element
     def test_DualLocalEdgeNodeNumbering(self):
@@ -68,7 +68,7 @@ class test_BrickElementLocalNumbering(NumpyTestCase):
                      [8, 12, 6, 1])
 
 
-class test_BrickElements(NumpyTestCase):
+class test_BrickElements(TestCase):
     TestMesh = TwoBricks
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -89,7 +89,7 @@ class test_BrickElementsX(test_BrickElements):
     TestMesh = TwoBricksX
 
 
-class test_GridGeneration(NumpyTestCase):
+class test_GridGeneration(TestCase):
     TestMesh = TwoBricks
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -115,7 +115,7 @@ class test_GridGeneration(NumpyTestCase):
 class test_GridGenerationX(test_GridGeneration):
     TestMesh = TwoBricksX
 
-class _StructuredBrickEntityNodeGeneration(NumpyTestCase):
+class _StructuredBrickEntityNodeGeneration(TestCase):
     TestMesh = TwoBricks
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -150,7 +150,7 @@ class _StructuredBrickEntityNodeGeneration(NumpyTestCase):
 class test_StructuredBrickEntityNodeGeneration(_StructuredBrickEntityNodeGeneration):
     TestMesh = TwoBricksX
 
-class test_BrickElementEntityNumbers(NumpyTestCase):
+class test_BrickElementEntityNumbers(TestCase):
     TestMesh = TwoBricks
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -187,7 +187,7 @@ class test_BrickElementEntityNumbers(NumpyTestCase):
 class test_BrickElementEntityNumbersX(test_BrickElementEntityNumbers):
     TestMesh = TwoBricksX
 
-class test_BrickElementConnections(NumpyTestCase):
+class test_BrickElementConnections(TestCase):
     TestMesh = TwoBricks
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -229,7 +229,7 @@ class test_BrickElementConnections(NumpyTestCase):
 class test_BrickElementConnectionsX(test_BrickElementConnections):
     TestMesh = TwoBricksX
 
-class test_BoundaryEntities(NumpyTestCase):
+class test_BoundaryEntities(TestCase):
     TestMesh = TwoBricks
     def setUp(self):
         self.testMesh = self.TestMesh()
@@ -320,7 +320,7 @@ class test_StructuredBrickMesh(test_BrickElements, test_GridGeneration,
     @property
     def face_nodes(self): return self.mesh.faceNodes
 
-class test_BrickFaceArea(NumpyTestCase):
+class test_BrickFaceArea(TestCase):
     TestMesh = OneBrick
     def setUp(self):
         self.testMesh = self.TestMesh()

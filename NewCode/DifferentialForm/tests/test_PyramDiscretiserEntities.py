@@ -1,13 +1,13 @@
 from __future__ import division
 
 import numpy as N
-from numpy.testing import NumpyTestCase, assert_array_equal, assert_almost_equal, assert_equal
+from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, assert_equal
 
 from NewCode.tests.PyramMeshes import SixPyram
 from NewCode.Meshes import PyramMesh
 from NewCode.DifferentialForm import PyramDiscretiserEntities
 
-class test_DiscretiserEntities(NumpyTestCase):
+class test_DiscretiserEntities(TestCase):
     TestMesh = SixPyram
     def setUp(self):
         self.testMesh = self.TestMesh()
