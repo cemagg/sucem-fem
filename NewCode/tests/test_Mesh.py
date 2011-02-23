@@ -100,13 +100,14 @@ class test_MeshKDTree(TestCase):
         self.assert_(kdt1 is kdt2)
 
     def test_findNodesRadius(self):
-        assert_equal(N.unique(self.mesh.findNodesRadius([0,0,0], 10)),
+        assert_equal(N.unique(self.mesh.findNodesRadius(N.array([0,0,0]), 10)),
                      N.arange(8))
-        assert_equal(self.mesh.findNodesRadius([1./6, 1./6, -1./6], 0.01),
+        assert_equal(self.mesh.findNodesRadius(N.array([1./6, 1./6, -1./6]), 0.01),
                      N.array([4]))
 
     def test_findClosestNode(self):
-        assert_equal(self.mesh.findClosestNode([1./2, 1./2, 1./2-0.05]), 1)
+        pos = N.array([1./2, 1./2, 1./2-0.05])
+        assert_equal(self.mesh.findClosestNode(pos), 1)
 
     def test_maxEdgeLength(self):
         assert_almost_equal(self.mesh.maxEdgeLength, 1.41421356237,

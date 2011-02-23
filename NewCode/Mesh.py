@@ -197,12 +197,14 @@ class MeshWithKDTree(MeshWithNodeElementConnections):
     def kdTree(self):
         try: return self._kdTree
         except AttributeError:
-            import Numeric  # Currently Bio.KDTree only works with old Numeric arrays
-            self.Numeric = Numeric
+            # import Numeric  # Currently Bio.KDTree only works with old Numeric arrays
+            # self.Numeric = Numeric
             from Bio.KDTree import KDTree
             print "Creating KDTree"
             self._kdTree = KDTree(dim=3)
-            self._kdTree.set_coords(Numeric.array(self.nodes.astype(N.float32)))
+            #self._kdTree.set_coords(Numeric.array(self.nodes.astype(N.float32)))
+            self._kdTree.set_coords(self.nodes.astype(N.float32))
+
         return self._kdTree
     
     def findClosestNode(self, coord):
@@ -212,9 +214,9 @@ class MeshWithKDTree(MeshWithNodeElementConnections):
         
     def findNodesRadius(self, coord, radius):
         kdt = self.kdTree
-        kdt.search(self.Numeric.array(coord, self.Numeric.Float32, savespace=True),
-                   radius)
-        return N.array(kdt.get_indices()) # Convert kdt's Numeric arrays to Numpy
+        #import pdb ; pdb.set_trace()  
+        kdt.search(coord, radius)
+        return kdt.get_indices() # Convert kdt's Numeric arrays to Numpy
 
 class Mesh(MeshWithKDTree): pass
 

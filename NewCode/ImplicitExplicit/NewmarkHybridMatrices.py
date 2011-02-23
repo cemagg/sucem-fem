@@ -135,9 +135,9 @@ class HybridBlockMats(DiscretiserMatrices.Matrices):
     def A_cc(self, dtype=N.float64):
         disc = self.discs.E.c
         no_dofs = disc.totalDOFs
-        try: X_cc = sparse.lil_matrix(shape=(no_dofs, no_dofs), dtype=dtype)
+        try: X_cc = sparse.lil_matrix((no_dofs, no_dofs), dtype=dtype)
         except TypeError:
-            X_cc = sparse.lil_matrix(shape=(1,1), dtype=dtype)
+            X_cc = sparse.lil_matrix((1,1), dtype=dtype)
 
         dtdt = self.dt**2
         for el, el_D in izip(disc.elements, disc.D().elements):
@@ -187,9 +187,9 @@ class HybridBlockMats(DiscretiserMatrices.Matrices):
     def B_cc(self, dtype=N.float64):
         disc = self.discs.E.c
         no_dofs = disc.totalDOFs
-        try: X_cc = sparse.lil_matrix(shape=(no_dofs, no_dofs), dtype=dtype)
+        try: X_cc = sparse.lil_matrix((no_dofs, no_dofs), dtype=dtype)
         except TypeError:
-            X_cc = sparse.lil_matrix(shape=(1,1), dtype=dtype)
+            X_cc = sparse.lil_matrix((1,1), dtype=dtype)
         dtdt = self.dt**2
         for el, el_D in izip(disc.elements, disc.D().elements):
             try: perm = el.permutation()

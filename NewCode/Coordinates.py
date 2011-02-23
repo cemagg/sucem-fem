@@ -14,6 +14,7 @@ import numpy as N
 from numpy import array, float64, ones, zeros, linalg, arange, compress, cross, \
      mod, newaxis, dot
 from NewCode import ProxyList
+from warnings import warn
 
 
 class SimplexCoord(object):
@@ -293,7 +294,8 @@ class SimplexCoord(object):
 class BrickCoord(object):
     noLocalCoords = 6
     def __init__(self, nodeCoords=None, *names, **kwargs):
-        super(BrickCoord, self).__init__(*names, **kwargs)
+        try: super(BrickCoord, self).__init__(*names, **kwargs)
+        except TypeError: warn("Super call to __init__ failed", UserWarning)
         if nodeCoords is not None: self.nodeCoords = nodeCoords
         try:                            # for @ProxyList.method compatibility
             getattr(self, 'index')

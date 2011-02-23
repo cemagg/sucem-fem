@@ -81,6 +81,7 @@ While it looks like there is a list of proxyItems, there is only one proxy
 object that returns the n'th item from the list. For instance
 
 """
+from warnings import warn
 
 
 def ItemClassFactory(attrs, clsname):
@@ -143,7 +144,8 @@ def %s(self):
             if attrs:
                 for attr, value in attrs.iteritems():
                     setattr(self, '_'+attr, value)
-            super(ProxyItem, self).__init__(attrs=attrs,*names,**kwargs)
+            try: super(ProxyItem, self).__init__(attrs=attrs,*names,**kwargs)
+            except TypeError: warn("Super call to __init__ failed", UserWarning)
 
         def __iter__(self):
             """
@@ -203,8 +205,9 @@ class ProxyList(object):
         self.entity = entity
         self.numberof = entity.numberof
         self.bounds = self.numberof - 1
-        super(ProxyList, self).__init__(entity, *names, **kwargs)
-
+        try: super(ProxyList, self).__init__(entity, *names, **kwargs)
+        except TypeError: warn("Super call to __init__ failed", UserWarning)
+        Warning
     def __getitem__(self, index):
         self.entity.index = index
         return self.entity

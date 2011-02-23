@@ -11,6 +11,8 @@ from DiscretiserEntities import geom_entity_names
 from NewCode.DifferentialForm import DiscretiserElement
 from BoundaryConditions import allfree
 
+from warnings import warn
+
 class BasePformDiscretiser(object):
     discElClasses = {1:DiscretiserElement.OneformElement,
                      2:DiscretiserElement.TwoformElement}
@@ -40,8 +42,9 @@ class BasePformDiscretiser(object):
         self.geomEntities = geomEntities
         self.matrix = DiscretiserMatrices(self)
         
-        super(BasePformDiscretiser, self).__init__(p, mesh, geomEntities,
+        try: super(BasePformDiscretiser, self).__init__(p, mesh, geomEntities,
                                                    *names, **kwargs)
+        except TypeError: warn("Super call to __init__ failed", UserWarning)
 
     def _setElements(self, freefun=None):
         try: ElClass=self.discElClasses[self.p]
