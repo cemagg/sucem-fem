@@ -65,12 +65,12 @@ class PMLMatrices(DiscretiserMatrices.Matrices):
     @CacheLast.CachedMethod
     def A_dy(self):
         L1 = self.discs.E.matrix.mass()
-        return L1.matvec(1/self.dt + 1/2/self.eps0*self.sigma_y())
+        return L1*(1/self.dt + 1/2/self.eps0*self.sigma_y())
 
     @CacheLast.CachedMethod
     def B_dy(self):
         L1 = self.discs.E.matrix.mass()
-        return L1.matvec(1/self.dt - 1/2/self.eps0*self.sigma_y())
+        return L1*(1/self.dt - 1/2/self.eps0*self.sigma_y())
 
     @CacheLast.CachedMethod
     def A_dx(self):

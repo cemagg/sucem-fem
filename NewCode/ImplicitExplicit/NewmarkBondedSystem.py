@@ -52,10 +52,10 @@ class NewmarkBondedSystem(NewmarkCoupledHybridSystem):
             dm1, d0 = self.newmark_dofArrays[-1], self.newmark_dofArrays[0]
             drv_n = drv_fun(dt, self.n-1)
             d0l_B = self.leapfrog_dofArrays.B
-            d0l_B -= dt*(C_dc.matvec(d0[sc]) + C_dd.matvec(d0[sd]))
+            d0l_B -= dt*(C_dc*(d0[sc]) + C_dd*(d0[sd]))
             if direch:
                 if self.direch_group in self.explicit_groups:
-                    d0l_B -= dt*drv_n*(C_p.matvec(direch_dofarr))
+                    d0l_B -= dt*drv_n*(C_p*(direch_dofarr))
             yield
 
     def step_E(self, no_steps=1):
@@ -95,10 +95,10 @@ class NewmarkBondedSystem(NewmarkCoupledHybridSystem):
             dm1, d0 = self.newmark_dofArrays[-1], self.newmark_dofArrays[0]
             d0a = d0[sa] ; d0b = d0[sb] ; d0c = d0[sc] ; d0d = d0[sd] 
             y_imp = N.zeros_like(d0[d_o.a:d_o.d])
-            y_imp[sa] =                    B.aa.matvec(d0a) + B.ab.matvec(d0b)
-            y_imp[sb] = B.ba.matvec(d0a) + B.bb.matvec(d0b) + B.bc.matvec(d0c)
-            y_imp[sc] = B.cb.matvec(d0b) + B.cc.matvec(d0c) + B.cd.matvec(d0d)
-            y_imp -= A_imp.matvec(dm1[0:d_o.d])
+            y_imp[sa] =                    B.aa*(d0a) + B.ab*(d0b)
+            y_imp[sb] = B.ba*(d0a) + B.bb*(d0b) + B.bc*(d0c)
+            y_imp[sc] = B.cb*(d0b) + B.cc*(d0c) + B.cd*(d0d)
+            y_imp -= A_imp*(dm1[0:d_o.d])
 
             drvs = [drv_fun(dt, self.n - i) for i in range(3)]
             drv_n = drvs[1]
@@ -107,7 +107,7 @@ class NewmarkBondedSystem(NewmarkCoupledHybridSystem):
             if direch:
                 if self.direch_group in self.implicit_groups:
                     dp1_p, d0_p, dm1_p = [drv*direch_dofarr for drv in drvs]
-                    y_imp[s_direch] += B_p.matvec(d0_p) - A_p.matvec(dp1_p + dm1_p)
+                    y_imp[s_direch] += B_p*(d0_p) - A_p*(dp1_p + dm1_p)
             self.newmark_dofArrays[1][0:d_o.d] = A_imp.solve(y_imp)
             if hasattr(self, 'writestuff_n'):
                 if self.n == self.writestuff_n:
@@ -128,7 +128,7 @@ class NewmarkBondedSystem(NewmarkCoupledHybridSystem):
             d0l = self.leapfrog_dofArrays.E
             d0l_B = self.leapfrog_dofArrays.B
             d0l += dt*M_dd.solve(
-                C_dd.T.matvec(Mb_dd.matvec(d0l_B)) + C_bm.T.matvec(Mb_b.matvec(b_b)))
+                C_dd.T*(Mb_dd*(d0l_B)) + C_bm.T*(Mb_b*(b_b)))
 
             self.log()
             # print 'Step Newmark Bonded %d/%d, drv_fun: %f, total steps: %d, max: %f' % \

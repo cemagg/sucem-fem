@@ -29,7 +29,7 @@ class test_MatrixSolver(TestCase):
     def test_solve_mat_matvec(self):
         assert_equal(self.inst.solve_mat_matvec(self.A, self.B, self.b),
                      iterative.cg(self.A,
-                                  self.B.matvec(self.b),
+                                  self.B*(self.b),
                                   tol=self.tol)[0]
                      )
         

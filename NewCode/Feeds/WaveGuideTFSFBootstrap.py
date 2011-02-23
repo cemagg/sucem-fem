@@ -172,7 +172,7 @@ class WaveGuideTFSFBootstrap(object):
             self.logsys.discs.E, self.on_measurement_port, self.port_free)
         self.measure_dofArray = sm_m.matchKnown(self.E_wg)
         self.nf = N.dot(self.measure_dofArray,
-                        sm_m.subDisc.matrix.mass().matvec(self.measure_dofArray))
+                        sm_m.subDisc.matrix.mass()*(self.measure_dofArray))
         self.log_dofarrays = Struct(E=self.logsys.dofs.E.dofArray,
                                     B=self.logsys.dofs.B.dofArray)
 
@@ -209,7 +209,7 @@ class WaveGuideTFSFBootstrap(object):
         if not zero:
             ts_modeintg_n = N.dot(
                 self.measure_dofArray,
-                self.sm_m.subDisc.matrix.mass().matvec(E_dofs)
+                self.sm_m.subDisc.matrix.mass()*(E_dofs)
                 )/self.nf
         if zero:
             E_dofs = N.zeros_like(E_dofs)

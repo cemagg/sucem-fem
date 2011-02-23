@@ -101,15 +101,15 @@ class NewmarkHybridSystemBase(object):
             s_imp = slice(d_o.a,d_o.d) ; s_exp = slice(d_o.d,self.totalDOFs)
             d0a = d0[sa] ; d0b = d0[sb] ; d0c = d0[sc] ; d0d = d0[sd] ; d0e = d0[se]
             y = N.zeros_like(d0)
-            y[sa] =                    B.aa.matvec(d0a) + B.ab.matvec(d0b)
-            y[sb] = B.ba.matvec(d0a) + B.bb.matvec(d0b) + B.bc.matvec(d0c)
-            y[sc] = B.cb.matvec(d0b) + B.cc.matvec(d0c) + B.cd.matvec(d0d)
-            y[sd] = B.dc.matvec(d0c) + B.dd.matvec(d0d) + B.de.matvec(d0e)
-            y[se] = B.ed.matvec(d0d) + B.ee.matvec(d0e)
+            y[sa] =                    B.aa*(d0a) + B.ab*(d0b)
+            y[sb] = B.ba*(d0a) + B.bb*(d0b) + B.bc*(d0c)
+            y[sc] = B.cb*(d0b) + B.cc*(d0c) + B.cd*(d0d)
+            y[sd] = B.dc*(d0c) + B.dd*(d0d) + B.de*(d0e)
+            y[se] = B.ed*(d0d) + B.ee*(d0e)
             dm1_imp = dm1[s_imp] ; dm1_exp = dm1[s_exp]
             y_imp = y[s_imp] ; y_exp = y[s_exp]
-            y_imp -= A_imp.matvec(dm1_imp)
-            y_exp -= A_exp.matvec(dm1_exp)
+            y_imp -= A_imp*(dm1_imp)
+            y_exp -= A_exp*(dm1_exp)
 
             drvs = [drv_fun(dt, self.n - i) for i in range(3)]
             y[drv_dofnos] -= drv_weights*(
@@ -117,8 +117,8 @@ class NewmarkHybridSystemBase(object):
             if direch:
                 dp1_p, d0_p, dm1_p = [drv*direch_dofarr for drv in drvs]
                 slices = dict(a=sa,b=sb,c=sc,d=sd,e=se)
-                y[slices[self.direch_group]] += B_p.matvec(d0_p) \
-                                                - A_p.matvec(dp1_p + dm1_p)
+                y[slices[self.direch_group]] += B_p*(d0_p) \
+                                                - A_p*(dp1_p + dm1_p)
             print 'Step %d/%d, drv_fun: %f, total steps: %d, max: %f' % \
                     (step+1, no_steps, drvs[0],
                      self.n, N.max(N.abs(self.dofArrays[1])))

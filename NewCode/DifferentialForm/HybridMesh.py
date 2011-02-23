@@ -32,7 +32,7 @@ def tet2hc_tet(edges, d_edges, d_edgemap, edge_dofnos):
 
     (T, hc_edge_dofnos) where
 
-    T -- Transform matrix, T.matvec(orig_dofs) -> hex_compat_dofs
+    T -- Transform matrix, T*orig_dofs -> hex_compat_dofs
 
     hc_edge_dofnos
 

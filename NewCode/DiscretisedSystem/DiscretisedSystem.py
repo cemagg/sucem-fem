@@ -125,9 +125,9 @@ class CurlCurlNewmark(TimeDomainSystem,EigenSystem):
             self.dofArrays[-1][:] = self.dofArrays[0]
             self.dofArrays[0][:] = self.dofArrays[1]
             dm1, d0 = self.dofArrays[-1], self.dofArrays[0]
-            RHS = (2/(dt**2)*M.matvec(d0) - (1-2*b)*S.matvec(d0)) \
-                  - (1/(dt**2)*M.matvec(dm1) - 1/2/dt*Q.matvec(dm1)
-                     + b*S.matvec(dm1))
+            RHS = (2/(dt**2)*M*d0 - (1-2*b)*S*d0) \
+                  - (1/(dt**2)*M*(dm1) - 1/2/dt*Q*dm1
+                     + b*(S*dm1))
             drvs = [drv_fun(dt, self.n - i) for i in range(3)]
             RHS[drv_dofnos] -= drv_weights*(
                 b*drvs[0] + (1-2*b)*drvs[1] + b*drvs[2])
@@ -171,16 +171,16 @@ class CurlCurlNewmarkDirechlet(CurlCurlNewmark):
             self.dofArrays[-1][:] = self.dofArrays[0]
             self.dofArrays[0][:] = self.dofArrays[1]
             dm1, d0 = self.dofArrays[-1], self.dofArrays[0]
-            RHS_f = (2/(dt**2)*Mf.matvec(d0) - (1-2*b)*Sf.matvec(d0)) \
-                    - (1/(dt**2)*Mf.matvec(dm1) - 1/2/dt*Qf.matvec(dm1)
-                       + b*Sf.matvec(dm1))
+            RHS_f = (2/(dt**2)*Mf*d0 - (1-2*b)*Sf*d0) \
+                    - (1/(dt**2)*Mf*dm1 - 1/2/dt*Qf*dm1
+                       + b*Sf*dm1)
             drvs = [drv_fun(dt, self.n - i) for i in range(3)]
             # drvs[0,1,2] -> drv(n+1), drv(n), drv(n-1)
             dp1_p, d0_p, dm1_p = [drv*direch_dofs for drv in drvs]
-            RHS_d = (2/(dt**2)*Mp.matvec(d0_p) - (1-2*b)*Sp.matvec(d0_p)) \
-                    - (1/(dt**2)*Mp.matvec(dm1_p) - 1/2/dt*Qp.matvec(dm1_p)
-                       + b*Sp.matvec(dm1_p)) \
-                    - direch_solveMat.matvec(dp1_p)
+            RHS_d = (2/(dt**2)*Mp*(d0_p) - (1-2*b)*Sp*(d0_p)) \
+                    - (1/(dt**2)*Mp*(dm1_p) - 1/2/dt*Qp*(dm1_p)
+                       + b*Sp*(dm1_p)) \
+                    - direch_solveMat*(dp1_p)
             RHS = RHS_f + RHS_d
             print 'Newmark step %d/%d, drv_fun: %f, total steps: %d, max: %f' % \
                     (step+1, no_steps, drvs[0], self.n, N.max(N.abs(self.dofArrays[1])))
@@ -210,15 +210,15 @@ class CurlCurlNewmarkDirechletCoupled(CurlCurlNewmarkDirechlet):
             self.dofArrays[-1][:] = self.dofArrays[0]
             self.dofArrays[0][:] = self.dofArrays[1]
             dm1, d0 = self.dofArrays[-1], self.dofArrays[0]
-            RHS_f = (2/(dt**2)*Mf.matvec(d0) - (1-2*b)*Sf.matvec(d0)) \
-                    - (1/(dt**2)*Mf.matvec(dm1) - 1/2/dt*Qf.matvec(dm1)
-                       + b*Sf.matvec(dm1))
+            RHS_f = (2/(dt**2)*Mf*(d0) - (1-2*b)*Sf*(d0)) \
+                    - (1/(dt**2)*Mf*(dm1) - 1/2/dt*Qf*(dm1)
+                       + b*Sf*(dm1))
             # Direchlet DOF values at t = n+1, n, n-1
             dp1_p, d0_p, dm1_p = self.direchSys.dof_mem
-            RHS_d = (2/(dt**2)*Mp.matvec(d0_p) - (1-2*b)*Sp.matvec(d0_p)) \
-                    - (1/(dt**2)*Mp.matvec(dm1_p) - 1/2/dt*Qp.matvec(dm1_p)
-                       + b*Sp.matvec(dm1_p)) \
-                    - direch_solveMat.matvec(dp1_p)
+            RHS_d = (2/(dt**2)*Mp*(d0_p) - (1-2*b)*Sp*(d0_p)) \
+                    - (1/(dt**2)*Mp*(dm1_p) - 1/2/dt*Qp*(dm1_p)
+                       + b*Sp*(dm1_p)) \
+                    - direch_solveMat*(dp1_p)
             RHS = RHS_f + RHS_d
             print 'Newmark step %d/%d, total steps: %d, max_RHS_d: %f, max_RHS_f: %f, max: %f' % \
                     (step+1, no_steps, self.n, N.max(N.abs(RHS_d)), N.max(N.abs(RHS_f)),
@@ -404,7 +404,7 @@ class CoupledFirstOrderSystemB(CoupledFirstOrderSystem):
             dofs.B.dofArray[:] -= dt*dofs.E.D(dofs.B.disc).dofArray
             # d/dt E = curl(B) - J
 
-            RHS = dt*Cbe.matvec(dofs.B.dofArray)
+            RHS = dt*Cbe*(dofs.B.dofArray)
             RHS[dofnos] -= dt*weights*drv
             print 'Step %d/%d, drv_fun: %f, total steps: %d, max E: %f ' % \
                   (step+1, no_steps, drv, self.n, N.max(N.abs(self.dofs.E.dofArray)))
@@ -430,7 +430,7 @@ class CoupledFirstOrderSystemBDirechlet(CoupledFirstOrderSystemB):
             dofs_p = self.direchSys.dofs
             discs_f, discs_p = self.discs, self.direchSys.discs        
             Me_p = discs_p.E.matrix.projectionOnto(discs_f.E)
-            cont = Me_p.matvec(dofs_p.E.dofArray)
+            cont = Me_p*(dofs_p.E.dofArray)
             dofnos_direch = N.arange(
                 Me_p.shape[0], dtype=N.int32)[N.abs(cont) > 0].copy()
             weights_direch = cont[dofnos_direch]
@@ -444,7 +444,7 @@ class CoupledFirstOrderSystemBDirechlet(CoupledFirstOrderSystemB):
             dofs_p = self.direchSys.dofs
             discs_f, discs_p = self.discs, self.direchSys.discs        
             Ceb_p = discs_p.E.matrix.exteriorDerivative(discs_f.B)
-            cont = Ceb_p.matvec(dofs_p.E.dofArray)
+            cont = Ceb_p*(dofs_p.E.dofArray)
             dofnos_direch = N.arange(
                 Ceb_p.shape[0], dtype=N.int32)[N.abs(cont) > 0].copy()
             weights_direch = cont[dofnos_direch]
@@ -475,10 +475,10 @@ class CoupledFirstOrderSystemBDirechlet(CoupledFirstOrderSystemB):
             print 'Step %d/%d, drv_fun: %f, total steps: %d, max E: %f ' % \
                   (step+1, no_steps, drv_np1, self.n, N.max(N.abs(self.dofs.E.dofArray)))
             # d/dt B = -curl(E)
-            dofs.B.dofArray[:] -= dt*(Ceb_f.matvec(dofs.E.dofArray))
+            dofs.B.dofArray[:] -= dt*(Ceb_f*(dofs.E.dofArray))
             dofs.B.dofArray[B_drv_dofs] -= dt*drv_n*B_drv_weights
             # d/dt E = curl(B) - J
-            RHS = (dt*Ceb_f.T.matvec(Mb.matvec(dofs.B.dofArray)))
+            RHS = (dt*Ceb_f.T*(Mb*(dofs.B.dofArray)))
             RHS[E_drv_dofsd] -= drv_delta*E_drv_weightsd 
             RHS[E_drv_dofsc] -= dt*drv_n*E_drv_weightsc
             dofs.E.dofArray[:] += dofs.E.solver.solve_mat_vec(Me_f, RHS)
@@ -560,7 +560,7 @@ class PMLSystem(BrickCoupledFirstOrderSystemBDirechlet):
             print 'Step %d/%d, drv_fun: %f, total steps: %d, max E: %f ' % \
                   (step+1, no_steps, drv_n, self.n, N.max(N.abs(self.dofs.E.dofArray)))
             # Update fake B using curl of E
-            next_b = 1/A_by*(B_by*b - L_2*C.matvec(e))
+            next_b = 1/A_by*(B_by*b - L_2*C*(e))
             next_b[B_drv_dofs] -= drv_n/A_by[B_drv_dofs]*L_2[B_drv_dofs] \
                                   *B_drv_weights
             # Update dual-mesh H using fake B
@@ -568,7 +568,7 @@ class PMLSystem(BrickCoupledFirstOrderSystemBDirechlet):
             b[:] = next_b    
             del(next_b)
             # Update fake d using curl of H and -J
-            next_d = 1/A_dy*(C.T.matvec(h) + B_dy*d)
+            next_d = 1/A_dy*(C.T*(h) + B_dy*d)
             next_d[E_drv_dofs] -= drv_n/A_dy[E_drv_dofs]*E_drv_weights
             # Update E using fake D
             e[:] = 1/A_ez*(A_dx*next_d - B_dx*d + B_ez*e)

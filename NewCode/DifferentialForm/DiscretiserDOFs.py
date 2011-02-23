@@ -104,7 +104,7 @@ class PformDiscretiserDOFs(PformDiscretiserRHS):
     def D(self, target_disc):
         target_disc_dofs = target_disc.newDOFs()
         target_disc_dofs.dofArray[:] = self.matrix.exteriorDerivative(
-            target_disc).matvec(self.dofArray)
+            target_disc)*self.dofArray
         return target_disc_dofs
 
     def hodgeStar(self, target_disc):

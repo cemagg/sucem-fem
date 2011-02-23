@@ -221,15 +221,15 @@ class WaveGuide2Port(object):
         sm_m2 = self.sm_m2 ; sm_m1 = self.sm_m1
         measure_dofArray2 = self.measure_dofArray2
         measure_dofArray1 = self.measure_dofArray1
-        nf2 =  N.dot(measure_dofArray2, sm_m2.subDisc.matrix.mass().matvec(measure_dofArray2))
-        nf1 =  N.dot(measure_dofArray1, sm_m1.subDisc.matrix.mass().matvec(measure_dofArray1))
+        nf2 =  N.dot(measure_dofArray2, sm_m2.subDisc.matrix.mass()*(measure_dofArray2))
+        nf1 =  N.dot(measure_dofArray1, sm_m1.subDisc.matrix.mass()*(measure_dofArray1))
 
         ts_modeintg2_n = N.array([
-            N.dot(measure_dofArray2, sm_m2.subDisc.matrix.mass().matvec(dof_vec))
+            N.dot(measure_dofArray2, sm_m2.subDisc.matrix.mass()*(dof_vec))
             for dof_vec in msys2.loggedDOFs.E[tuple(self.logged_dofnos2)].vals],
                                 N.float64)/nf2
         ts_modeintg1_n = N.array([
-            N.dot(measure_dofArray1, sm_m1.subDisc.matrix.mass().matvec(dof_vec))
+            N.dot(measure_dofArray1, sm_m1.subDisc.matrix.mass()*(dof_vec))
             for dof_vec in msys1.loggedDOFs.E[tuple(self.logged_dofnos1)].vals],
                                  N.float64)/nf1
         return Struct(nf2=nf2, nf1=nf1,  ts_modeintg2_n=ts_modeintg2_n,
@@ -258,14 +258,14 @@ class WaveGuide2Port(object):
         
         for n in xrange(n_steps):
             for bstep in B_steppers: bstep.next()
-            drv_sys.dofs.B.dofArray[self.B_st_dofnos] += dt*C_st.matvec(e_ts)
+            drv_sys.dofs.B.dofArray[self.B_st_dofnos] += dt*C_st*(e_ts)
 
             inc_vals = self.WGB.next_drive()
             e_ts = inc_vals.E_incdofs
             b_st = inc_vals.B_incdofs
             self.inc_modeintg.append(inc_vals.mode_weighted)
-            drv_sys.dofs.E.dofArray[self.E_ts_dofnos] += dt*M_eps_inv_ts.matvec(
-                C_st.T.matvec(M_mu_st.matvec(b_st)))
+            drv_sys.dofs.E.dofArray[self.E_ts_dofnos] += dt*M_eps_inv_ts*(
+                C_st.T*(M_mu_st*(b_st)))
 
             for estep in E_steppers: estep.next()
 

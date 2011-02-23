@@ -54,7 +54,7 @@ class MatrixSolver(object):
         solution strategies don't require wide-ranging code changes.
         """
 
-        return self.solve_mat_vec(A,B.matvec(b))
+        return self.solve_mat_vec(A,B*(b))
 
 
 def add_diagonal_preconditioner(A):
