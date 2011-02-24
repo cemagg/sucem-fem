@@ -1,0 +1,3 @@
+eMAGUS/*.mod
+.noseids
+NewCode/tests/testdata/test_eMAGUSImport/+test_tet.out
