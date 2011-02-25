@@ -38,7 +38,7 @@ def setup_PformDiscretiser(
     hyb_disc.init_entity_dofnos()
     hyb_disc.init_nodofs()
     
-    hc_T = sparse.lil_matrix(shape=(hyb_disc.nodofs.tot, hyb_disc.nodofs.mtet), dtype=N.float64)
+    hc_T = sparse.lil_matrix((hyb_disc.nodofs.tot, hyb_disc.nodofs.mtet), dtype=N.float64)
     
     hyb_dofmaps = HybridMesh.HybridSubdim2GlobDofmaps()
     subdim_ent_attr = hyb_dofmaps.subdim_ent_attr
@@ -82,7 +82,7 @@ def setup_PformDiscretiser(
     
     hc_T = hc_T.tocsc()
     
-    brickglob_T = sparse.lil_matrix(shape=(hyb_disc.nodofs.tot, hyb_disc.nodofs.brick), dtype=N.int8)
+    brickglob_T = sparse.lil_matrix((hyb_disc.nodofs.tot, hyb_disc.nodofs.brick), dtype=N.int8)
     for i in range(hyb_disc.nodofs.brick):
         brickglob_T[i,i] = 1
     brickglob_T = brickglob_T.tocsc()

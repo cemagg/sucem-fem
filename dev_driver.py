@@ -1,4 +1,4 @@
-"""
+1"""
 Test driver code. Anything of lasting importance should be factored out pronto
 """
 from __future__ import division

@@ -109,7 +109,7 @@ hyb_nodofs = brick_subdisc.totalDOFs
 otet_nodofs = otet_disc.totalDOFs 
 tot_nodofs = otet_nodofs + brick_nodofs 
 
-hc_T = sparse.lil_matrix(shape=(tot_nodofs, mtet_nodofs), dtype=N.float64)
+hc_T = sparse.lil_matrix((tot_nodofs, mtet_nodofs), dtype=N.float64)
 
 
 def make_2face_permutation(tf_els):
@@ -210,7 +210,7 @@ for ent, entmap in hct_dofnos.items():
 
 hc_T = hc_T.tocsc()
 
-brickglob_T = sparse.lil_matrix(shape=(tot_nodofs, brick_nodofs), dtype=N.int8)
+brickglob_T = sparse.lil_matrix((tot_nodofs, brick_nodofs), dtype=N.int8)
 for i in range(brick_nodofs):
     brickglob_T[i,i] = 1
 brickglob_T = brickglob_T.tocsc()

@@ -268,7 +268,6 @@ class HexTriFaceMatcher(object):
         self.init_hextri_map()
         
     def init_kdtrees(self):
-        import Numeric  # Currently Bio.KDTree only works with old Numeric arrays
         from Bio.KDTree import KDTree
         hface_centroids = [[],[],[]]
         self.hface_indices = hface_indices = [[],[],[]]
@@ -282,10 +281,9 @@ class HexTriFaceMatcher(object):
         for centroids in hface_centroids :
             kdtrees.append(KDTree(dim=3))
             if len(centroids) == 0: continue
-            kdtrees[-1].set_coords(Numeric.array(centroids, Numeric.Float32))
+            kdtrees[-1].set_coords(N.array(centroids, N.float32))
 
     def init_hextri_map(self):
-        import Numeric
         r = self.search_radius ; kdtrees = self.kdtrees
         self.hex_tris = [[] for hface in self.hexsm.elements]
         for tri in self.trism.elements:
@@ -293,7 +291,7 @@ class HexTriFaceMatcher(object):
             mid_pt = N.average(tface_coords, axis=0).astype(N.float32)
             ndir = calc_face_normaldir(tface_coords)
             kdt = kdtrees[ndir]
-            kdt.search(Numeric.array(mid_pt, Numeric.Float32), r)
+            kdt.search(mid_pt, r)
             inds = kdt.get_indices() ; radii = kdt.get_radii()
             closest_ind = inds[N.argmin(radii)]
             hface_ind = self.hface_indices[ndir][closest_ind]
