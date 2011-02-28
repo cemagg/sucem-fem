@@ -78,41 +78,8 @@ system.init_merged_mats()
 system.init_dofs()
 system.set_dt(1.)
 
-hc_T = system.block_matrices.hybrid_transform_mat()
-
-#M = system.merged_matrices.A()
-#S = 2*M - system.merged_matrices.B()
-
-M_aa = system.block_matrices.A_aa()
-M_ab = system.block_matrices.A_ab()
-M_bb = system.block_matrices.A_bb()
-M_bc = system.block_matrices.A_bc()
-M_cc = system.block_matrices.A_cc()
-M_dd = system.block_matrices.A_dd()
-# #M_ee = system.block_matrices.A_ee()
-
-S_aa = 2*M_aa - system.block_matrices.B_aa()
-S_ab = 2*M_ab - system.block_matrices.B_ab()
-S_bb = 2*M_bb - system.block_matrices.B_bb()
-S_bc = 2*M_bc - system.block_matrices.B_bc()
-S_cc = 2*M_cc - system.block_matrices.B_cc()
-S_cd = - system.block_matrices.B_cd()
-S_dd = 2*M_dd - system.block_matrices.B_dd()
-# S_de = - system.block_matrices.B_de()
-# S_ee = 2*M_ee - system.block_matrices.B_ee()
-
-M = sparse.bmat([[M_aa,   M_ab,   None,  None],
-                 [M_ab.T, M_bb,   M_bc,  None],
-                 [None,   M_bc.T, M_cc,  None],
-                 [None,   None  , None,  M_dd]]).tocsc()
-
-S = sparse.bmat([[S_aa,   S_ab,   None,   None],
-                 [S_ab.T, S_bb,   S_bc,   None],
-                 [None,   S_bc.T, S_cc,   S_cd],
-                 [None,   None  , S_cd.T, S_dd]]).tocsc()
-
-
-
+M = system.merged_matrices.A()
+S = 2*M - system.merged_matrices.B()
 
 from scipy.sparse.linalg.eigen.arpack import speigs
 sigma = 0.01

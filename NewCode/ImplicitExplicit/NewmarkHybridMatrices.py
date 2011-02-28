@@ -52,13 +52,14 @@ class HybridMergedMats(DiscretiserMatrices.Matrices):
     @CacheLast.CachedMethod
     def A(self):
         bmats = Struct((k, getattr(self.hybrid_block_mats, 'A_'+k)())
-                     for k in ('aa', 'ab', 'bb', 'bc', 'cc', 'dd', 'ee'))
+                     for k in ('aa', 'ab', 'bb', 'bc', 'cc', 'dd'))
         ofs_b = bmats.aa.shape[0]
         ofs_c = ofs_b + bmats.bb.shape[0]
         ofs_d = ofs_c + bmats.cc.shape[0]
         ofs_e = ofs_d + bmats.dd.shape[0]
 
         if self.hybrid_block_mats.discs.E.e.totalDOFs > 0:
+            bmats.ee = self.hybrid_block_mats.A_ee
             return self._finalizeMatrix(merge_sparse_blocks((
                 ((0,0), bmats.aa), ((0, ofs_b), bmats.ab), 
                 ((ofs_b, 0), bmats.ab.T), ((ofs_b, ofs_b), bmats.bb),
@@ -78,21 +79,35 @@ class HybridMergedMats(DiscretiserMatrices.Matrices):
     def B(self):
         bmats = Struct((k, getattr(self.hybrid_block_mats, 'B_'+k)())
                      for k in ('aa', 'ab', 'bb', 'bc', 'cc',
-                               'cd', 'de', 'dd', 'ee'))
+                               'cd', 'dd'))
         ofs_b = bmats.aa.shape[0]
         ofs_c = ofs_b + bmats.bb.shape[0]
         ofs_d = ofs_c + bmats.cc.shape[0]
         ofs_e = ofs_d + bmats.dd.shape[0]
 
-        return self._finalizeMatrix(merge_sparse_blocks((
-            ((0,0), bmats.aa), ((0, ofs_b), bmats.ab), 
-            ((ofs_b, 0), bmats.ab.T), ((ofs_b, ofs_b), bmats.bb),
-            ((ofs_b, ofs_c), bmats.bc),
-            ((ofs_c, ofs_b), bmats.bc.T), ((ofs_c, ofs_c), bmats.cc),
-            ((ofs_c, ofs_d), bmats.cd),
-            ((ofs_d, ofs_c), bmats.cd.T), ((ofs_d, ofs_d), bmats.dd),
-            ((ofs_d, ofs_e), bmats.de),
-            ((ofs_e, ofs_d), bmats.de.T), ((ofs_e, ofs_e), bmats.ee))))
+        if self.hybrid_block_mats.discs.E.e.totalDOFs > 0:
+            bmats.de = self.hybrid_block_mats.B_de
+            bmats.ee = self.hybrid_block_mats.B_ee
+            return self._finalizeMatrix(merge_sparse_blocks((
+                ((0,0), bmats.aa), ((0, ofs_b), bmats.ab), 
+                ((ofs_b, 0), bmats.ab.T), ((ofs_b, ofs_b), bmats.bb),
+                ((ofs_b, ofs_c), bmats.bc),
+                ((ofs_c, ofs_b), bmats.bc.T), ((ofs_c, ofs_c), bmats.cc),
+                ((ofs_c, ofs_d), bmats.cd),
+                ((ofs_d, ofs_c), bmats.cd.T), ((ofs_d, ofs_d), bmats.dd),
+                ((ofs_d, ofs_e), bmats.de),
+                ((ofs_e, ofs_d), bmats.de.T), ((ofs_e, ofs_e), bmats.ee)))
+                                        )
+        else:
+            return self._finalizeMatrix(merge_sparse_blocks((
+                ((0,0), bmats.aa), ((0, ofs_b), bmats.ab), 
+                ((ofs_b, 0), bmats.ab.T), ((ofs_b, ofs_b), bmats.bb),
+                ((ofs_b, ofs_c), bmats.bc),
+                ((ofs_c, ofs_b), bmats.bc.T), ((ofs_c, ofs_c), bmats.cc),
+                ((ofs_c, ofs_d), bmats.cd),
+                ((ofs_d, ofs_c), bmats.cd.T), ((ofs_d, ofs_d), bmats.dd)))
+                                        )
+            
         
         
 class HybridBlockMats(DiscretiserMatrices.Matrices):
