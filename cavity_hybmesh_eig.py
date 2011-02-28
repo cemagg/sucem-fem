@@ -71,7 +71,7 @@ def freeE(ent):
                 N.all(b_p(y)) or N.all(zero_p(y)) or
                 N.all(c_p(z)) or N.all(zero_p(z)))
 
-freeE = free
+#freeE = free
 
 from analytical_WG_driver import WGT
 

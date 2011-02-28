@@ -143,3 +143,8 @@ def merge_sparse_blocks(block_mats, format='coo', dtype=N.float64):
 def extract_diag_mat(mat):
     return sparse.dia_matrix(([mat.diagonal()], [0]), shape=mat.shape, dtype=mat.dtype)
 
+class EmptySparse(N.matrix):
+    def __new__(subtype, shape=(0,0)):
+        return N.asmatrix(N.zeros(shape))
+    nnz = 0
+

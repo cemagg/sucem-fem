@@ -109,7 +109,7 @@ def boundary_matrix(disc, dtype=N.float64):
     Calculate the boundary surface matrix of system disc, returning a scipy.sparse.lil_matrix
     """
     no_dofs = disc.totalDOFs
-    bdry_mat = sparse.lil_matrix(shape=(no_dofs, no_dofs), dtype=dtype)
+    bdry_mat = sparse.lil_matrix((no_dofs, no_dofs), dtype=dtype)
     for el in disc.elements:
         local_mat = local_boundary_matrix(el, disc.mesh.faces)
         insert_global(bdry_mat, local_mat, el.permutation())

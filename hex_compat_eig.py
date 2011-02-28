@@ -61,7 +61,7 @@ for i, edge in enumerate(mesh.edges):
 
 
 
-T = sparse.lil_matrix(shape=(no_newdofs, no_olddofs), dtype=N.float64)
+T = sparse.lil_matrix((no_newdofs, no_olddofs), dtype=N.float64)
 
 for i, edge in enumerate(mesh.edges):
     if i in d_edges:

@@ -20,7 +20,7 @@ class HybridMeshHybridBlockMats(HybridBlockMats):
     def hybrid_transform_mat(self):
         hyb_nodofs = self.discs.E.c_exp.totalDOFs
         hybtet_nodofs = self.discs.E.c_imp.totalDOFs
-        hc_T = sparse.lil_matrix(shape=(hyb_nodofs, hybtet_nodofs), dtype=N.float64)
+        hc_T = sparse.lil_matrix((hyb_nodofs, hybtet_nodofs), dtype=N.float64)
         hyb_discs = Struct(mtet=self.discs.E.c_imp, brick=self.discs.E.c_exp)
         mt_perm = hyb_discs.mtet.permuter ; b_perm = hyb_discs.brick.permuter
         entity_dofnos = Struct()

@@ -47,7 +47,7 @@ def tet2hc_tet(edges, d_edges, d_edgemap, edge_dofnos):
     no_newdofs = N.max(hc_edge_dofnos)+1
     no_olddofs = N.max(edge_dofnos)+1
 
-    T = sparse.lil_matrix(shape=(no_newdofs, no_olddofs), dtype=N.float64)
+    T = sparse.lil_matrix((no_newdofs, no_olddofs), dtype=N.float64)
 
     for i, edge in enumerate(edges):
         if i in d_edges:
@@ -248,7 +248,6 @@ def make_hface_locmat(tri_els, b_el):
     lh_M_inv = linalg.inv(lh_M)
     lh_hc_T = (N.dot(lh_M_inv, lh_P)).T
     lh_hc_T[N.abs(lh_hc_T) < eps] = 0
-
     return lh_hc_T, hface2glob_tet_perm
 
 normal_dirs = {(1.,0.,0.):0, (0.,1.,0.):1, (0.,0.,1.):2}

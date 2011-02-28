@@ -51,7 +51,7 @@ brick_mesh = BrickMesh.Mesh(
 print 'Brick-Mesh elements: ', len(brick_mesh.elements)
 
 
-order = 1
+order = 3
 g_eps = 1e-10                           # Geometrical tollerance
 hybrid_boundary_p = close_to_point(a*bfrac, g_eps)
 on_hbdry = lambda ent: N.all([hybrid_boundary_p(x) for (x,y,z) in ent.nodeCoords])
@@ -64,27 +64,9 @@ def freeE(ent):
                 N.all(b_p(y)) or N.all(zero_p(y)) or
                 N.all(c_p(z)) or N.all(zero_p(z)))
 
-freeE = allfree
+#freeE = allfree
 
 from analytical_WG_driver import WGT
-
-drv_fun = WGT.discrete_drv_fn
-z_measure = WGT.test_z
-z_measure_p = close_to_point(z_measure, g_eps)
-runtime = WGT.t_final
-z_port = 0.
-z_port_p = close_to_point(z_port, g_eps)
-zero_p = close_to_point(0, g_eps)
-on_port = lambda ent: N.all(z_port_p(ent.nodeCoords[:,2]))
-def port_free(ent):
-    x,y,z = ent.nodeCoords.T
-    return not (N.all(a_p(x)) or N.all(zero_p(x)) or 
-                N.all(b_p(y)) or N.all(zero_p(y)))
-analytical_dt = WGT.dt
-
-on_measurement_port = lambda ent: N.all(z_measure_p(ent.nodeCoords[:,2]))
-measurement_port_free = port_free
-direch_free = lambda ent: on_port(ent) and port_free(ent)  
 
 hyb_mesh = Struct(tet=tet_mesh, brick=brick_mesh, on_hbdry=on_hbdry)
 
@@ -101,22 +83,13 @@ hc_T = system.block_matrices.hybrid_transform_mat()
 #M = system.merged_matrices.A()
 #S = 2*M - system.merged_matrices.B()
 
-#S_cc_exp = system.block_matrices.S_cc_exp()
-
-# M = sparse.bmat([[M_cc, None, None],
-#                  [None, M_dd, None],
-#                  [None, None, M_ee]]).tocsc()
-# S = sparse.bmat([[S_cc, S_cd, None],
-#                  [S_cd.T, S_dd, S_de],
-#                  [None, S_de.T, S_ee]]).tocsc()
-
 M_aa = system.block_matrices.A_aa()
 M_ab = system.block_matrices.A_ab()
 M_bb = system.block_matrices.A_bb()
 M_bc = system.block_matrices.A_bc()
 M_cc = system.block_matrices.A_cc()
 M_dd = system.block_matrices.A_dd()
-#M_ee = system.block_matrices.A_ee()
+# #M_ee = system.block_matrices.A_ee()
 
 S_aa = 2*M_aa - system.block_matrices.B_aa()
 S_ab = 2*M_ab - system.block_matrices.B_ab()
@@ -139,29 +112,6 @@ S = sparse.bmat([[S_aa,   S_ab,   None,   None],
                  [None,   None  , S_cd.T, S_dd]]).tocsc()
 
 
-# M = sparse.bmat([[M_aa,   M_ab,   None],
-#                  [M_ab.T, M_bb,   M_bc],
-#                  [None,   M_bc.T, M_cc]]).tocsc()
-
-# S = sparse.bmat([[S_aa,   S_ab,   None],
-#                  [S_ab.T, S_bb,   S_bc],
-#                  [None,   S_bc.T, S_cc]]).tocsc()
-
-# M = sparse.bmat([[M_aa,   M_ab],
-#                  [M_ab.T, M_bb]]).tocsc()
-
-# S = sparse.bmat([[S_aa,   S_ab],
-#                  [S_ab.T, S_bb]]).tocsc()
-
-# M = sparse.bmat([[M_bb,   M_bc],
-#                  [M_bc.T, M_cc]]).tocsc()
-
-# S = sparse.bmat([[S_bb,   S_bc],
-#                  [S_bc.T, S_cc]]).tocsc()
-
-
-# S = S_bb
-# M = M_bb
 
 
 from scipy.sparse.linalg.eigen.arpack import speigs
