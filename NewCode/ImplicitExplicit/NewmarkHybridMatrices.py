@@ -59,7 +59,7 @@ class HybridMergedMats(DiscretiserMatrices.Matrices):
         ofs_e = ofs_d + bmats.dd.shape[0]
 
         if self.hybrid_block_mats.discs.E.e.totalDOFs > 0:
-            bmats.ee = self.hybrid_block_mats.A_ee
+            bmats.ee = self.hybrid_block_mats.A_ee()
             return self._finalizeMatrix(merge_sparse_blocks((
                 ((0,0), bmats.aa), ((0, ofs_b), bmats.ab), 
                 ((ofs_b, 0), bmats.ab.T), ((ofs_b, ofs_b), bmats.bb),
@@ -86,8 +86,8 @@ class HybridMergedMats(DiscretiserMatrices.Matrices):
         ofs_e = ofs_d + bmats.dd.shape[0]
 
         if self.hybrid_block_mats.discs.E.e.totalDOFs > 0:
-            bmats.de = self.hybrid_block_mats.B_de
-            bmats.ee = self.hybrid_block_mats.B_ee
+            bmats.de = self.hybrid_block_mats.B_de()
+            bmats.ee = self.hybrid_block_mats.B_ee()
             return self._finalizeMatrix(merge_sparse_blocks((
                 ((0,0), bmats.aa), ((0, ofs_b), bmats.ab), 
                 ((ofs_b, 0), bmats.ab.T), ((ofs_b, ofs_b), bmats.bb),
