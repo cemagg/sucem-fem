@@ -40,7 +40,7 @@ print 'Tet_mesh elements: ', len(tet_mesh.elements)
 # h0 = 1.0001/1.
 # ha = 1.0001/4.
 a,b,c = 29,23,19
-h = a/1.
+h = a/4.
 bfrac = 0.5
 # brick_mesh = BrickMesh.Mesh(
 #     BrickMeshGen.make_rect_cavity_brick_listmesh(a*bfrac,b,c, [a*ha, b*h0, c*h0]))
@@ -51,7 +51,7 @@ brick_mesh = BrickMesh.Mesh(
 print 'Brick-Mesh elements: ', len(brick_mesh.elements)
 
 
-order = 3
+order = 1
 g_eps = 1e-10                           # Geometrical tollerance
 hybrid_boundary_p = close_to_point(a*bfrac, g_eps)
 on_hbdry = lambda ent: N.all([hybrid_boundary_p(x) for (x,y,z) in ent.nodeCoords])
