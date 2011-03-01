@@ -59,13 +59,19 @@ class NewmarkBondedSystem(NewmarkCoupledHybridSystem):
             yield
 
     def step_E(self, no_steps=1):
+        class FakeSparseDiag(object):
+            def __init__(self, diag):
+                self.diag = diag
+            def __mul__(self, x):
+                return self.diag*x
+            def solve(self, x):
+                return x/self.diag
+
         C_dd = self.block_matrices.C_dd()
-        M_dd_diag = self.discs.E.d.matrix.mass().diagonal()        
-        M_dd = Struct(matvec=lambda x: M_dd_diag*x,
-                       solve=lambda x: x/M_dd_diag)
+        M_dd_diag = self.discs.E.d.matrix.mass().diagonal()
+        M_dd = FakeSparseDiag(M_dd_diag)
         Mb_dd_diag = self.discs.B.d.matrix.mass().diagonal()
-        Mb_dd = Struct(matvec=lambda x: Mb_dd_diag*x,
-                       solve=lambda x: x/Mb_dd_diag)
+        Mb_dd = FakeSparseDiag(Mb_dd_diag)
         A_imp = self.merged_matrices.A_imp()
         if self.useLU:
             A_imp.solve = self.merged_matrices.A_imp_LU().solve
