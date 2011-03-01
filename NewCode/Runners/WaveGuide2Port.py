@@ -258,14 +258,14 @@ class WaveGuide2Port(object):
         
         for n in xrange(n_steps):
             for bstep in B_steppers: bstep.next()
-            drv_sys.dofs.B.dofArray[self.B_st_dofnos] += dt*C_st*(e_ts)
+            drv_sys.dofs.B.dofArray[self.B_st_dofnos] += dt*(C_st*e_ts)
 
             inc_vals = self.WGB.next_drive()
             e_ts = inc_vals.E_incdofs
             b_st = inc_vals.B_incdofs
             self.inc_modeintg.append(inc_vals.mode_weighted)
             drv_sys.dofs.E.dofArray[self.E_ts_dofnos] += dt*M_eps_inv_ts*(
-                C_st.T*(M_mu_st*(b_st)))
+                C_st.T*(M_mu_st*b_st))
 
             for estep in E_steppers: estep.next()
 

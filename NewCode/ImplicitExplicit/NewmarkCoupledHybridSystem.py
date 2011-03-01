@@ -84,14 +84,14 @@ def newmark_leapfrog_step(self, no_steps=1):
   
         d0l = self.leapfrog_dofArrays.E
         d0l_B = self.leapfrog_dofArrays.B
-        d0l_B[sd_B] -= dt*(C_dc*(d0[sc]) + C_dd*(d0[sd]))
-        d0l_B[se_B] -= dt*(C_ed*(d0[sd]) + C_ee*(d0l[d_o_E_exp_e:]))
+        d0l_B[sd_B] -= dt*(C_dc*d0[sc] + C_dd*d0[sd])
+        d0l_B[se_B] -= dt*(C_ed*d0[sd] + C_ee*d0l[d_o_E_exp_e:])
         if direch:
             if self.direch_group not in self.implicit_groups:
-                d0l_B[s_direch_B] -= dt*drv_n*(C_p*(direch_dofarr))
+                d0l_B[s_direch_B] -= dt*drv_n*(C_p*direch_dofarr)
         d0l[d_o_E_exp_d:d_o_E_exp_e] += M_dd.solve(
-            P_dd*(d0l_B[sd_B]) + P_de*(d0l_B[se_B]))*dt
-        d0l[d_o_E_exp_e:] += M_ee.solve(P_ee*(d0l_B[se_B]))*dt
+            P_dd*d0l_B[sd_B] + P_de*d0l_B[se_B])*dt
+        d0l[d_o_E_exp_e:] += M_ee.solve(P_ee*d0l_B[se_B])*dt
         self.newmark_dofArrays[1][0:d_o.d] = self.solver.solve_mat_vec(A_imp, y_imp)
         self.log()
         print 'Step %d/%d, drv_fun: %f, total steps: %d, max: %f' % \

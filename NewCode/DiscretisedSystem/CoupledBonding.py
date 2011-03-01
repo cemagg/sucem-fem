@@ -226,7 +226,7 @@ class PMLBondedSystem(BondedSystem, PMLSystem):
         for step in xrange(no_steps):
             drv_n = drive_fun(dt, self.n)
             # Update fake B using curl of E
-            next_b = 1/A_by*(B_by*b - L_2*C*e)
+            next_b = 1/A_by*(B_by*b - L_2*(C*e))
             next_b[B_drv_dofs] -= drv_n/A_by[B_drv_dofs]*L_2[B_drv_dofs] \
                                   *B_drv_weights
             # Update dual-mesh H using fake B

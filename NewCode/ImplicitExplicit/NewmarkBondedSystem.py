@@ -52,10 +52,10 @@ class NewmarkBondedSystem(NewmarkCoupledHybridSystem):
             dm1, d0 = self.newmark_dofArrays[-1], self.newmark_dofArrays[0]
             drv_n = drv_fun(dt, self.n-1)
             d0l_B = self.leapfrog_dofArrays.B
-            d0l_B -= dt*(C_dc*(d0[sc]) + C_dd*(d0[sd]))
+            d0l_B -= dt*(C_dc*d0[sc] + C_dd*d0[sd])
             if direch:
                 if self.direch_group in self.explicit_groups:
-                    d0l_B -= dt*drv_n*(C_p*(direch_dofarr))
+                    d0l_B -= dt*drv_n*(C_p*direch_dofarr)
             yield
 
     def step_E(self, no_steps=1):
