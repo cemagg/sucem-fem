@@ -24,18 +24,25 @@ import NewCode.eMAGUSImport as eMAGUSImport
 from NewCode.Analytical import WaveguidePhasor
 from NewCode import Consts
 
-try:
-    max_dt_div_pow = int(sys.argv[1])
-except IndexError:
-    max_dt_div_pow = 8
-try:
-    FEKO_workspace = sys.argv[2]
-except IndexError:
-    FEKO_workspace = 'workspace'
-try:
-    output_dir = sys.argv[3]
-except IndexError:
-    output_dir = '.'
+# try:
+#     max_dt_div_pow = int(sys.argv[1])
+# except IndexError:
+#     max_dt_div_pow = 8
+# try:
+#     FEKO_workspace = sys.argv[2]
+# except IndexError:
+#     FEKO_workspace = 'workspace'
+# try:
+#     output_dir = sys.argv[3]
+# except IndexError:
+#     output_dir = '.'
+
+max_dt_div_pow = 0
+FEKO_workspace = 'workspace'
+output_dir = '.'
+orders = (2,3)
+#orders = (1,)
+
     
 eMAGUSImport.init(FEKO_workspace)
 tet_mesh = eMAGUSImport.get_mesh()
@@ -80,8 +87,6 @@ min_bufflen = a/16*30
 base_dt = a/3*Consts.lumped_stability_factors[1]/1.1
 
 
-#orders = (1,3,2)
-orders = (3,)
 for order in orders:
     print 'order: ', order
     TRS = HybridWaveGuide2PortPEC(a,b,h,order,drv_fun, no_PML_cells)
@@ -120,7 +125,6 @@ for order in orders:
         res['run_dt'] = dt
         res['base_dt'] = base_dt
         pickle.dump(res, file(output_filename, 'w'))
-        
 
 
 # # z_tf = z_measure - z_inc 
