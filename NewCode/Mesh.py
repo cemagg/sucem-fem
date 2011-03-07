@@ -508,3 +508,4 @@ class Element(ProxyElement, Coordinates.SimplexCoord):
                        N.float64)
 
     normals = outwardNormals
+ 
