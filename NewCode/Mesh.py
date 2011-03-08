@@ -197,8 +197,6 @@ class MeshWithKDTree(MeshWithNodeElementConnections):
     def kdTree(self):
         try: return self._kdTree
         except AttributeError:
-            # import Numeric  # Currently Bio.KDTree only works with old Numeric arrays
-            # self.Numeric = Numeric
             from Bio.KDTree import KDTree
             print "Creating KDTree"
             self._kdTree = KDTree(dim=3)
@@ -214,7 +212,6 @@ class MeshWithKDTree(MeshWithNodeElementConnections):
         
     def findNodesRadius(self, coord, radius):
         kdt = self.kdTree
-        #import pdb ; pdb.set_trace()  
         kdt.search(coord, radius)
         return kdt.get_indices() # Convert kdt's Numeric arrays to Numpy
 
