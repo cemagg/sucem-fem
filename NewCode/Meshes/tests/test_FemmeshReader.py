@@ -18,9 +18,17 @@ class test_FemmeshReader(TestCase):
         self.desired_mesh = self.DesiredMesh()
         self.desired_mesh.setUp()
         self.femmesh_reader = FemmeshReader.FemmeshReader(self.femmesh_filename)
-        #self.testlistmesh = self.femmesh_reader.get_listmesh()
         pass
     
+    def test_read_meshfile(self):
+        self.femmesh_reader.read_meshfile()
+        assert_almost_equal(self.femmesh_reader.nodes,
+                            self.desired_mesh.listmesh['Nodes'],
+                            decimal=14)
+        assert_equal(self.femmesh_reader.tet_nodes,
+                     self.desired_mesh.listmesh['ElementNodes'])
+        
+        
     # def test_femmesh_filename(self):
     #     assert_equal(self.testlistmesh['FemmeshFilename'], 'inscribed_tet.femmesh')
 
@@ -45,3 +53,20 @@ class test_FemmeshReader(TestCase):
                             decimal=14)
 
 
+    def test_parse_tets(self):
+        parse_str = ['          11\n',
+        '           1           1           1           6           4           7\n',
+        '           2           1           1           3           5           7\n',
+        '           3           1           4           3           7           8\n',
+        '           4           1           2           1           5           6\n',
+        '           5           1           3           2           5           8\n',
+        '           6           1           2           4           6           8\n',
+        '           7           1           8           4           6           7\n',
+        '           8           1           1           5           6           7\n',
+        '           9           1           3           5           7           8\n',
+        '          10           1           5           2           6           8\n',
+        '          11           1           5           6           7           8\n',
+        'ENDBLOCK\n']
+        self.femmesh_reader.parse_tets(iter(parse_str))
+        assert_equal(self.femmesh_reader.tet_nodes,
+                     self.desired_mesh.listmesh['ElementNodes'])
