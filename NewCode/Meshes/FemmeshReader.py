@@ -1,9 +1,14 @@
 from __future__ import division
 
 import numpy as N
-import re
+import re, os
 
-#def nodes
+def uninit_error(fn):
+    def check_fn(self):
+        try: return fn(self)
+        except AttributeError: raise Exception(
+            "Call read_meshfile() method of %s first" % self.__class__)
+    return check_fn
 
 class FemmeshReader(object):
     block_start_re = re.compile(r'^BLOCK (.*)')
@@ -55,6 +60,34 @@ class FemmeshReader(object):
             bfun = self.find_block_fun(l)
             if bfun: bfun(fo)
 
+    @uninit_error
+    def get_mesh_filename(self):
+        return os.path.basename(self.mesh_filename)
+
+    @uninit_error
+    def get_mesh_dirname(self):
+        return os.path.dirname(self.mesh_filename)
+
+    @uninit_error
+    def get_tet_nodes(self):
+        return self.tet_nodes
+
+    @uninit_error
+    def get_tet_property_nos(self):
+        return self.tet_property_nos
+
+    @uninit_error
+    def get_nodes(self):
+        return self.nodes
+
+
+class Femmesh2ListMesh(object):
+    def __init__(self, femmesh):
+        self.listmesh = dict(
+            FemmeshFilename=femmesh.get_mesh_filename(),
+            Nodes=femmesh.get_nodes(),
+            ElementNodes=femmesh.get_tet_nodes())            
+    
     def get_listmesh(self):
-        try: return self.listmesh
-        except AttributeError: raise Exception("Call read_meshfile() method first")
+        return self.listmesh
+        
