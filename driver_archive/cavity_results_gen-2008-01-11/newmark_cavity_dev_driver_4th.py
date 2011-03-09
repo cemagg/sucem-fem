@@ -63,7 +63,7 @@ orders = (1,2,3,4)
 #orders = (2,3)
 tms = (2500,5000,10000,20000,40000,80000)#,160000)
 #times = {0.5:tms, 0.25:tms, 0.125:tms, 0.0625:tms, 0.03125:tms, 0.015625:tms,
-         0.0078125:tms }
+#         0.0078125:tms }
 times = {0.03125:tms,}         
 results = dict(info="Newmark beta using white97's geometry, tets, beta = 0.25001"
                +str(times))
