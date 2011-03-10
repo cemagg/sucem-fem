@@ -65,6 +65,16 @@ class test_CalculateConnectivity(TestCase):
         assert_equal(actual_element_connect_2_edge_nodes,
                      desired_element_edge_nodes)
 
+    def test_calc_face_node_connectivity(self):
+        cc = self.calculate_connectivity
+        cc.calc_face_node_connectivity()
+        # Since the actual global face numbering is arbitrary, we only
+        # check that the same set nof node pairs are present
+        desired_face_nodes = set(
+            tuple(en) for en in self.desired_mesh.listmesh['FaceNodes'])
+        f2n = cc.get_face_connect_2_node()
+        assert_equal(set(tuple(fn) for fn in f2n), desired_face_nodes)
+
     # def test_calc_element_face_connectivity(self):
     #     cc = self.calculate_connectivity
     #     cc.set_input_listmesh(self.input_listmesh)

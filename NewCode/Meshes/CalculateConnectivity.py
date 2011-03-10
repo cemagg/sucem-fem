@@ -94,6 +94,15 @@ class CalculateConnectivity(object):
     def get_edge_connect_2_node(self):
         return self.edge_connect_2_node
 
+    def calc_face_node_connectivity(self):
+        """Calculate FaceNodes"""
+        self.ensure_initialised(2,0)
+        self.face_connect_2_node = numpy.vstack(
+            [face.entities(0) for face in dolfin.faces(self.dolfin_mesh)])
+
+    def get_face_connect_2_node(self):
+        return self.face_connect_2_node
+
     def calc_element_face_connectivity(self):
         """Calculate ElementFaces"""
         self.ensure_initialised(3,2)
