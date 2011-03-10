@@ -75,10 +75,18 @@ class test_CalculateConnectivity(TestCase):
         f2n = cc.get_face_connect_2_node()
         assert_equal(set(tuple(fn) for fn in f2n), desired_face_nodes)
 
-    # def test_calc_element_face_connectivity(self):
-    #     cc = self.calculate_connectivity
-    #     cc.set_input_listmesh(self.input_listmesh)
-    #     cc.setup_mesh()
-    #     cc.calc_element_face_connectivity()
-    #     assert_equal(cc.get_element_connect_2_face(),
-    #                  self.desired_mesh.listmesh['ElementFaces'])
+    def test_calc_element_face_connectivity(self):
+        cc = self.calculate_connectivity
+        cc.calc_element_face_connectivity()
+        ref_face_nodes = self.desired_mesh.listmesh['FaceNodes']
+        desired_element_face_nodes = [
+            ref_face_nodes[i] for i in self.desired_mesh.listmesh['ElementFaces']]
+        actual_element_connect_2_face = cc.get_element_connect_2_face()
+        cc.calc_face_node_connectivity()
+        actual_face_connect_2_node = cc.get_face_connect_2_node()
+        actual_element_connect_2_face_nodes = array([
+            actual_face_connect_2_node[i] for i in actual_element_connect_2_face])
+
+        assert_equal(actual_element_connect_2_face_nodes,
+                     desired_element_face_nodes)
+

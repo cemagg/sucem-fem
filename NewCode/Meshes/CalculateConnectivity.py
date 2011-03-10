@@ -106,8 +106,19 @@ class CalculateConnectivity(object):
     def calc_element_face_connectivity(self):
         """Calculate ElementFaces"""
         self.ensure_initialised(3,2)
+        # As defined in eMAGUS
+        target_local_facenodes = [tuple(nodepair) for nodepair in numpy.array(
+            [[1,2,3], [1,2,4], [1,3,4], [2,3,4]], numpy.int32) - 1
+                                  ]
+        # As defined in UFC user manual
+        UFC_local_facenodes_map = dict(
+            (nodepair,ind) for ind,nodepair in enumerate(
+                ((1,2,3), (0,2,3), (0,1,3), (0,1,2) )) )
+        # Permutation of UFC -> eMAGUS local face ordering
+        perm = [UFC_local_facenodes_map[nodepair]
+                for nodepair in target_local_facenodes]
         self.element_connect_2_face = numpy.vstack(
-            [cell.entities(2) for cell in dolfin.cells(self.dolfin_mesh)])
+            [cell.entities(2)[perm] for cell in dolfin.cells(self.dolfin_mesh)])
                                                     
     def get_element_connect_2_face(self):
         return self.element_connect_2_face
