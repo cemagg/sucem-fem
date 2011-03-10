@@ -24,7 +24,17 @@ class test_CalculateConnectivity(TestCase):
     
     def test_setup_mesh(self):
         cc = self.calculate_connectivity
-        cc.set_listmesh(self.input_listmesh)
+        cc.set_input_listmesh(self.input_listmesh)
         cc.setup_mesh()
         assert_equal(cc.get_nodes(), self.desired_mesh.listmesh['Nodes'])
         assert_equal(cc.get_tet_nodes(), self.desired_mesh.listmesh['ElementNodes'])
+
+    def test_calc_node_element_connectivity(self):
+        cc = self.calculate_connectivity
+        cc.set_input_listmesh(self.input_listmesh)
+        cc.setup_mesh()
+        cc.calc_node_element_connectivity()
+        assert_equal(cc.get_node_connect_2_element(),
+                     self.desired_mesh.listmesh['NodeConnect2Element'])
+        assert_equal(cc.get_node_connect_2_element_ptr(),
+                     self.desired_mesh.listmesh['NodeConnect2ElementPtr'])
