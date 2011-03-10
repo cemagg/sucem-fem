@@ -90,3 +90,16 @@ class test_CalculateConnectivity(TestCase):
         assert_equal(actual_element_connect_2_face_nodes,
                      desired_element_face_nodes)
 
+    def test_calc_face_element_connectivity(self):
+        cc = self.calculate_connectivity
+        cc.calc_face_element_connectivity()
+        ref_face_nodes = self.desired_mesh.listmesh['FaceNodes']
+        ref_face_elements = self.desired_mesh.listmesh['FaceConnect2Elem']
+        desired_facenode_elements = dict((tuple(facenodes), els) for facenodes, els in zip(
+            ref_face_nodes, ref_face_elements))
+        actual_face_elements = cc.get_face_connect_2_element()
+        cc.calc_face_node_connectivity()
+        actual_face_nodes = cc.get_face_connect_2_node()
+        actual_facenode_elements = dict((tuple(facenodes), els) for facenodes, els in zip(
+            actual_face_nodes, actual_face_elements))
+        assert_equal(actual_facenode_elements, desired_facenode_elements)

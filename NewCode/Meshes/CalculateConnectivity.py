@@ -123,5 +123,20 @@ class CalculateConnectivity(object):
     def get_element_connect_2_face(self):
         return self.element_connect_2_face
 
+    def calc_face_element_connectivity(self):
+        """Calculate FaceConnect2Elem """
+        self.ensure_initialised(2,3)
+        face_connect_2_element_list = [
+            sorted(face.entities(3)) for face in dolfin.faces(self.dolfin_mesh)]
+        fc2e = self.face_connect_2_element = numpy.zeros(
+            (len(face_connect_2_element_list), 2), dtype=numpy.int32)
+        fc2e -= 1
+        for i, faces in enumerate(face_connect_2_element_list):
+            if len(faces) == 2: fc2e[i,:] = faces
+            else: fc2e[i,0] = faces[0]
+
+    def get_face_connect_2_element(self):
+        return self.face_connect_2_element
+        
     def get_output_listmesh(self):
         return self.output_listmesh
