@@ -65,6 +65,43 @@ class CalculateConnectivity(object):
     def get_node_connect_2_element_ptr(self):
         return self.node_connect_2_element_ptr
 
+    def calc_element_edge_connectivity(self):
+        """Calculate ElementEdges"""
+        self.ensure_initialised(3,1)
+        # As defined in eMAGUS
+        target_local_edgenodes = [tuple(nodepair) for nodepair in numpy.array(
+            [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]], numpy.int32) - 1
+                                  ]
+        # As defined in UFC user manual
+        UFC_local_edgenodes_map = dict(
+            (nodepair,ind) for ind,nodepair in enumerate(
+                ((2,3), (1,3), (1,2), (0,3), (0,2), (0,1))) )
+        # Permutation of UFC -> eMAGUS local edge ordering
+        perm = [UFC_local_edgenodes_map[nodepair]
+                for nodepair in target_local_edgenodes]
+        self.element_connect_2_edge = numpy.vstack(
+            [cell.entities(1)[perm] for cell in dolfin.cells(self.dolfin_mesh)])
+                                                    
+    def get_element_connect_2_edge(self):
+        return self.element_connect_2_edge
+
+    def calc_edge_node_connectivity(self):
+        """Calculate EdgeNodes"""
+        self.ensure_initialised(1,0)
+        self.edge_connect_2_node = numpy.vstack(
+            [edge.entities(0) for edge in dolfin.edges(self.dolfin_mesh)])
+
+    def get_edge_connect_2_node(self):
+        return self.edge_connect_2_node
+
+    def calc_element_face_connectivity(self):
+        """Calculate ElementFaces"""
+        self.ensure_initialised(3,2)
+        self.element_connect_2_face = numpy.vstack(
+            [cell.entities(2) for cell in dolfin.cells(self.dolfin_mesh)])
+                                                    
+    def get_element_connect_2_face(self):
+        return self.element_connect_2_face
+
     def get_output_listmesh(self):
         return self.output_listmesh
-        
