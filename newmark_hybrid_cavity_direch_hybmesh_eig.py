@@ -30,8 +30,6 @@ from NewCode.ImplicitExplicit.HybridMeshNewmarkHybridSystem \
 from NewCode.ImplicitExplicit.HybridMeshNewmarkHybridMatrices \
      import HybridMeshHybridBlockMats
 
-import wg_hybrid_disc_fake
-
 eMAGUSImport.init('workspace')
 tet_mesh = Mesh.Mesh(eMAGUSImport.get_listmesh())
 
@@ -40,8 +38,10 @@ print 'Tet_mesh elements: ', len(tet_mesh.elements)
 # h0 = 1.0001/1.
 # ha = 1.0001/4.
 a,b,c = 29,23,19
-h = a/4.
+h = a/2, b, c
 bfrac = 0.5
+order = 3
+
 # brick_mesh = BrickMesh.Mesh(
 #     BrickMeshGen.make_rect_cavity_brick_listmesh(a*bfrac,b,c, [a*ha, b*h0, c*h0]))
 
@@ -51,7 +51,6 @@ brick_mesh = BrickMesh.Mesh(
 print 'Brick-Mesh elements: ', len(brick_mesh.elements)
 
 
-order = 1
 g_eps = 1e-10                           # Geometrical tollerance
 hybrid_boundary_p = close_to_point(a*bfrac, g_eps)
 on_hbdry = lambda ent: N.all([hybrid_boundary_p(x) for (x,y,z) in ent.nodeCoords])
@@ -65,8 +64,6 @@ def freeE(ent):
                 N.all(c_p(z)) or N.all(zero_p(z)))
 
 #freeE = allfree
-
-from analytical_WG_driver import WGT
 
 hyb_mesh = Struct(tet=tet_mesh, brick=brick_mesh, on_hbdry=on_hbdry)
 
@@ -97,8 +94,7 @@ res =  N.array(sorted(N.abs(w[w > 0.0000001]))[0:10])
 print res
 
 
-
-from AnalyticResults import PEC_cavity, accoustic_eigs, err_percentage
+from postproc_code.AnalyticResults import PEC_cavity, accoustic_eigs, err_percentage
 
 ares = PEC_cavity['rect-white']
 
