@@ -17,7 +17,9 @@ class FemmeshReader(object):
         self.mesh_filename = mesh_filename
         self.block_parse_funs = dict(
             nodes=self.parse_nodes,
-            tets=self.parse_tets)
+            tets=self.parse_tets,
+            # We ignore trianlgles
+            tris=lambda *x: None)
         
 
     def parse_nodes(self, iter):
@@ -91,3 +93,9 @@ class Femmesh2ListMesh(object):
     def get_listmesh(self):
         return self.listmesh
         
+def get_femmesh_as_listmesh(meshfile):
+    """Helper function that reads a femmesh file and returns a listmesh"""
+    femmesh_reader = FemmeshReader(meshfile)
+    femmesh_reader.read_meshfile()
+    femmesh2listmesh = Femmesh2ListMesh(femmesh_reader)
+    return femmesh2listmesh.get_listmesh()

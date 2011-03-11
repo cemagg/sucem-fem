@@ -22,7 +22,7 @@ class EnsureInitialised(object):
         """
         ent0 = self.dim_entity_map[dim0](self.dolfin_mesh, 0)
         if len(ent0.entities(dim1)) == 0: self.dolfin_mesh.init(dim0, dim1)
-    
+
 class CalculateConnectivity(object):
     def set_input_listmesh(self,input_listmesh):
         self.input_listmesh = input_listmesh
@@ -55,9 +55,6 @@ class CalculateConnectivity(object):
         self.node_connect_2_element = numpy.hstack((vert_cells))
         self.node_connect_2_element_ptr = numpy.cumsum(
             [0] + [len(x) for x in vert_cells])
-
-        self.output_listmesh['NodeConnect2Element'] = self.node_connect_2_element
-        self.output_listmesh['NodeConnect2ElementPtr'] = self.node_connect_2_element_ptr
 
     def get_node_connect_2_element(self):
         return self.node_connect_2_element
@@ -157,4 +154,25 @@ class CalculateConnectivity(object):
         return self.edge_connect_2_element
         
     def get_output_listmesh(self):
+        self.output_listmesh['NodeConnect2Element'] = self.node_connect_2_element
+        self.output_listmesh['NodeConnect2ElementPtr'] = self.node_connect_2_element_ptr
+        self.output_listmesh['EdgeConnect2Elem'] = self.edge_connect_2_element
+        self.output_listmesh['FaceConnect2Elem'] = self.face_connect_2_element
+        self.output_listmesh['ElementFaces'] = self.element_connect_2_face
+        self.output_listmesh['FaceNodes'] = self.face_connect_2_node
+        self.output_listmesh['EdgeNodes'] = self.edge_connect_2_node
+        self.output_listmesh['ElementEdges'] = self.element_connect_2_edge
         return self.output_listmesh
+
+def get_all_connectivities(input_listmesh):
+    cc = CalculateConnectivity()
+    cc.set_input_listmesh(input_listmesh)
+    cc.setup_mesh()
+    cc.calc_edge_element_connectivity()
+    cc.calc_edge_node_connectivity()
+    cc.calc_element_edge_connectivity()    
+    cc.calc_element_face_connectivity()
+    cc.calc_face_element_connectivity()
+    cc.calc_face_node_connectivity()
+    cc.calc_node_element_connectivity()
+    return cc.get_output_listmesh()
