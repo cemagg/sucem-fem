@@ -103,3 +103,18 @@ class test_CalculateConnectivity(TestCase):
         actual_facenode_elements = dict((tuple(facenodes), els) for facenodes, els in zip(
             actual_face_nodes, actual_face_elements))
         assert_equal(actual_facenode_elements, desired_facenode_elements)
+
+    def test_calc_edge_element_connectivity(self):
+        cc = self.calculate_connectivity
+        cc.calc_edge_element_connectivity()
+        ref_edge_nodes = self.desired_mesh.listmesh['EdgeNodes']
+        ref_edge_elements = self.desired_mesh.listmesh['EdgeConnect2Elem']
+        desired_edgenode_elements = dict((tuple(edgenodes), els) for edgenodes, els in zip(
+            ref_edge_nodes, ref_edge_elements))
+        actual_edge_elements = cc.get_edge_connect_2_element()
+        cc.calc_edge_node_connectivity()
+        actual_edge_nodes = cc.get_edge_connect_2_node()
+        actual_edgenode_elements = dict((tuple(edgenodes), els) for edgenodes, els in zip(
+            actual_edge_nodes, actual_edge_elements))
+        assert_equal(actual_edgenode_elements, desired_edgenode_elements)
+        
