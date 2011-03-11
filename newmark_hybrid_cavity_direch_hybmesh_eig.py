@@ -14,9 +14,9 @@ from scipy import sparse
 #
 import NewCode
 from NewCode import Utilities
-import NewCode.eMAGUSImport as eMAGUSImport
+#import NewCode.eMAGUSImport as eMAGUSImport
 import NewCode.Mesh as Mesh
-from NewCode.Meshes import BrickMesh, BrickMeshGen
+from NewCode.Meshes import BrickMesh, BrickMeshGen, CalculateConnectivity, FemmeshReader
 from NewCode.Utilities import Struct, partial, close_to_point
 from NewCode import SubDimMesh, DifferentialForm, Waveforms, PostProc, Feeds, Runners
 from NewCode.DifferentialForm import Discretiser, SubDimDiscretiser, \
@@ -29,18 +29,19 @@ from NewCode.ImplicitExplicit.HybridMeshNewmarkHybridSystem \
      import HybridMeshNewmarkHybridSystem
 from NewCode.ImplicitExplicit.HybridMeshNewmarkHybridMatrices \
      import HybridMeshHybridBlockMats
-
-eMAGUSImport.init('workspace')
-tet_mesh = Mesh.Mesh(eMAGUSImport.get_listmesh())
-
-print 'Tet_mesh elements: ', len(tet_mesh.elements)
-
 # h0 = 1.0001/1.
 # ha = 1.0001/4.
 a,b,c = 29,23,19
 h = a/2, b, c
 bfrac = 0.5
 order = 3
+meshfile = 'workspace/rect-white-hybrid-halfx-offs0-1.femmesh'
+listmesh = CalculateConnectivity.get_all_connectivities(
+    FemmeshReader.get_femmesh_as_listmesh(meshfile))
+tet_mesh = Mesh.Mesh(listmesh)
+
+print 'Tet_mesh elements: ', len(tet_mesh.elements)
+
 
 # brick_mesh = BrickMesh.Mesh(
 #     BrickMeshGen.make_rect_cavity_brick_listmesh(a*bfrac,b,c, [a*ha, b*h0, c*h0]))
