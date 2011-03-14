@@ -16,7 +16,7 @@ import NewCode
 from NewCode import Utilities
 #import NewCode.eMAGUSImport as eMAGUSImport
 import NewCode.Mesh as Mesh
-from NewCode.Meshes import BrickMesh, BrickMeshGen, CalculateConnectivity, FemmeshReader
+from NewCode.Meshes import BrickMesh, BrickMeshGen, CalculateConnectivity, Femmesh
 from NewCode.Utilities import Struct, partial, close_to_point
 from NewCode import SubDimMesh, DifferentialForm, Waveforms, PostProc, Feeds, Runners
 from NewCode.DifferentialForm import Discretiser, SubDimDiscretiser, \
@@ -37,7 +37,7 @@ bfrac = 0.5
 order = 3
 meshfile = 'workspace/rect-white-hybrid-halfx-offs0-1.femmesh'
 listmesh = CalculateConnectivity.get_all_connectivities(
-    FemmeshReader.get_femmesh_as_listmesh(meshfile))
+    Femmesh.get_femmesh_as_listmesh(meshfile))
 tet_mesh = Mesh.Mesh(listmesh)
 
 print 'Tet_mesh elements: ', len(tet_mesh.elements)

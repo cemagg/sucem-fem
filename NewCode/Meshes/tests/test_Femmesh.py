@@ -5,7 +5,7 @@ import sys, os
 #
 # Local Imports
 #
-from NewCode.Meshes import FemmeshReader
+from NewCode.Meshes import Femmesh
 import NewCode.tests.TestMeshes as TestMeshes
 
 InscribedTetMesh = TestMeshes.InscribedTetMesh
@@ -17,7 +17,7 @@ class test_FemmeshReader(TestCase):
     def setUp(self):
         self.desired_mesh = self.DesiredMesh()
         self.desired_mesh.setUp()
-        self.femmesh_reader = FemmeshReader.FemmeshReader(self.femmesh_filename)
+        self.femmesh_reader = Femmesh.FemmeshReader(self.femmesh_filename)
         pass
     
     def test_read_meshfile(self):
@@ -69,9 +69,9 @@ class test_Femmesh2ListMesh(TestCase):
     def setUp(self):
         self.desired_mesh = self.DesiredMesh()
         self.desired_mesh.setUp()
-        self.femmesh_reader = FemmeshReader.FemmeshReader(self.femmesh_filename)
+        self.femmesh_reader = Femmesh.FemmeshReader(self.femmesh_filename)
         self.femmesh_reader.read_meshfile()
-        self.femmesh2listmesh = FemmeshReader.Femmesh2ListMesh(self.femmesh_reader)
+        self.femmesh2listmesh = Femmesh.Femmesh2ListMesh(self.femmesh_reader)
         
     def test_listmesh_filename(self):
         testlistmesh = self.femmesh2listmesh.get_listmesh()

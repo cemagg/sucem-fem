@@ -14,7 +14,7 @@ import re
 #
 from NewCode.Utilities import Struct, partial, close_to_point
 from NewCode import Mesh
-from NewCode.Meshes import CalculateConnectivity, FemmeshReader
+from NewCode.Meshes import CalculateConnectivity, Femmesh
 from NewCode import Waveforms
 from NewCode.Runners.HybridWaveGuide2Port import HybridWaveGuide2PortPEC
 from NewCode.GeomGen.Hybrid import NodeInDeadElements, WGSizeCalc
@@ -51,7 +51,7 @@ orders = (2,)
 
 meshfile = 'workspace/wg_hcyl_pin_1_h8.femmesh'
 listmesh = CalculateConnectivity.get_all_connectivities(
-    FemmeshReader.get_femmesh_as_listmesh(meshfile))
+    Femmesh.get_femmesh_as_listmesh(meshfile))
 tet_mesh = Mesh.Mesh(listmesh)
 
 
