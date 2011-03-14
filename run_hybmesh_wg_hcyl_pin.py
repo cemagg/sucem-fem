@@ -9,12 +9,9 @@ import random
 import numpy as N
 import scipy
 import re
-#
-# Local Imports
-#
 from NewCode.Utilities import Struct, partial, close_to_point
 from NewCode import Mesh
-from NewCode.Meshes import CalculateConnectivity, Femmesh
+from NewCode.Meshes import CalculateConnectivity
 from NewCode import Waveforms
 from NewCode.Runners.HybridWaveGuide2Port import HybridWaveGuide2PortPEC
 from NewCode.GeomGen.Hybrid import NodeInDeadElements, WGSizeCalc
@@ -25,6 +22,11 @@ from RunInfos.WGParms import WGParms
 import NewCode.eMAGUSImport as eMAGUSImport
 from NewCode.Analytical import WaveguidePhasor
 from NewCode import Consts
+from NewCode.Meshes.MeshIO import Femmesh
+
+#
+# Local Imports
+#
 
 # try:
 #     max_dt_div_pow = int(sys.argv[1])

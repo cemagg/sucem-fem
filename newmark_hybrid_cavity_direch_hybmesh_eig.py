@@ -8,15 +8,10 @@ import random
 import numpy as N
 import scipy
 from scipy import sparse
-
-#
-# Local Imports
-#
-import NewCode
+from NewCode.Meshes.MeshIO import Femmesh
 from NewCode import Utilities
-#import NewCode.eMAGUSImport as eMAGUSImport
 import NewCode.Mesh as Mesh
-from NewCode.Meshes import BrickMesh, BrickMeshGen, CalculateConnectivity, Femmesh
+from NewCode.Meshes import BrickMesh, BrickMeshGen, CalculateConnectivity
 from NewCode.Utilities import Struct, partial, close_to_point
 from NewCode import SubDimMesh, DifferentialForm, Waveforms, PostProc, Feeds, Runners
 from NewCode.DifferentialForm import Discretiser, SubDimDiscretiser, \
@@ -29,6 +24,18 @@ from NewCode.ImplicitExplicit.HybridMeshNewmarkHybridSystem \
      import HybridMeshNewmarkHybridSystem
 from NewCode.ImplicitExplicit.HybridMeshNewmarkHybridMatrices \
      import HybridMeshHybridBlockMats
+
+from scipy.sparse.linalg.eigen.arpack import speigs
+
+
+from postproc_code.AnalyticResults import PEC_cavity, accoustic_eigs, err_percentage
+
+#
+# Local Imports
+#
+#import NewCode.eMAGUSImport as eMAGUSImport
+
+
 # h0 = 1.0001/1.
 # ha = 1.0001/4.
 a,b,c = 29,23,19
@@ -79,7 +86,6 @@ system.set_dt(1.)
 M = system.merged_matrices.A()
 S = 2*M - system.merged_matrices.B()
 
-from scipy.sparse.linalg.eigen.arpack import speigs
 sigma = 0.01
 print "(nodofs, nnz, sparsity %)", M.shape[0], M.nnz, M.nnz/M.shape[0]**2.0*100
 print 'Sparse LU decomposition'
@@ -95,7 +101,6 @@ res =  N.array(sorted(N.abs(w[w > 0.0000001]))[0:10])
 print res
 
 
-from postproc_code.AnalyticResults import PEC_cavity, accoustic_eigs, err_percentage
 
 ares = PEC_cavity['rect-white']
 

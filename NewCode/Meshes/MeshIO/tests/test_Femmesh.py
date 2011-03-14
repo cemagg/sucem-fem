@@ -2,11 +2,12 @@ from numpy.testing import TestCase, assert_array_equal, assert_almost_equal, \
      assert_equal, assert_array_almost_equal
 from numpy import array, float64, int32
 import sys, os
+import NewCode.tests.TestMeshes as TestMeshes
+from NewCode.Meshes.MeshIO import Femmesh
+
 #
 # Local Imports
 #
-from NewCode.Meshes import Femmesh
-import NewCode.tests.TestMeshes as TestMeshes
 
 InscribedTetMesh = TestMeshes.InscribedTetMesh
 
