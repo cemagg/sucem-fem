@@ -13,6 +13,8 @@ import re
 # Local Imports
 #
 from NewCode.Utilities import Struct, partial, close_to_point
+from NewCode import Mesh
+from NewCode.Meshes import CalculateConnectivity, FemmeshReader
 from NewCode import Waveforms
 from NewCode.Runners.HybridWaveGuide2Port import HybridWaveGuide2PortPEC
 from NewCode.GeomGen.Hybrid import NodeInDeadElements, WGSizeCalc
@@ -40,12 +42,19 @@ from NewCode import Consts
 max_dt_div_pow = 0
 FEKO_workspace = 'workspace'
 output_dir = '.'
-orders = (2,3)
+orders = (2,)
 #orders = (1,)
 
     
-eMAGUSImport.init(FEKO_workspace)
-tet_mesh = eMAGUSImport.get_mesh()
+# eMAGUSImport.init(FEKO_workspace)
+# tet_mesh = eMAGUSImport.get_mesh()
+
+meshfile = 'workspace/wg_hcyl_pin_1_h8.femmesh'
+listmesh = CalculateConnectivity.get_all_connectivities(
+    FemmeshReader.get_femmesh_as_listmesh(meshfile))
+tet_mesh = Mesh.Mesh(listmesh)
+
+
 
 print 'Tet_mesh elements: ', len(tet_mesh.elements)
 tetmesh_basename, tetmesh_ext = os.path.splitext(tet_mesh.FemmeshFilename)
