@@ -87,6 +87,7 @@ class Femmesh2ListMesh(object):
     def __init__(self, femmesh):
         self.listmesh = dict(
             FemmeshFilename=femmesh.get_mesh_filename(),
+            FemmeshDir = femmesh.get_mesh_dirname(),
             Nodes=femmesh.get_nodes(),
             ElementNodes=femmesh.get_tet_nodes())            
     

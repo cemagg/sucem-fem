@@ -76,6 +76,7 @@ class test_Femmesh2ListMesh(TestCase):
     def test_listmesh_filename(self):
         testlistmesh = self.femmesh2listmesh.get_listmesh()
         assert_equal(testlistmesh['FemmeshFilename'], 'inscribed_tet.femmesh')
+        assert_equal(testlistmesh['FemmeshDir'], 'NewCode/tests/testdata/test_FemmeshReader')
 
     def test_listmesh_nodes(self):
         testlistmesh = self.femmesh2listmesh.get_listmesh()
