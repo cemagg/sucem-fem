@@ -29,14 +29,14 @@ OBJS =	bandeig.o basisfun.o blockinput_tools.o cbaa_sys.o 	      \
 	write_matrix.o bessel.o ssband.o umf4_f77wrapper.o geomwrap.o
 
 INCLUDE = /usr/include/suitesparse
-LIBS = -lminpack -larpack -llapack -lf77blas -lumfpack -lamd -lg2c -lm	
+LIBS = -lminpack -larpack -llapack -lf77blas -lumfpack -lamd -lm	
 
 CC = gcc
 CFLAGS = -O2 -fPIC
-FC = ifort
+FC = gfortran
 FFLAGS = -O2 -fPIC
-F90 = ifort
-F90FLAGS = -O2 -fPIC
+F90 = gfortran
+F90FLAGS = -O2 -fPIC -ffixed-line-length-none 
 LDFLAGS = 
 
 all: $(PROG)
