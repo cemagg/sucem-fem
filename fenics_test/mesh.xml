@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dolfin xmlns:dolfin="http://www.fenicsproject.org">
+  <mesh celltype="triangle" dim="2">
+    <vertices size="9">
+      <vertex index="0" x="0" y="0"/>
+      <vertex index="1" x="0.5" y="0"/>
+      <vertex index="2" x="1" y="0"/>
+      <vertex index="3" x="0" y="0.5"/>
+      <vertex index="4" x="0.5" y="0.5"/>
+      <vertex index="5" x="1" y="0.5"/>
+      <vertex index="6" x="0" y="1"/>
+      <vertex index="7" x="0.5" y="1"/>
+      <vertex index="8" x="1" y="1"/>
+    </vertices>
+    <cells size="8">
+      <triangle index="0" v0="0" v1="1" v2="4"/>
+      <triangle index="1" v0="0" v1="3" v2="4"/>
+      <triangle index="2" v0="1" v1="2" v2="5"/>
+      <triangle index="3" v0="1" v1="4" v2="5"/>
+      <triangle index="4" v0="3" v1="4" v2="7"/>
+      <triangle index="5" v0="3" v1="6" v2="7"/>
+      <triangle index="6" v0="4" v1="5" v2="8"/>
+      <triangle index="7" v0="4" v1="7" v2="8"/>
+    </cells>
+      <data>
+        <data_entry name="cell_domains">
+          <meshfunction type="uint" dim="2" size="8">
+            <entity index="0" value="0"/>
+            <entity index="1" value="0"/>
+            <entity index="2" value="10"/>
+            <entity index="3" value="0"/>
+            <entity index="4" value="4294967294"/>
+            <entity index="5" value="0"/>
+            <entity index="6" value="1634886000"/>
+            <entity index="7" value="1702126957"/>
+          </meshfunction>
+        </data_entry>
+        <data_entry name="exterior_facet_domains">
+          <meshfunction type="uint" dim="1" size="16">
+            <entity index="0" value="1777266520"/>
+            <entity index="1" value="32671"/>
+            <entity index="2" value="1777266520"/>
+            <entity index="3" value="32671"/>
+            <entity index="4" value="45139872"/>
+            <entity index="5" value="0"/>
+            <entity index="6" value="47939408"/>
+            <entity index="7" value="0"/>
+            <entity index="8" value="47939432"/>
+            <entity index="9" value="0"/>
+            <entity index="10" value="47939432"/>
+            <entity index="11" value="0"/>
+            <entity index="12" value="47847568"/>
+            <entity index="13" value="0"/>
+            <entity index="14" value="47847580"/>
+            <entity index="15" value="0"/>
+          </meshfunction>
+        </data_entry>
+      </data>
+  </mesh>
+</dolfin>

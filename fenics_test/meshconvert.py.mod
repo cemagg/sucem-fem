@@ -222,6 +222,7 @@ def gmsh2xml(ifilename, handler):
 
     # Open files
     ifile = open(ifilename, "r")
+    #ofile = open(ofilename, "w")
 
     # Scan file for cell type
     cell_type = None
@@ -301,8 +302,9 @@ def gmsh2xml(ifilename, handler):
 
     # Step to beginning of file
     ifile.seek(0)
-    
-    # Set mesh type
+
+    # Write header
+    #write_header_mesh(ofile, cell_type, dim)
     handler.set_mesh_type(cell_type, dim)
 
     # Initialise node list (gmsh does not export all vertexes in order)
@@ -343,6 +345,7 @@ def gmsh2xml(ifilename, handler):
                 state = 4
         elif state == 4:
             num_vertices = len(vertex_dict)
+            #write_header_vertices(ofile, num_vertices)
             handler.start_vertices(num_vertices)
             state = 5
         elif state == 5:
@@ -356,6 +359,7 @@ def gmsh2xml(ifilename, handler):
             num_vertices_read +=1
 
             if num_vertices == num_vertices_read:
+                #write_footer_vertices(ofile)
                 handler.end_vertices()
                 state = 6
         elif state == 6:
@@ -365,6 +369,7 @@ def gmsh2xml(ifilename, handler):
             if line == "$Elements":
                 state = 8
         elif state == 8:
+            #write_header_cells(ofile,  num_cells_counted)
             handler.start_cells(num_cells_counted)
             state = 9
         elif state == 9:
@@ -377,6 +382,10 @@ def gmsh2xml(ifilename, handler):
                     if not node in nodelist:
                         _error("Vertex %d of triangle %d not previously defined." %
                               (node, num_cells_read))
+                # n0 = nodelist[node_num_list[0]]
+                # n1 = nodelist[node_num_list[1]]
+                # n2 = nodelist[node_num_list[2]]
+                #write_cell_triangle(ofile, num_cells_read, n0, n1, n2)
                 handler.add_cell(num_cells_read, node_num_list)
                 num_cells_read +=1
             elif elem_type == 4 and dim == 3:
@@ -385,10 +394,16 @@ def gmsh2xml(ifilename, handler):
                     if not node in nodelist:
                         _error("Vertex %d of tetrahedron %d not previously defined." %
                               (node, num_cells_read))
+                # n0 = nodelist[node_num_list[0]]
+                # n1 = nodelist[node_num_list[1]]
+                # n2 = nodelist[node_num_list[2]]
+                # n3 = nodelist[node_num_list[3]]
+                #write_cell_tetrahedron(ofile, num_cells_read, n0, n1, n2, n3)
                 handler.add_cell(num_cells_read, node_num_list)
                 num_cells_read +=1
 
             if num_cells_counted == num_cells_read:
+                #write_footer_cells(ofile)
                 handler.end_cells()
                 state = 10
         elif state == 10:
@@ -417,8 +432,12 @@ def gmsh2xml(ifilename, handler):
     else:
        _error("Missing data, unable to convert \n\ Did you use version 2.0 of the gmsh file format?")
 
+    # Write footer
+   # write_footer_mesh(ofile)
+
     # Close files
     ifile.close()
+    #ofile.close()
 
 def triangle2xml(ifilename, ofilename):
     """Convert between triangle format (http://www.cs.cmu.edu/~quake/triangle.html) and .xml.  The
