@@ -1,7 +1,6 @@
 import Coordinates
 import Mesh
 import ProxyList
-import eMAGUSImport
 import tests
 import Integration
 import SystemMatrix
