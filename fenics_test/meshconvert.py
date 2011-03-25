@@ -199,7 +199,7 @@ def mesh2xml(ifilename, ofilename):
     # Close files
     ifile.close()
     ofile.close()
-
+ 
 def gmsh2xml(ifilename, handler):
     """Convert between .gmsh v2.0 format (http://www.geuz.org/gmsh/) and .xml,
     parser implemented as a state machine:
@@ -377,7 +377,8 @@ def gmsh2xml(ifilename, handler):
                     if not node in nodelist:
                         _error("Vertex %d of triangle %d not previously defined." %
                               (node, num_cells_read))
-                handler.add_cell(num_cells_read, node_num_list)
+                cell_nodes = [nodelist[n] for n in node_num_list]
+                handler.add_cell(num_cells_read, cell_nodes)
                 num_cells_read +=1
             elif elem_type == 4 and dim == 3:
                 node_num_list = [vertex_dict[int(node)] for node in element[3 + num_tags:]]
@@ -385,7 +386,9 @@ def gmsh2xml(ifilename, handler):
                     if not node in nodelist:
                         _error("Vertex %d of tetrahedron %d not previously defined." %
                               (node, num_cells_read))
-                handler.add_cell(num_cells_read, node_num_list)
+                # import pdb ; pdb.set_trace()
+                cell_nodes = [nodelist[n] for n in node_num_list]
+                handler.add_cell(num_cells_read, cell_nodes)
                 num_cells_read +=1
 
             if num_cells_counted == num_cells_read:
@@ -1312,8 +1315,8 @@ def convert(ifilename, handler, iformat=None):
     else:
         _error("Sorry, cannot convert between %s and DOLFIN xml file formats." % iformat)
 
-    # XXX: handler.close messes things for other input formats than abaqus
-    if iformat == "abaqus":
+    # XXX: handler.close messes things for other input formats than abaqus or gmsh
+    if iformat in ("abaqus", "gmsh"):
         handler.close()
 
 def starcd2xml(ifilename, ofilename):
