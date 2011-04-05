@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dolfin xmlns:dolfin="http://www.fenics.org/dolfin/">
+  <meshfunction type="uint" dim="3" size="17">
+    <entity index="0" value="1000"/>
+    <entity index="1" value="1000"/>
+    <entity index="2" value="1000"/>
+    <entity index="3" value="1000"/>
+    <entity index="4" value="1000"/>
+    <entity index="5" value="1000"/>
+    <entity index="6" value="1000"/>
+    <entity index="7" value="1000"/>
+    <entity index="8" value="1000"/>
+    <entity index="9" value="1000"/>
+    <entity index="10" value="1000"/>
+    <entity index="11" value="1000"/>
+    <entity index="12" value="1000"/>
+    <entity index="13" value="1000"/>
+    <entity index="14" value="1000"/>
+    <entity index="15" value="1000"/>
+    <entity index="16" value="1000"/>
+  </meshfunction>
+</dolfin>

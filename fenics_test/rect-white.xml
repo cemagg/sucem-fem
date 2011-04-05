@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dolfin xmlns:dolfin="http://www.fenicsproject.org">
+  <mesh celltype="tetrahedron" dim="3">
+    <vertices size="10">
+      <vertex index="0" x="0" y="0" z="0"/>
+      <vertex index="1" x="29" y="0" z="0"/>
+      <vertex index="2" x="0" y="23" z="0"/>
+      <vertex index="3" x="0" y="0" z="19"/>
+      <vertex index="4" x="29" y="23" z="0"/>
+      <vertex index="5" x="29" y="0" z="19"/>
+      <vertex index="6" x="0" y="23" z="19"/>
+      <vertex index="7" x="29" y="23" z="19"/>
+      <vertex index="8" x="17.1157" y="12.5473" z="11.2054"/>
+      <vertex index="9" x="9.85067" y="9.99977" z="6.3385"/>
+    </vertices>
+    <cells size="17">
+      <tetrahedron index="0" v0="2" v1="6" v2="7" v3="8"/>
+      <tetrahedron index="1" v0="2" v1="4" v2="7" v3="8"/>
+      <tetrahedron index="2" v0="3" v1="6" v2="7" v3="8"/>
+      <tetrahedron index="3" v0="0" v1="3" v2="6" v3="9"/>
+      <tetrahedron index="4" v0="0" v1="2" v2="6" v3="9"/>
+      <tetrahedron index="5" v0="2" v1="6" v2="8" v3="9"/>
+      <tetrahedron index="6" v0="3" v1="6" v2="8" v3="9"/>
+      <tetrahedron index="7" v0="3" v1="5" v2="7" v3="8"/>
+      <tetrahedron index="8" v0="4" v1="5" v2="7" v3="8"/>
+      <tetrahedron index="9" v0="1" v1="4" v2="5" v3="8"/>
+      <tetrahedron index="10" v0="1" v1="3" v2="5" v3="8"/>
+      <tetrahedron index="11" v0="0" v1="1" v2="3" v3="9"/>
+      <tetrahedron index="12" v0="1" v1="3" v2="8" v3="9"/>
+      <tetrahedron index="13" v0="0" v1="1" v2="4" v3="9"/>
+      <tetrahedron index="14" v0="1" v1="4" v2="8" v3="9"/>
+      <tetrahedron index="15" v0="0" v1="2" v2="4" v3="9"/>
+      <tetrahedron index="16" v0="2" v1="4" v2="8" v3="9"/>
+    </cells>
+  </mesh>
+</dolfin>
