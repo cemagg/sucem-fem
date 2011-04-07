@@ -30,8 +30,9 @@ if not dol.has_slepc():
 # Define mesh
 # mesh = dol.UnitCube(1,1,1)
 # mesh.coordinates()[:] *= [cdims.a,cdims.b,cdims.c]
-mesh_file = 'lee_mittra92_fig6b.xml'
-#mesh_file = 'albani_bernardi74_fig2VII.xml'
+#mesh_file = 'lee_mittra92_fig6b.xml'
+#mesh_file = 'lee_mittra92_fig6c.xml'
+mesh_file = 'albani_bernardi74_fig2VII.xml'
 materials_mesh_file = "%s_physical_region%s" % (os.path.splitext(mesh_file))
 mesh = dol.Mesh(mesh_file)
 materials = {1000:MaterialProperties(eps_r=16/eps0),
@@ -46,7 +47,7 @@ eps.vector()[:] = N.array([eps_vals[int(i)] for i in material_mesh_func.array()]
 
 
 # Define function space
-order = 4
+order = 5
 V = dol.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", order)
 
 # Define basis and bilinear form
@@ -75,7 +76,7 @@ bc.apply(S)
 #M, S = dol.assemble_system(m, s, bc)
 
 
-sigma = 2
+sigma = 1.5
 smat = S - sigma*M
 #lu = dol.LUSolver(S - sigma*M)
 lu = dol.LUSolver(smat)
@@ -108,6 +109,7 @@ arpack_eigs,v = speigs.ARPACK_gen_eigs(M_matvec, sigma_solve, M.size(0), sigma, 
 
 res = N.array(sorted(arpack_eigs)[0:10])
 print N.sqrt(res)
+print c0*N.sqrt(res)/2/N.pi/1e6
 #errs = postproc_eigres.calc_errs(res)
 #postproc_eigres.print_errs(errs)
 

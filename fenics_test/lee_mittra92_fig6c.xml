@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dolfin xmlns:dolfin="http://www.fenicsproject.org">
+  <mesh celltype="tetrahedron" dim="3">
+    <vertices size="23">
+      <vertex index="0" x="0" y="0.555556" z="0"/>
+      <vertex index="1" x="0" y="0.555556" z="0.444444"/>
+      <vertex index="2" x="0" y="0" z="0.444444"/>
+      <vertex index="3" x="0" y="0" z="0"/>
+      <vertex index="4" x="0.25" y="0.388889" z="0"/>
+      <vertex index="5" x="0.25" y="0.388889" z="0.277778"/>
+      <vertex index="6" x="0.25" y="0.166667" z="0.277778"/>
+      <vertex index="7" x="0.25" y="0.166667" z="0"/>
+      <vertex index="8" x="0.75" y="0.388889" z="0"/>
+      <vertex index="9" x="0.75" y="0.388889" z="0.277778"/>
+      <vertex index="10" x="0.75" y="0.166667" z="0.277778"/>
+      <vertex index="11" x="0.75" y="0.166667" z="0"/>
+      <vertex index="12" x="1" y="0.555556" z="0"/>
+      <vertex index="13" x="1" y="0.555556" z="0.444444"/>
+      <vertex index="14" x="1" y="0" z="0.444444"/>
+      <vertex index="15" x="1" y="0" z="0"/>
+      <vertex index="16" x="0.876544" y="0.135514" z="0.162805"/>
+      <vertex index="17" x="0.136388" y="0.114585" z="0.162971"/>
+      <vertex index="18" x="0.863108" y="0.441774" z="0.16093"/>
+      <vertex index="19" x="0.526374" y="0.09203" z="0.17226"/>
+      <vertex index="20" x="0.12354" y="0.428152" z="0.163854"/>
+      <vertex index="21" x="0.495535" y="0.463453" z="0.172433"/>
+      <vertex index="22" x="0.5" y="0.277778" z="0.138889"/>
+    </vertices>
+    <cells size="74">
+      <tetrahedron index="0" v0="8" v1="9" v2="11" v3="16"/>
+      <tetrahedron index="1" v0="8" v1="9" v2="18" v3="21"/>
+      <tetrahedron index="2" v0="7" v1="10" v2="11" v3="19"/>
+      <tetrahedron index="3" v0="9" v1="13" v2="16" v3="18"/>
+      <tetrahedron index="4" v0="3" v1="4" v2="17" v3="20"/>
+      <tetrahedron index="5" v0="9" v1="13" v2="18" v3="21"/>
+      <tetrahedron index="6" v0="6" v1="9" v2="10" v3="14"/>
+      <tetrahedron index="7" v0="3" v1="4" v2="7" v3="17"/>
+      <tetrahedron index="8" v0="9" v1="10" v2="11" v3="16"/>
+      <tetrahedron index="9" v0="0" v1="3" v2="4" v3="20"/>
+      <tetrahedron index="10" v0="9" v1="10" v2="14" v3="16"/>
+      <tetrahedron index="11" v0="0" v1="1" v2="20" v3="21"/>
+      <tetrahedron index="12" v0="8" v1="9" v2="16" v3="18"/>
+      <tetrahedron index="13" v0="4" v1="8" v2="9" v3="21"/>
+      <tetrahedron index="14" v0="2" v1="6" v2="17" v3="20"/>
+      <tetrahedron index="15" v0="0" v1="4" v2="20" v3="21"/>
+      <tetrahedron index="16" v0="0" v1="4" v2="12" v3="21"/>
+      <tetrahedron index="17" v0="0" v1="1" v2="13" v3="21"/>
+      <tetrahedron index="18" v0="8" v1="11" v2="15" v3="16"/>
+      <tetrahedron index="19" v0="10" v1="14" v2="16" v3="19"/>
+      <tetrahedron index="20" v0="10" v1="11" v2="16" v3="19"/>
+      <tetrahedron index="21" v0="8" v1="12" v2="15" v3="16"/>
+      <tetrahedron index="22" v0="12" v1="14" v2="15" v3="16"/>
+      <tetrahedron index="23" v0="0" v1="1" v2="3" v3="20"/>
+      <tetrahedron index="24" v0="4" v1="6" v2="7" v3="17"/>
+      <tetrahedron index="25" v0="2" v1="3" v2="17" v3="19"/>
+      <tetrahedron index="26" v0="1" v1="2" v2="3" v3="20"/>
+      <tetrahedron index="27" v0="4" v1="8" v2="12" v3="21"/>
+      <tetrahedron index="28" v0="12" v1="13" v2="14" v3="16"/>
+      <tetrahedron index="29" v0="0" v1="12" v2="13" v3="21"/>
+      <tetrahedron index="30" v0="12" v1="13" v2="18" v3="21"/>
+      <tetrahedron index="31" v0="8" v1="12" v2="16" v3="18"/>
+      <tetrahedron index="32" v0="12" v1="13" v2="16" v3="18"/>
+      <tetrahedron index="33" v0="7" v1="11" v2="15" v3="19"/>
+      <tetrahedron index="34" v0="14" v1="15" v2="16" v3="19"/>
+      <tetrahedron index="35" v0="11" v1="15" v2="16" v3="19"/>
+      <tetrahedron index="36" v0="4" v1="6" v2="17" v3="20"/>
+      <tetrahedron index="37" v0="2" v1="3" v2="17" v3="20"/>
+      <tetrahedron index="38" v0="4" v1="5" v2="6" v3="20"/>
+      <tetrahedron index="39" v0="1" v1="5" v2="20" v3="21"/>
+      <tetrahedron index="40" v0="4" v1="5" v2="20" v3="21"/>
+      <tetrahedron index="41" v0="4" v1="5" v2="9" v3="21"/>
+      <tetrahedron index="42" v0="8" v1="12" v2="18" v3="21"/>
+      <tetrahedron index="43" v0="9" v1="13" v2="14" v3="16"/>
+      <tetrahedron index="44" v0="2" v1="9" v2="13" v3="14"/>
+      <tetrahedron index="45" v0="2" v1="6" v2="9" v3="14"/>
+      <tetrahedron index="46" v0="2" v1="6" v2="17" v3="19"/>
+      <tetrahedron index="47" v0="1" v1="9" v2="13" v3="21"/>
+      <tetrahedron index="48" v0="1" v1="2" v2="9" v3="13"/>
+      <tetrahedron index="49" v0="1" v1="2" v2="6" v3="9"/>
+      <tetrahedron index="50" v0="1" v1="5" v2="6" v3="9"/>
+      <tetrahedron index="51" v0="1" v1="5" v2="9" v3="21"/>
+      <tetrahedron index="52" v0="1" v1="5" v2="6" v3="20"/>
+      <tetrahedron index="53" v0="1" v1="2" v2="6" v3="20"/>
+      <tetrahedron index="54" v0="3" v1="14" v2="15" v3="19"/>
+      <tetrahedron index="55" v0="2" v1="3" v2="14" v3="19"/>
+      <tetrahedron index="56" v0="3" v1="7" v2="15" v3="19"/>
+      <tetrahedron index="57" v0="3" v1="7" v2="17" v3="19"/>
+      <tetrahedron index="58" v0="2" v1="6" v2="14" v3="19"/>
+      <tetrahedron index="59" v0="6" v1="10" v2="14" v3="19"/>
+      <tetrahedron index="60" v0="6" v1="7" v2="10" v3="19"/>
+      <tetrahedron index="61" v0="6" v1="7" v2="17" v3="19"/>
+      <tetrahedron index="62" v0="5" v1="6" v2="9" v3="22"/>
+      <tetrahedron index="63" v0="8" v1="9" v2="11" v3="22"/>
+      <tetrahedron index="64" v0="9" v1="10" v2="11" v3="22"/>
+      <tetrahedron index="65" v0="7" v1="8" v2="11" v3="22"/>
+      <tetrahedron index="66" v0="6" v1="7" v2="10" v3="22"/>
+      <tetrahedron index="67" v0="7" v1="10" v2="11" v3="22"/>
+      <tetrahedron index="68" v0="6" v1="9" v2="10" v3="22"/>
+      <tetrahedron index="69" v0="4" v1="6" v2="7" v3="22"/>
+      <tetrahedron index="70" v0="4" v1="7" v2="8" v3="22"/>
+      <tetrahedron index="71" v0="4" v1="5" v2="6" v3="22"/>
+      <tetrahedron index="72" v0="4" v1="8" v2="9" v3="22"/>
+      <tetrahedron index="73" v0="4" v1="5" v2="9" v3="22"/>
+    </cells>
+  </mesh>
+</dolfin>
