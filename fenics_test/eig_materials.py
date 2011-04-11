@@ -47,7 +47,7 @@ eps.vector()[:] = N.array([eps_vals[int(i)] for i in material_mesh_func.array()]
 
 
 # Define function space
-order = 5
+order = 3
 V = dol.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", order)
 
 # Define basis and bilinear form
@@ -90,7 +90,7 @@ def sigma_solve(b):
     return xx[:]
 M_matvec = lambda x: M*x
 
-arpack_eigs,v = speigs.ARPACK_gen_eigs(M_matvec, sigma_solve, M.size(0), sigma, 51, ncv=91)
+arpack_eigs,arpack_v = speigs.ARPACK_gen_eigs(M_matvec, sigma_solve, M.size(0), sigma, 51, ncv=91)
 
 # Create eigensolver
 # esolver = dol.SLEPcEigenSolver(S,M)
@@ -114,3 +114,15 @@ print c0*N.sqrt(res)/2/N.pi/1e6
 #postproc_eigres.print_errs(errs)
 
 
+# class TestSub(dol.SubDomain):
+#     retvals = [True, True, True, True, True]
+#     i = 0
+#     def inside(self, x, on_boundary):
+#         #rv = self.retvals[self.i%len(self.retvals)]
+#         rv = x[0] > -0.49
+#         self.i += 1
+#         return rv
+# ts = TestSub()
+# mf = dol.MeshFunction('uint', mesh, mesh.topology().dim())
+# ts.mark(mf,1111)
+# print mf.array()
