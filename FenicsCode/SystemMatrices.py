@@ -1,6 +1,7 @@
 from __future__ import division
 
 import dolfin 
+from FenicsCode import Forms
 
 class SystemMatrices(object):
     MatrixClass = dolfin.PETScMatrix
@@ -16,10 +17,13 @@ class SystemMatrices(object):
     def calc_system_matrices(self):
         """Calculate and return system matrices in a dict"""
         system_matrices = dict()
-        for matname, form in self.matrix_forms:
+        for matname, form in self.matrix_forms.items():
             mat = self.MatrixClass()
-            dolfin.assemble(form, tensor=mat)
-            self.boundary_conditions.apply_essential(mat)
+            if isinstance(form, Forms.NullForm):
+                mat = None
+            else:
+                dolfin.assemble(form, tensor=mat)
+                self.boundary_conditions.apply_essential(mat)
             system_matrices[matname] = mat
 
         return system_matrices
@@ -37,11 +41,11 @@ class SystemVectors(object):
 
     def calc_system_vectors(self):
         """Calculate and return system vectors in a dict"""
-    system_vectors = dict()
-    for vecname, form in self.vector_forms:
-        vec = self.VectorClass()
-        dolfin.assemble(form, tensor=vec)
-        self.boundary_conditions.apply_essential(vec)
-        system_vectors[vecname] = vec
+        system_vectors = dict()
+        for vecname, form in self.vector_forms:
+            vec = self.VectorClass()
+            dolfin.assemble(form, tensor=vec)
+            self.boundary_conditions.apply_essential(vec)
+            system_vectors[vecname] = vec
 
-    return system_vectors
+        return system_vectors

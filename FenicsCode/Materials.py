@@ -1,5 +1,6 @@
 from __future__ import division
 
+import numpy 
 from NewCode import Consts
 import dolfin
 
@@ -10,7 +11,7 @@ class MaterialProperties(object):
     allowed_properties_defaults = {'eps_r':1.0, 'mu_r':1.0}
 
     def __init__(self):
-        for prop, val in self.allowed_properties_defaults:
+        for prop, val in self.allowed_properties_defaults.items():
             setattr(self, prop, val)
 
     def init_values(self, **kwargs):
@@ -30,6 +31,9 @@ class MaterialProperties(object):
 
     def get_mu_r(self):
         return self.mu_r
+
+    def get_mu_r_inv(self):
+        return 1/self.get_mu_r()
 
     def get_eps(self):
         return eps0*self.eps_r
@@ -58,7 +62,7 @@ class MaterialPropertiesFactory(object):
         self.material_properties = {}
         for region_no, property_values in material_regions.items():
             matprop = MaterialProperties()
-            matprop.init_values(property_values)
+            matprop.init_values(**property_values)
             self.material_properties[region_no] = matprop
 
     def get_material_properties(self):
@@ -86,7 +90,7 @@ class MaterialFunctionFactory(object):
         self.region_meshfunction = region_meshfunction
         self.mesh = mesh
 
-    def get_material_functions(self, property_names):
+    def get_material_functions(self, *property_names):
         """Return material functions for the requested properties
 
         Input Parameters
@@ -113,13 +117,13 @@ class MaterialFunctionFactory(object):
         region_meshfn = self.region_meshfunction
         mats = self.region_material_properties
         for pname in property_names:
-            valfunc = get_+'pname'
+            valfunc = 'get_'+pname
             # Simple dictionary of region number to value for property pname
-            region_valuemap = dict((k, get(mat, valfunc)())
+            region_valuemap = dict((k, getattr(mat, valfunc)())
                                    for k, mat in mats.items())
             matfn = dolfin.Function(mat_funcspace)
-            matfn.vector()[:] = N.array([region_valuemap[int(i)]
-                                         for i in region_meshfn.array()])
+            matfn.vector()[:] = numpy.array([region_valuemap[int(i)]
+                                             for i in region_meshfn.array()])
             mat_fns[pname] = matfn
         return mat_fns
         

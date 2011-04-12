@@ -1,8 +1,15 @@
-from __future__ import division
-
 import dolfin
 
 from dolfin import inner, dot, dx, curl
+
+class NullForm(object):
+    """Null form that can be added to a dolfin form while making a zero contribution
+    """
+    _integrals = []
+
+    def __add__(self, other):
+        return other
+
 
 class GalerkinInteriorForms(object):
     """Basic Galerkin System forms for the interior part of the problem
@@ -54,7 +61,7 @@ class EMGalerkinInteriorForms(GalerkinInteriorForms):
         u = self.trial_function
         v = self.test_function
         mu_r = self.material_functions['mu_r']
-        s = (1/mu)*dot(curl(v), curl(u))*dx
+        s = dot(curl(v), curl(u))/mu_r*dx
         return s
 
 

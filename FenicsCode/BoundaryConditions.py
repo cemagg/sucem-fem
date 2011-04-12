@@ -1,15 +1,7 @@
 from __future__ import division
 
 import dolfin
-
-class NullForm(object):
-    """Null form that can be added to a dolfin form while making a zero contribution
-    """
-    _integrals = []
-
-    def __add__(self, other):
-        return other
-
+from FenicsCode import Forms
 
 class BoundaryCondition(object):
     """Boundary condition base class
@@ -62,7 +54,7 @@ class BoundaryCondition(object):
             the RHS of the system matrix equation that is eventually
             solved.
         """
-        return NullForm()
+        return Forms.NullForm()
 
     def get_bilinear_form(self, test_function=None, trial_function=None):
         """Return boundary condition's  bilinear form contribution as a dolfin form
@@ -85,7 +77,7 @@ class BoundaryCondition(object):
             be added to the form used to calculate the RHS of the
             system matrix equation that is eventually solved.
         """
-        return NullForm()
+        return Forms.NullForm()
 
 class EssentialBoundaryCondition(BoundaryCondition):
     """Essential boundary condition class
@@ -208,7 +200,7 @@ class BoundaryConditions(object):
     def get_linear_form(self):
         """Get boundary conditions contribution to RHS linear form
         """
-        lin_form = NullForm()
+        lin_form = Forms.NullForm()
         for bc_num, bc in self.boundary_conditions.items():
             lin_form = lin_form + bc.get_linear_form()
 
@@ -218,7 +210,7 @@ class BoundaryConditions(object):
         """Get boundary conditions contribution to bilinear form
         """
 
-        bilin_form = NullForm()
+        bilin_form = Forms.NullForm()
         for bc_num, bc in self.boundary_conditions.items():
             bilin_form = bilin_form + bc.get_bilinear_form()
 
