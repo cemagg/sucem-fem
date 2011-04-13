@@ -9,7 +9,7 @@ import dolfin as dol
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigen import EigenProblem
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigen import DefaultEigenSolver
 
-from NewCode.Consts import c0
+from FenicsCode.Consts import c0
 
 
 # Define mesh
