@@ -1,4 +1,4 @@
-from NewCode import Consts
+from FenicsCode import Consts
 
 mu0 = Consts.mu0
 eps0 = Consts.eps0

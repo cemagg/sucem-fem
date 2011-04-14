@@ -8,7 +8,7 @@ import dolfin as dol
 from dolfin import dot, curl, inner, dx
 from scipy.sparse.linalg.eigen.arpack import speigs
 
-from NewCode.Consts import eps0, mu0, c0
+from FenicsCode.Consts import eps0, mu0, c0
 
 import postproc_eigres
 from material_properties import MaterialProperties
