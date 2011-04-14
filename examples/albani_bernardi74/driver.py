@@ -48,7 +48,7 @@ es.set_eigenproblem(ep)
 es.set_sigma(sigma)
 
 # Solve the eigenproblem
-eigs_w, eigs_v = es.solve_problem()
+eigs_w, eigs_v = es.solve_problem(10)
 
 # Output the results
 res = N.array(sorted(eigs_w)[0:10])

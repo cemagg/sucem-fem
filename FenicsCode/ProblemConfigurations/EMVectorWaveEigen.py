@@ -95,9 +95,12 @@ class DefaultEigenSolver(object):
         """Spectrum shift (sigma) to apply to k^2"""
         self.sigma = sigma
 
-    def solve_problem(self):
+    def solve_problem(self, nev, ncv=None):
         """Solve problem for eigenvalues and eigenvectors
-
+        Input Values
+        -------------
+        @param nev: Number of eigenpairs to compute
+        @param ncv: Number of Arnoldi basisvectors to use. If None, default to 2*nev+1
         Return Values
         -------------
         (eigs_w, eigs_v) with
@@ -124,6 +127,6 @@ class DefaultEigenSolver(object):
             return xx[:]
         M_matvec = lambda x: M*x
         eigs_w, eigs_v = speigs.ARPACK_gen_eigs(
-            M_matvec, sigma_solve, M.size(0), self.sigma, 51, ncv=91)
+            M_matvec, sigma_solve, M.size(0), self.sigma, nev, ncv=ncv)
 
         return eigs_w, eigs_v.T
