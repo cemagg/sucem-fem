@@ -32,7 +32,7 @@ if not dol.has_slepc():
 # mesh.coordinates()[:] *= [cdims.a,cdims.b,cdims.c]
 #mesh_file = 'lee_mittra92_fig6b.xml'
 #mesh_file = 'lee_mittra92_fig6c.xml'
-mesh_file = 'albani_bernardi74_fig2VII.xml'
+mesh_file = '../examples/albani_bernardi74/mesh/albani_bernardi74_fig2VII.xml'
 materials_mesh_file = "%s_physical_region%s" % (os.path.splitext(mesh_file))
 mesh = dol.Mesh(mesh_file)
 materials = {1000:MaterialProperties(eps_r=16/eps0),
