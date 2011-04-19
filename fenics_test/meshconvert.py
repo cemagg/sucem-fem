@@ -11,6 +11,7 @@
 # Modified by Arve Knudsen (make into module, abaqus support)
 # Modified by Kent-Andre Mardal (Star-CD function)
 # Modified by Nuno Lopes (fix for emc2 mesh format (medit version 0))
+# Modified by Neilen Marais (add gmsh support for reading physical region)
 """ Module for converting various mesh formats.
 """
 
@@ -216,6 +217,9 @@ def gmsh2xml(ifilename, handler):
         9 = read  cells
         10 = done
 
+    Afterwards, extract physical region numbers if they are defined in
+    the mesh file as a mesh function.
+
     """
 
     print "Converting from Gmsh format (.msh, .gmsh) to DOLFIN XML format"
@@ -347,8 +351,10 @@ def gmsh2xml(ifilename, handler):
             state = 5
         elif state == 5:
             (node_no, x, y, z) = line.split()
-            if vertex_dict.has_key(int(node_no)):
-                node_no = vertex_dict[int(node_no)]
+            node_no = int(node_no)
+            x,y,z = [float(xx) for xx in (x,y,z)]
+            if vertex_dict.has_key(node_no):
+                node_no = vertex_dict[node_no]
             else:
                 continue
             nodelist[int(node_no)] = num_vertices_read
