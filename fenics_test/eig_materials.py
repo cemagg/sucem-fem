@@ -8,7 +8,7 @@ import dolfin as dol
 from dolfin import dot, curl, inner, dx
 from scipy.sparse.linalg.eigen.arpack import speigs
 
-from NewCode.Consts import eps0, mu0, c0
+from FenicsCode.Consts import eps0, mu0, c0
 
 import postproc_eigres
 from material_properties import MaterialProperties
@@ -32,7 +32,7 @@ if not dol.has_slepc():
 # mesh.coordinates()[:] *= [cdims.a,cdims.b,cdims.c]
 #mesh_file = 'lee_mittra92_fig6b.xml'
 #mesh_file = 'lee_mittra92_fig6c.xml'
-mesh_file = 'albani_bernardi74_fig2VII.xml'
+mesh_file = '../examples/albani_bernardi74/mesh/albani_bernardi74_fig2VII.xml'
 materials_mesh_file = "%s_physical_region%s" % (os.path.splitext(mesh_file))
 mesh = dol.Mesh(mesh_file)
 materials = {1000:MaterialProperties(eps_r=16/eps0),

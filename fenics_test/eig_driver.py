@@ -9,7 +9,7 @@ import dolfin as dol
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigen import EigenProblem
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigen import DefaultEigenSolver
 
-from NewCode.Consts import c0
+from FenicsCode.Consts import c0
 
 
 # Define mesh
@@ -17,7 +17,7 @@ from NewCode.Consts import c0
 # mesh.coordinates()[:] *= [cdims.a,cdims.b,cdims.c]
 #mesh_file = 'lee_mittra92_fig6b.xml'
 #mesh_file = 'lee_mittra92_fig6c.xml'
-mesh_file = 'albani_bernardi74_fig2VII.xml'
+mesh_file = '../examples/albani_bernardi74/mesh/albani_bernardi74_fig2VII.xml'
 materials_mesh_file = "%s_physical_region%s" % (os.path.splitext(mesh_file))
 mesh = dol.Mesh(mesh_file)
 material_mesh_func = dol.MeshFunction('uint', mesh, materials_mesh_file)
@@ -38,7 +38,7 @@ ep.init_problem()
 es = DefaultEigenSolver()
 es.set_eigenproblem(ep)
 es.set_sigma(sigma)
-eigs_w, eigs_v = es.solve_problem()
+eigs_w, eigs_v = es.solve_problem(10)
 
 
 res = N.array(sorted(eigs_w)[0:10])

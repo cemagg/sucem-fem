@@ -4,3 +4,5 @@ NewCode/tests/testdata/test_eMAGUSImport/+test_tet.out
 ./workspace/+test_tet.out
 ./.ropeproject/objectdb
 *.msh.opt
+.project
+.pydevproject

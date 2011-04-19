@@ -1,7 +1,7 @@
 from __future__ import division
 
 import numpy 
-from NewCode import Consts
+from FenicsCode import Consts
 import dolfin
 
 mu0 = Consts.mu0
