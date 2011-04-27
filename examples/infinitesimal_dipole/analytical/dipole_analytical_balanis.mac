@@ -1,0 +1,49 @@
+/* Phasor field of an infinitesimal z-directed electric current dipole
+using example in C. A. Balanis, Advanced Engineering Electromagnetics,
+pp 279. Implementing the solution on pp 280 in spherical coordinates.
+
+Using k instead of \Beta
+
+Variables:
+
+k -- wavenumber, i.e. 2*pi*f*sqrt(mu*epsilon), 2*pi/lambda etc.
+I -- dipole current
+l -- dipole length
+theta, phi, r -- spherical coords, phi from positive x axis, theta from positive
+    z axis
+epsilon, mu -- respective permittivity and permiability of medium
+eta -- intrinsic impedance of the medium, i.e. sqrt(mu/epsilon)
+*/
+
+/*k:2*%pi*f*sqrt(mu*epsilon)$ */
+H_r:0$
+H_theta=0$
+H_phi:(%i*k*I*l*sin(theta)/(4*%pi*r))*(1 + 1/(%i*k*r))*%e^(-%i*k*r)$
+E_r:eta*(I*l*cos(theta))/(2*%pi*r^2)*(1 + 1/(%i*k*r))*%e^(-%i*k*r)$
+E_theta:%i*eta*(k*I*l*sin(theta))/(4*%pi*r)*(1 + 1/(%i*k*r) - 1/(k*r)^2)*%e^(-%i*k*r)$
+E_phi:0$
+
+subs_eta(expr, epsilon, mu):=block(
+  /* Substitute intrinsic impedance using material parameters */
+  [subs:[eta=sqrt(mu/epsilon)]],
+  subst(subs, expr))$
+
+subs_k(expr):=block(
+  /*Substitute k with 2*pi*f*sqrt(mu*epsilon) */
+  [subs:[k=2*%pi*f*sqrt(mu*epsilon)]],
+  subst(subs, expr))$
+
+sph_to_cart(expr_r, expr_theta, expr_phi):=block(
+  /* Convert spherical coordinate expression to Cartesian components */
+  [expr_x:(sin(theta)*cos(phi)*expr_r + cos(theta)*cos(phi)*expr_theta
+           -sin(phi)*expr_phi),
+   expr_y:(sin(theta)*sin(phi)*expr_r + cos(theta)*sin(phi)*expr_theta
+           + cos(phi)*expr_phi),
+   expr_z:(cos(theta)*expr_r - sin(theta)*expr_theta),
+   subst_coord:[r=sqrt(x^2+y^2+z^2),
+                theta=acos(z/sqrt(x^2+y^2+z^2)),
+                phi=atan2(y,x)]],
+  subst(subst_coord, [expr_x, expr_y, expr_z]))$
+                
+   
+   

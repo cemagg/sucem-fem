@@ -1,0 +1,18 @@
+load("dipole_analytical_haus_melcher.mac")$
+
+mu:4*%pi*10^(-7)$ /* Exact definition of vacuum permiability */
+c0:299792458$ /* Exact definition of the speed of light */
+epsilon:1/mu/c0^2$ /* Exact definition of vacuum permittivity */
+l:1$ /* Dipole length in m*/
+I:1$ /* Dipole current in m*/
+f:1$ /* Dipole frequency in Hz. yes, that's 1 Hz, quite low for EM phenomena */
+/* Wave number i.t.o. frequency and physical constants */
+k:f*2*%pi*sqrt(mu*epsilon)$ 
+
+/* Make a list of test positions along a diagonal */
+test_pts:makelist([10*fac,10*fac,10*fac], fac, 1, 100)$
+
+E_vals:makelist(ev(E, x:pt[1], y:pt[2], z:pt[3]), pt, test_pts)$
+E_vals:float(realpart(E_vals)) + %i*float(imagpart(E_vals))$
+E_vals_abs:abs(E_vals)$
+E_vals_abs[1];

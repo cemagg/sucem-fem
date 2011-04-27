@@ -1,12 +1,10 @@
 load(vect)$
-/*load(pdiff)$
-load(dblint)$ */
-kill(A,E,H,x,y,z,Phi, mu, epsilon, d, x, y, z, r, I, l, k, nabla)$
+kill(A,E,H,x,y,z,Phi, mu, epsilon, d, x, y, z, r, I, l, k)$
 scalefactors([x,y,z])$  /* Set up Cartesian coordinate system */
 declare([A, E, H], nonscalar)$
 depends([A,E,H], [r, theta, phi, t])$
-declare([Phi, mu, epsilon, d, x, y, z, r, I, l, k, nabla], scalar)$
-declare([mu, epsilon, d, x, y, z, r, l, k, nabla], real)$
+declare([Phi, mu, epsilon, d, x, y, z, r, I, l, k], scalar)$
+declare([mu, epsilon, d, x, y, z, r, l, k], real)$
 assume(r>=0)$
 assume(x^2+y^2+z^2>0)$
 assume(x^2+z^2>0)$

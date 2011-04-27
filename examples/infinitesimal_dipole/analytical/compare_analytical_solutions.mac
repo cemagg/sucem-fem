@@ -1,0 +1,8 @@
+kill(all)$
+load("dipole_analytical_balanis.mac");
+E_cart:sph_to_cart(E_r, E_theta, E_phi)$
+E_an1:subs_eta(E_cart, epsilon, mu)$
+load("dipole_analytical_haus_melcher.mac")$
+E_an2:ev(E)$
+E_diff:radcan(E_an1 - E_an2);
+
