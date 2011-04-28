@@ -6,10 +6,19 @@ __date__ = "14 April 2011"
 This file has been adapted from a file eig_driver.py developed by N Marais
 
 Problem considered:
+
+Eigenvalue solution of a dielectricaly loaded PEC cavity.
+
+Note that the reference result described in Albani_Bernardi74 seems to
+be incorrect; they seem to have missed a mode with a lower resonant
+frequency.
     
     
-Reference:
-    Albani, Bernardi
+Reference: 
+
+'A Numerical Method Based on the Discretization of Maxwell Equations
+in Integral Form (Short Papers)' ,Microwave Theory and Techniques,
+IEEE Transactions on, vol. 22, no. 4, pp. 446-450, 1974. 
 """
 import sys
 import numpy as N
