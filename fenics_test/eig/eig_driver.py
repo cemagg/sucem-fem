@@ -1,7 +1,7 @@
 from __future__ import division
 
 import sys
-sys.path.append('../')
+sys.path.append('../../')
 import numpy as N
 import os
 import dolfin as dol
@@ -17,7 +17,7 @@ from FenicsCode.Consts import c0
 # mesh.coordinates()[:] *= [cdims.a,cdims.b,cdims.c]
 #mesh_file = 'lee_mittra92_fig6b.xml'
 #mesh_file = 'lee_mittra92_fig6c.xml'
-mesh_file = '../examples/albani_bernardi74/mesh/albani_bernardi74_fig2VII.xml'
+mesh_file = '../../examples/albani_bernardi74/mesh/albani_bernardi74_fig2VII.xml'
 materials_mesh_file = "%s_physical_region%s" % (os.path.splitext(mesh_file))
 mesh = dol.Mesh(mesh_file)
 material_mesh_func = dol.MeshFunction('uint', mesh, materials_mesh_file)
