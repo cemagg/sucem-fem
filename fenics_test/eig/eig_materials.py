@@ -1,7 +1,7 @@
 from __future__ import division
 
 import sys
-sys.path.append('../')
+sys.path.append('../../')
 import numpy as N
 import os
 import dolfin as dol
