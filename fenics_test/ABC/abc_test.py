@@ -9,11 +9,15 @@ from dolfin import dot, cross, curl, inner, dx, ds
 import scipy.sparse
 
 from FenicsCode.Consts import eps0, mu0, c0
+import point_source
+reload(point_source)
 
 # Define material and frequency
 eps_r = 1;
 mu_r = 1;
 freq = 1e9;
+source_coord = [0.5,0.5,0.5]
+source_value = N.array([0,0,1.])
 
 # Define mesh
 mesh = dol.UnitCube(11,11,11)
@@ -33,8 +37,6 @@ s = (1/mu_r)*dot(curl(v), curl(u))*dx            # Stiffness form
 
 n = V.cell().n
 s_0 = inner ( cross ( n, v), cross ( n, u ) )*ds
-
-
 
 def boundary(x, on_boundary):
     return on_boundary
@@ -66,6 +68,11 @@ Ssp = to_scipy_csr(S)
 S_0sp = to_scipy_csr(S_0, dtype=N.complex128, imagify=True)
 
 A = Ssp - k_0**2*Msp + k_0*S_0sp 
+b = N.zeros(M.size(0), dtype=N.complex128)
+dofnos, rhs_contrib = point_source.calc_pointsource_contrib(
+    V, source_coord, source_value)
+b[dofnos] += rhs_contrib
+
 
 
 # ml = smoothed_aggregation_solver(Asp,max_coarse=10)
