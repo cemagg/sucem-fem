@@ -7,6 +7,8 @@ e = N.e
 mu0 = N.pi*4*1e-7                       # Per definition 
 c0 = 299792458                          # Per definition
 eps0 = 10**7/4/N.pi/c0/c0               # Per definition
+# Per definition, see http://en.wikipedia.org/wiki/Impedance_of_free_space#Relation_to_other_constants
+Z0 = mu0*c0                              
 
 c = mu = eps = 1.                       # Our simplified choice
 

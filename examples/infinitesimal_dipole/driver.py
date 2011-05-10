@@ -8,7 +8,7 @@ import dolfin as dol
 from dolfin import dot, cross, curl, inner, dx, ds
 import scipy.sparse
 
-from FenicsCode.Consts import eps0, mu0, c0
+from FenicsCode.Consts import eps0, mu0, c0, Z0
 import point_source
 reload(point_source)
 # parameters dictionary, should be rebound by user of module
@@ -35,6 +35,13 @@ def run(parameters, workspace):
                                       for i in source_elnos]))]
     centre_pt = dol.Cell(mesh, closest_elno).midpoint()
     centre_coord = N.array([centre_pt.x(), centre_pt.y(), centre_pt.z()])
+    # There seems to be an issue with the intersect operator if the
+    # mesh coordinates are changed after calling it for the first
+    # time. Since we called it to find the centroid, we should init a
+    # new mesh
+    mesh_coords = mesh.coordinates().copy()
+    mesh = dol.UnitCube(*parameters['domain_subdivisions'])
+    mesh.coordinates()[:] = mesh_coords
     mesh.coordinates()[:] -= centre_coord
     ##
 
@@ -69,6 +76,8 @@ def run(parameters, workspace):
     b = N.zeros(M.size(0), dtype=N.complex128)
     dofnos, rhs_contrib = point_source.calc_pointsource_contrib(
         V, source_coord, source_value)
+
+    rhs_contrib = 1j*k_0*Z0*rhs_contrib
     b[dofnos] += rhs_contrib
 
 
@@ -85,29 +94,36 @@ def run(parameters, workspace):
         Asp = csr_matrix( (data,col,row), shape=(n,n), dtype=dtype)
         return Asp
 
+    print M.size(0)
     Msp = to_scipy_csr(M)
     Ssp = to_scipy_csr(S)
     S_0sp = to_scipy_csr(S_0, dtype=N.complex128, imagify=True)
 
     A = Ssp - k_0**2*Msp + k_0*S_0sp 
 
-    residuals = []
-    ml = pyamg.smoothed_aggregation_solver(A,max_coarse=10)
-#    x = ml.solve(b,tol=1e-10,residuals=residuals)
-#    import pdb; pdb.set_trace()
-    x = ml.solve(b,tol=1e-10,accel='cg',residuals=residuals)
-    # x, ml = pyamg.solve(A,b,verb=False, return_solver=True)
     import scipy.sparse.linalg
-    A_lu = scipy.sparse.linalg.factorized(A)
-    x_lu = A_lu(b)
+    A_lu = scipy.sparse.linalg.factorized(A.T)
+    x = A_lu(b)
 
-    residuals = residuals
     #print ml
 
     workspace['V'] = V
+    workspace['u'] = u
     workspace['x'] = x
-    workspace['x_lu'] = x_lu
     workspace['A'] = A
-    workspace['ml'] = ml
     workspace['b'] = b
-    workspace['residuals'] = N.array(residuals)
+
+def get_E_field(workspace, field_pts):
+    dol.set_log_active(False)
+    x = workspace['x']
+    V = workspace['V']
+    mesh = V.mesh()
+    u_re = dol.Function(V)
+    u_im = dol.Function(V)
+    u_re.vector()[:] = N.real(x)
+    u_im.vector()[:] = N.imag(x)
+    E_field = N.zeros((len(field_pts), 3), dtype=N.complex128)
+    for i, fp in enumerate(field_pts):
+        try: E_field[i,:] = u_re(fp) + 1j*u_im(fp)
+        except RuntimeError: E_field[i,:] = N.nan + 1j*N.nan
+    return E_field
