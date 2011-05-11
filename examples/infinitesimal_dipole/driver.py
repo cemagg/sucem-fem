@@ -9,6 +9,8 @@ from dolfin import dot, cross, curl, inner, dx, ds
 import scipy.sparse
 
 from FenicsCode.Consts import eps0, mu0, c0, Z0
+from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
+from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
 import point_source
 reload(point_source)
 # parameters dictionary, should be rebound by user of module
@@ -81,30 +83,32 @@ def run(parameters, workspace):
     b[dofnos] += rhs_contrib
 
 
-    from scipy.sparse import csr_matrix
     import pyamg 
-    from numpy import intc
-
-    def to_scipy_csr(mat, dtype=None, imagify=False):
-        (row,col,data) = mat.data()   # get sparse data
-        col = intc(col)
-        row = intc(row)
-        n = mat.size(0)
-        if imagify: data = data*1j
-        Asp = csr_matrix( (data,col,row), shape=(n,n), dtype=dtype)
-        return Asp
-
+    
     print M.size(0)
-    Msp = to_scipy_csr(M)
-    Ssp = to_scipy_csr(S)
-    S_0sp = to_scipy_csr(S_0, dtype=N.complex128, imagify=True)
+    Msp = dolfin_ublassparse_to_scipy_csr(M)
+    Ssp = dolfin_ublassparse_to_scipy_csr(S)
+    S_0sp = dolfin_ublassparse_to_scipy_csr(S_0, dtype=N.complex128, imagify=True)
 
     A = Ssp - k_0**2*Msp + k_0*S_0sp 
+    
+    
+    solved = False;
+    try:
+        if parameters['solver'] != 'iterative':
+            # solve using scipy bicgstab
+            print 'solve using scipy bicgstab'
+            x = solve_sparse_system ( A, b )
+            solved = True;
+    except KeyError:
+        pass
 
-    import scipy.sparse.linalg
-    A_lu = scipy.sparse.linalg.factorized(A.T)
-    x = A_lu(b)
-
+    if not solved:            
+        import scipy.sparse.linalg
+        A_lu = scipy.sparse.linalg.factorized(A.T)
+        x = A_lu(b)
+        solved = True
+    
     #print ml
 
     workspace['V'] = V
@@ -112,6 +116,7 @@ def run(parameters, workspace):
     workspace['x'] = x
     workspace['A'] = A
     workspace['b'] = b
+
 
 def get_E_field(workspace, field_pts):
     dol.set_log_active(False)
