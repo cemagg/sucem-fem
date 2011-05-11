@@ -10,6 +10,7 @@ import scipy.sparse
 
 from FenicsCode.Consts import eps0, mu0, c0, Z0
 from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
+from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
 import point_source
 reload(point_source)
 # parameters dictionary, should be rebound by user of module
@@ -91,10 +92,22 @@ def run(parameters, workspace):
 
     A = Ssp - k_0**2*Msp + k_0*S_0sp 
     
-    import scipy.sparse.linalg
-    A_lu = scipy.sparse.linalg.factorized(A.T)
-    x = A_lu(b)
+    
+    solved = False;
+    try:
+        if parameters['solver'] != 'iterative':
+            # solve using scipy bicgstab
+            x = solve_sparse_system ( A, b )
+            solved = True;
+    except:
+        pass
 
+    if not solved:            
+        import scipy.sparse.linalg
+        A_lu = scipy.sparse.linalg.factorized(A.T)
+        x = A_lu(b)
+        solved = True
+    
     #print ml
 
     workspace['V'] = V
@@ -102,6 +115,7 @@ def run(parameters, workspace):
     workspace['x'] = x
     workspace['A'] = A
     workspace['b'] = b
+
 
 def get_E_field(workspace, field_pts):
     dol.set_log_active(False)
