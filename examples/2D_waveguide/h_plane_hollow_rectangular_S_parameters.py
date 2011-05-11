@@ -15,6 +15,7 @@ import csv
 import sys
 sys.path.insert(0, '../../')
 from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
+from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
 del sys.path[0]
 #from solvers import CutoffSquared
 #parameters["linear algebra backend"] = "uBLAS"
@@ -156,8 +157,8 @@ def reference_phase(f_range, adjust_range, perform_mod):
 
     return phi
     
-lagrange_order = 3
-mesh_refine_factor = 5
+lagrange_order = 4
+mesh_refine_factor = 6
 mesh = Rectangle(0, 0, l, a, int(N.ceil(l/a)), 1)
 for r in range(mesh_refine_factor):
     mesh = refine(mesh)
@@ -239,11 +240,12 @@ S = assemble(s_ii)
 T = assemble(t_ii)
 
 # creat the LHS and RHS matrices
-LHS = N.zeros((V.dim()+num_ports*M, V.dim()+num_ports*M), dtype=N.complex128)
+LHS = scipy.sparse.csr_matrix ((V.dim()+num_ports*M, V.dim()+num_ports*M), dtype=N.complex128 )
 RHS = N.zeros((V.dim()+num_ports*M, 1), dtype=N.complex128)
 
 # the entries corresponding to D are invariant under frequency
-LHS[:num_ports*M,num_ports*M:] = D
+#LHS[:num_ports*M,num_ports*M:] = D
+AD = scipy.sparse.hstack( (scipy.sparse.eye(M*num_ports, M*num_ports, 0, N.complex128, 'csr' ), scipy.sparse.csr_matrix ( D, dtype=N.complex128 ) ), 'csr' )
 
 f_range = [10., 11., 12.,]
 #f_range = N.arange(10.0,15.25,0.25).tolist()
@@ -252,9 +254,7 @@ f_range = [10., 11., 12.,]
 f_scale = 1e6
 
 results = N.zeros((1+num_ports*M,len(f_range)), dtype=N.complex128)
-
-results_file = open('results/results_file_39.csv', 'wb')
-results_csv = csv.writer(results_file)
+F = uBLASSparseMatrix()
 
 for i in range(len(f_range)):
     f = f_range[i]*f_scale
@@ -264,7 +264,7 @@ for i in range(len(f_range)):
     
     print "Assemble F"
 #    F = S - k_o_squared*T
-    F = assemble(f_ii)
+    assemble(f_ii, tensor=F )
 #    F = assemble(s_ii - k_o(f)**2*t_ii)
     print "apply BC"
     bc.apply(F)
@@ -284,50 +284,33 @@ for i in range(len(f_range)):
             j = k*M + m
             
             B_km = Beta_km(f, m+1)
-            LHS[j,j] = -N.sqrt(a/b)*N.sqrt(ko*Z_0/B_km)
+            AD[j,j] = -N.sqrt(a/b)*N.sqrt(ko*Z_0/B_km)
             coefficients_C[j] = 1j*B_km*2/N.sqrt(a*b)*N.sqrt(ko*Z_0/B_km)
             
-    LHS[num_ports*M:,num_ports*M:] = F.array()[:,:]
-    LHS[num_ports*M:,:num_ports*M] = N.dot(C, N.diag(coefficients_C))
+    
+    F_sp = dolfin_ublassparse_to_scipy_csr ( F ) # scipy.sparse.csr_matrix ( F.array() )
+    C_sp = scipy.sparse.csr_matrix ( N.dot(C, N.diag(coefficients_C)) )
+
+#    LHS[num_ports*M:,num_ports*M:] = F.array()[:,:]
+#    LHS[num_ports*M:,:num_ports*M] = N.dot(C, N.diag(coefficients_C))
+    LHS = scipy.sparse.vstack( ( AD, scipy.sparse.hstack( (C_sp, F_sp ), 'csr') ), 'csr' )
     
     RHS[0,0] = -LHS[0,0]
     RHS[num_ports*M:,0] = coefficient_H_C*H_inc.array()[:]
     t.stop()
     
-    print "Solving (dense)"
-    t = Timer("Solve System")
-#    BE = N.linalg.solve(LHS, RHS)
-    t.stop()
-    print "converting to sparse"
-    t = Timer("Sparse Conversion")
-    import scipy.sparse
-    LHS_sp = scipy.sparse.csr_matrix( LHS )
-    M_sp = scipy.sparse.spdiags( 1./N.diag(LHS), 0, LHS.shape[0], LHS.shape[1] )
-#    RHS_sp = scipy.sparse.csr_matrix( RHS )
-    t.stop()
     print "Solving (sparse)"
     t = Timer("Sparse Solve")
-    import scipy.sparse.linalg
-    BE_sp, info = scipy.sparse.linalg.bicgstab( LHS_sp, RHS, M=M_sp )
-    print info
+    BE = solve_sparse_system ( LHS, RHS )
     t.stop()
-    
-    BE = N.zeros_like(RHS)
-    BE[:,0] = BE_sp[:] 
     print "Done"
     results[0,i] = f
     
     for k in range(num_ports):
         for m in range(M):
-            results[1+k*M+m,i] = BE[k*M+m,0] 
+            results[1+k*M+m,i] = BE[k*M+m] 
     
-    print BE[:num_ports*M,0]
-    results_csv.writerow(results[:,i].T)
-    results_file.flush()
-
-results_file.close()
-#print results
-
+#    print BE[:num_ports*M]
 
 S11 = results[1+0*M,:]
 S21 = results[1+1*M,:]
@@ -364,7 +347,7 @@ plot_two_axis_data(results[0,:].real/1e6, [N.zeros(results[0,:].shape), magnitud
                    Y2_styles = ['ko', '--',])
 
 P.xlabel('Frequency [GHz]')
-P.savefig('results/images/hollow_h_plane_S_parameters.eps')
+#P.savefig('results/images/hollow_h_plane_S_parameters.eps')
 P.show()
 
 

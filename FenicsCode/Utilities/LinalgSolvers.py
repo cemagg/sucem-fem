@@ -18,7 +18,10 @@ def solve_sparse_system ( A, b ):
     
     x, info = scipy.sparse.linalg.bicgstab( A, b, M=scipy.sparse.spdiags(1./A.diagonal(), 0, A.shape[0], A.shape[1]) )
     
-    assert ( info == 0 )
+    if ( info > 0 ):
+        "convergence to tolerance not achieved, in %d iterations" % info
+    elif ( info < 0 ): 
+        "illegal input or breakdown (%d)" % info
     
     return x
     
