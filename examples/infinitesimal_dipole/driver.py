@@ -73,6 +73,8 @@ def run(parameters, workspace):
     dol.assemble(m, tensor=M, mesh=mesh)
     dol.assemble(s, tensor=S, mesh=mesh)
     dol.assemble(s_0, tensor=S_0, mesh=mesh)
+    print M.size(0)
+
 
     # Set up RHS
     b = N.zeros(M.size(0), dtype=N.complex128)
@@ -82,20 +84,15 @@ def run(parameters, workspace):
     rhs_contrib = 1j*k_0*Z0*rhs_contrib
     b[dofnos] += rhs_contrib
 
-
-    import pyamg 
-    
-    print M.size(0)
     Msp = dolfin_ublassparse_to_scipy_csr(M)
     Ssp = dolfin_ublassparse_to_scipy_csr(S)
-    S_0sp = dolfin_ublassparse_to_scipy_csr(S_0, dtype=N.complex128, imagify=True)
-
-    A = Ssp - k_0**2*Msp + k_0*S_0sp 
+    S_0sp = dolfin_ublassparse_to_scipy_csr(S_0)
+    A = Ssp - k_0**2*Msp + 1j*k_0*S_0sp 
     
     
     solved = False;
     try:
-        if parameters['solver'] != 'iterative':
+        if parameters['solver'] == 'iterative':
             # solve using scipy bicgstab
             print 'solve using scipy bicgstab'
             x = solve_sparse_system ( A, b )
@@ -116,7 +113,8 @@ def run(parameters, workspace):
     workspace['x'] = x
     workspace['A'] = A
     workspace['b'] = b
-
+    workspace['rhs_dofnos'] = dofnos
+    workspace['rhs_contrib'] = rhs_contrib
 
 def get_E_field(workspace, field_pts):
     dol.set_log_active(False)
