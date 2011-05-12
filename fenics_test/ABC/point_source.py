@@ -25,7 +25,6 @@ def calc_pointsource_contrib(V, source_coords, source_value):
     dofnos = N.zeros(dm.max_cell_dimension(), dtype=N.uint32)
     source_pt = dolfin.Point(*source_coords)
     cell_index = V.mesh().any_intersected_entity(source_pt)
-    #cell_index = 
     c = dolfin.Cell(V.mesh(), cell_index)
     # Check that the source point is in this element    
     assert(c.intersects_exactly(source_pt)) 
