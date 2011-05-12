@@ -150,8 +150,27 @@ class CalculateConnectivity(object):
         for i, elements in enumerate(edge_connect_2_element_list):
             ec2e[i,:len(elements)] = elements
 
+    def calc_element_connect_2_element(self):
+        """Calculate ElementConnect2Elem"""
+        # Assumes that calc_element_face_connectivity() and
+        # calc_face_connect_2_element has been called already
+        elc2fs = self.element_connect_2_face
+        elc2el = self.element_connect_2_element = numpy.zeros_like(elc2fs)
+        fc2els = self.get_face_connect_2_element()
+        for i, el_faces in enumerate(elc2fs):
+            el_faces_els = fc2els[el_faces]
+            for f_j, face_els in enumerate(el_faces_els):
+                if face_els[0] != i:
+                    elc2el[i, f_j] = face_els[0]
+                else:
+                    elc2el[i, f_j] = face_els[1]
+                    
+
     def get_edge_connect_2_element(self):
         return self.edge_connect_2_element
+
+    def get_element_connect_2_element(self):
+        return self.element_connect_2_element
         
     def get_output_listmesh(self):
         self.output_listmesh['NodeConnect2Element'] = self.node_connect_2_element
@@ -162,6 +181,7 @@ class CalculateConnectivity(object):
         self.output_listmesh['FaceNodes'] = self.face_connect_2_node
         self.output_listmesh['EdgeNodes'] = self.edge_connect_2_node
         self.output_listmesh['ElementEdges'] = self.element_connect_2_edge
+        self.output_listmesh['ElementConnect2Elem'] = self.element_connect_2_element
         return self.output_listmesh
 
 def get_all_connectivities(input_listmesh):
@@ -175,4 +195,5 @@ def get_all_connectivities(input_listmesh):
     cc.calc_face_element_connectivity()
     cc.calc_face_node_connectivity()
     cc.calc_node_element_connectivity()
+    cc.calc_element_connect_2_element()
     return cc.get_output_listmesh()
