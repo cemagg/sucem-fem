@@ -28,9 +28,13 @@ lam = c0/test_data.problem_data['f']
 # #domain_subdivisions = N.array([21,21,21], N.uint)
 # parameters.update(dict(domain_size=domain_size,
 #                        domain_subdivisions=domain_subdivisions))
-mesh_file = '../../workspace/sphere-r1m-6.femmesh'
-mesh = femmesh_2_dolfin_mesh(mesh_file)
-mesh.init()
+
+
+# mesh_file = '../../workspace/sphere-r1m-6.femmesh'
+# mesh = femmesh_2_dolfin_mesh(mesh_file)
+# mesh.init()
+mesh = dol.UnitTetrahedron()
+mesh.coordinates()[:] *= lam
 workspace['mesh'] = mesh
 
 parameters.update(dict(source_coord=source_coord,
@@ -46,6 +50,11 @@ x = workspace['x']
 A = workspace['A']
 b = workspace['b']
 
+M = workspace['M']
+S = workspace['S']
+S_0 = workspace['S_0']
+
+
 u_abs = dol.Function(V)
 u_re = dol.Function(V)
 u_im = dol.Function(V)
@@ -58,12 +67,7 @@ u_im.vector()[:] = N.imag(x)
 last = 18
 ratio = N.abs(E_1[last] / test_data.E_1[last])
 
-u_abs_recons = N.array([u_abs(r) for r in test_data.r_1[0:last+1]])
-u_re_recons = N.array([u_re(r) for r in test_data.r_1[0:last+1]])
-u_im_recons = N.array([u_im(r) for r in test_data.r_1[0:last+1]])
-
-
-
-E_1_norm = E_1[0:last+1]/ratio
-
+# u_abs_recons = N.array([u_abs(r) for r in test_data.r_1[0:last+1]])
+# u_re_recons = N.array([u_re(r) for r in test_data.r_1[0:last+1]])
+# u_im_recons = N.array([u_im(r) for r in test_data.r_1[0:last+1]])
 

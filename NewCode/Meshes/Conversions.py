@@ -72,6 +72,7 @@ def listmesh_2_dolfin_mesh(listmesh):
     return dm
 
 def dolfin_mesh_2_listmesh(dolfin_mesh):
+    listmesh = {}
     listmesh['Nodes'] = dolfin_mesh.coordinates().copy()
     listmesh['ElementNodes'] = dolfin_mesh.cells().copy()
     return listmesh

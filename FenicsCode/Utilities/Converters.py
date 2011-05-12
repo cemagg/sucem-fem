@@ -23,4 +23,4 @@ def dolfin_ublassparse_to_scipy_csr ( A, dtype=None, imagify=False ):
     A_sp = scipy.sparse.csr_matrix( (data,col,row), shape=(n,n), dtype=dtype)
     
     return A_sp
-    
+

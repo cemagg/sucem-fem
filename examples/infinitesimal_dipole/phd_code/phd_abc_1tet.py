@@ -33,39 +33,13 @@ k_0 = 2*N.pi*freq/c0
 source_coord = N.array([0,0,0.]) + 1e-5
 source_value = N.array([0,0,1.])*parameters['I']*parameters['l']
 
-meshfile = '../../../workspace/sphere-r1m-6.femmesh'
-listmesh = Femmesh.get_femmesh_as_listmesh(meshfile)
-listmesh['Nodes'] *= lam
+import dolfin as dol
+source_point = dol.Point(*source_coord)
+dol_mesh = dol.UnitTetrahedron()
+dol_mesh.coordinates()[:] *= lam
+listmesh = Conversions.dolfin_mesh_2_listmesh(dol_mesh)
 listmesh = CalculateConnectivity.get_all_connectivities(listmesh)
-
-
-## Set up dolfin mesh
-# import dolfin as dol
-# source_point = dol.Point(*source_coord)
-# domain_size = N.array([4.]*3)
-# max_edge_len = 1/6.
-# domain_subdivisions = N.array(N.ceil(domain_size/max_edge_len), N.uint)
-# dol_mesh = dol.UnitCube(*domain_subdivisions)
-# # Transform dol_mesh to correct dimensions
-# dol_mesh.coordinates()[:] *= domain_size
-# dol_mesh.coordinates()[:] -= domain_size/2
-# ## Translate dol_mesh slightly so that source coordinate lies at centroid of an element
-# source_elnos = dol_mesh.all_intersected_entities(source_point)
-# closest_elno = source_elnos[(N.argmin([source_point.distance(dol.Cell(dol_mesh, i).midpoint())
-#                                   for i in source_elnos]))]
-# centre_pt = dol.Cell(dol_mesh, closest_elno).midpoint()
-# centre_coord = N.array([centre_pt.x(), centre_pt.y(), centre_pt.z()])
-# # There seems to be an issue with the intersect operator if the
-# # dol_mesh coordinates are changed after calling it for the first
-# # time. Since we called it to find the centroid, we should init a
-# # new dol_mesh
-# dol_mesh_coords = dol_mesh.coordinates().copy()
-# dol_mesh = dol.UnitCube(*domain_subdivisions)
-# dol_mesh.coordinates()[:] = dol_mesh_coords
-# dol_mesh.coordinates()[:] -= centre_coord
-# listmesh = Conversions.dolfin_mesh_2_listmesh(dol_mesh)
-# listmesh = CalculateConnectivity.get_all_connectivities(listmesh)
-# ## End dolfin mesh setup
+## End dolfin mesh setup
 
 mesh = Mesh.Mesh(listmesh)
 

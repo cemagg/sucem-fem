@@ -2,6 +2,7 @@ import csv, os
 import numpy as N
 
 data_path = 'analytical'
+data_path = os.path.join(os.path.dirname(__file__), data_path)
 E_data_csv_files = ('E_vals_1_re.csv',
                     'E_vals_1_im.csv',
                     'E_vals_2_re.csv',
