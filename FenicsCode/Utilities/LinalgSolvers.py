@@ -16,7 +16,8 @@ def solve_sparse_system ( A, b ):
     import scipy.sparse
     import scipy.sparse.linalg
     
-    x, info = scipy.sparse.linalg.bicgstab( A, b, M=scipy.sparse.spdiags(1./A.diagonal(), 0, A.shape[0], A.shape[1]) )
+    x, info = scipy.sparse.linalg.bicgstab(
+        A, b, M=scipy.sparse.spdiags(1./A.diagonal(), 0, A.shape[0], A.shape[1]) )
     
     assert ( info == 0 )
     
