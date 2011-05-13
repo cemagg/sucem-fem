@@ -1,4 +1,5 @@
 import dolfin
+import numpy as N
 
 def listmesh_2_dolfin_mesh(listmesh, reorder=False):
     """Setup dolfin mesh using node and tet data from listmesh
@@ -28,7 +29,8 @@ def dolfin_mesh_2_listmesh(dolfin_mesh):
     """
     listmesh = {}
     listmesh['Nodes'] = dolfin_mesh.coordinates().copy()
-    listmesh['ElementNodes'] = dolfin_mesh.cells().copy()
+    listmesh['ElementNodes'] = N.array(dolfin_mesh.cells(),
+                                       dtype=N.int32, copy=True)
     return listmesh
 
 def femmesh_reader_2_dolfin_mesh(femmesh_reader, reorder=True):

@@ -150,7 +150,8 @@ class CalculateConnectivity(object):
         # Assumes that calc_element_face_connectivity() and
         # calc_face_connect_2_element has been called already
         elc2fs = self.element_connect_2_face
-        elc2el = self.element_connect_2_element = numpy.zeros_like(elc2fs)
+        elc2el = self.element_connect_2_element = numpy.zeros(
+            shape=elc2fs.shape, dtype=numpy.int32)
         fc2els = self.get_face_connect_2_element()
         for i, el_faces in enumerate(elc2fs):
             el_faces_els = fc2els[el_faces]
