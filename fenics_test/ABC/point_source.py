@@ -24,8 +24,14 @@ def calc_pointsource_contrib(V, source_coords, source_value):
     dm = V.dofmap()
     dofnos = N.zeros(dm.max_cell_dimension(), dtype=N.uint32)
     source_pt = dolfin.Point(*source_coords)
-    cell_index = V.mesh().any_intersected_entity(source_pt)
-    #cell_index = 
+    try:
+        cell_index = V.mesh().any_intersected_entity(source_pt)
+    except StandardError:
+        # CGAL as used by dolfin to implement intersection searches
+        # seems to break with 1-element meshes
+        if dolfin.Cell(V.mesh(), 0).intersects(source_pt):
+            cell_index = 0
+        else: raise
     c = dolfin.Cell(V.mesh(), cell_index)
     # Check that the source point is in this element    
     assert(c.intersects_exactly(source_pt)) 

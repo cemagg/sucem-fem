@@ -27,25 +27,29 @@ def run(parameters, workspace):
     source_value = N.array([0,0,1.])*parameters['I']*parameters['l']
 
     # Define mesh
-    mesh = dol.UnitCube(*parameters['domain_subdivisions'])
-    # Transform mesh to correct dimensions
-    mesh.coordinates()[:] *= parameters['domain_size']
-    mesh.coordinates()[:] -= parameters['domain_size']/2
-    ## Translate mesh slightly so that source coordinate lies at centroid of an element
-    source_elnos = mesh.all_intersected_entities(source_point)
-    closest_elno = source_elnos[(N.argmin([source_point.distance(dol.Cell(mesh, i).midpoint())
+    if 'mesh' in workspace:    
+        mesh = workspace['mesh']
+    else:
+        mesh = dol.UnitCube(*parameters['domain_subdivisions'])
+        # Transform mesh to correct dimensions
+        mesh.coordinates()[:] *= parameters['domain_size']
+        mesh.coordinates()[:] -= parameters['domain_size']/2
+        ## Translate mesh slightly so that source coordinate lies at
+        ## centroid of an element
+        source_elnos = mesh.all_intersected_entities(source_point)
+        closest_elno = source_elnos[(N.argmin([source_point.distance(dol.Cell(mesh, i).midpoint())
                                       for i in source_elnos]))]
-    centre_pt = dol.Cell(mesh, closest_elno).midpoint()
-    centre_coord = N.array([centre_pt.x(), centre_pt.y(), centre_pt.z()])
-    # There seems to be an issue with the intersect operator if the
-    # mesh coordinates are changed after calling it for the first
-    # time. Since we called it to find the centroid, we should init a
-    # new mesh
-    mesh_coords = mesh.coordinates().copy()
-    mesh = dol.UnitCube(*parameters['domain_subdivisions'])
-    mesh.coordinates()[:] = mesh_coords
-    mesh.coordinates()[:] -= centre_coord
-    ##
+        centre_pt = dol.Cell(mesh, closest_elno).midpoint()
+        centre_coord = N.array([centre_pt.x(), centre_pt.y(), centre_pt.z()])
+        # There seems to be an issue with the intersect operator if the
+        # mesh coordinates are changed after calling it for the first
+        # time. Since we called it to find the centroid, we should init a
+        # new mesh
+        mesh_coords = mesh.coordinates().copy()
+        mesh = dol.UnitCube(*parameters['domain_subdivisions'])
+        mesh.coordinates()[:] = mesh_coords
+        mesh.coordinates()[:] -= centre_coord
+        ##
 
     # Define function space
     order = parameters['order']
@@ -112,6 +116,12 @@ def run(parameters, workspace):
     workspace['u'] = u
     workspace['x'] = x
     workspace['A'] = A
+    workspace['M'] = Msp
+    workspace['S'] = Ssp
+    workspace['S_0'] = S_0sp
+    workspace['Sdol'] = S
+    workspace['Mdol'] = M
+    workspace['S_0dol'] = S_0
     workspace['b'] = b
     workspace['rhs_dofnos'] = dofnos
     workspace['rhs_contrib'] = rhs_contrib
@@ -123,10 +133,10 @@ def get_E_field(workspace, field_pts):
     mesh = V.mesh()
     u_re = dol.Function(V)
     u_im = dol.Function(V)
-    u_re.vector()[:] = N.real(x)
-    u_im.vector()[:] = N.imag(x)
+    u_re.vector()[:] = N.real(x).copy()
+    u_im.vector()[:] = N.imag(x).copy()
     E_field = N.zeros((len(field_pts), 3), dtype=N.complex128)
     for i, fp in enumerate(field_pts):
         try: E_field[i,:] = u_re(fp) + 1j*u_im(fp)
-        except RuntimeError: E_field[i,:] = N.nan + 1j*N.nan
+        except (RuntimeError, StandardError): E_field[i,:] = N.nan + 1j*N.nan
     return E_field
