@@ -10,21 +10,21 @@ import scipy
 #
 # Local Imports
 #
+import sys
+sys.path.append('../')
 import NewCode
-import NewCode.eMAGUSImport as eMAGUSImport
 import NewCode.Mesh as Mesh
 from NewCode.Utilities import Struct, partial
 from NewCode import DifferentialForm, Waveforms, PostProc
 from NewCode.DifferentialForm import Discretiser
-from NewCode.tests.TestMeshes import FlatTet, InscribedTetMesh, TwoTets
 from NewCode.DiscretisedSystem import CurlCurlNewmark
+from NewCode.Meshes import CalculateConnectivity
+from NewCode.Meshes.MeshIO import Femmesh
 
-mesh1 = Mesh.Mesh(FlatTet.listmesh)
-mesh2 = Mesh.Mesh(TwoTets.listmesh)
-mesh3 = Mesh.Mesh(InscribedTetMesh.listmesh)
-eMAGUSImport.init('workspace')
-mesh4 = Mesh.Mesh(eMAGUSImport.get_listmesh())
-mesh = mesh4
+meshfile = '../workspace/sphere-r1m-6.femmesh'
+listmesh = CalculateConnectivity.get_all_connectivities(
+    Femmesh.get_femmesh_as_listmesh(meshfile))
+mesh = Mesh.Mesh(listmesh)
 
 Discretiser.BasePformDiscretiser.defaultIntegrationOrder = 6
 CurlCurlNewmark.triIntegrationOrder = 6

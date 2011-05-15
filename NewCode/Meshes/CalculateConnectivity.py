@@ -1,6 +1,7 @@
 from __future__ import division
 import dolfin
 import numpy
+from NewCode.Meshes import Conversions
 
 class EnsureInitialised(object):
     """Ensures that a dolfin.mesh object connectivity info is initialised"""
@@ -18,10 +19,12 @@ class EnsureInitialised(object):
         """Ensure that connectivity from dim0 to dim1 is initialised
 
         A test is done to determine wether the connectivity info has
-        been initialised, and initalised the connectivity if needed
+        been initialised, and initalises the connectivity if needed
         """
         ent0 = self.dim_entity_map[dim0](self.dolfin_mesh, 0)
         if len(ent0.entities(dim1)) == 0: self.dolfin_mesh.init(dim0, dim1)
+
+
 
 class CalculateConnectivity(object):
     def set_input_listmesh(self,input_listmesh):
@@ -30,16 +33,8 @@ class CalculateConnectivity(object):
         self.dolfin_mesh = None
 
     def setup_mesh(self):
-        """Setup dolfin mesh using node and tet data from self.input_listmesh"""
-        dm = self.dolfin_mesh = dolfin.Mesh()
-        me = dolfin.MeshEditor()
-        me.open(dm, 'tetrahedron', 3, 3)
-        me.init_vertices(len(self.input_listmesh['Nodes']))
-        me.init_cells(len(self.input_listmesh['ElementNodes']))
-        dm.coordinates()[:,:] = self.input_listmesh['Nodes']
-        dm.cells()[:,:] = self.input_listmesh['ElementNodes']
-        me.close()
-        self.ensure_initialised = EnsureInitialised(dm)
+        self.dolfin_mesh = Conversions.listmesh_2_dolfin_mesh(self.input_listmesh)
+        self.ensure_initialised = EnsureInitialised(self.dolfin_mesh)
 
     ### FIXME use @uninit_error -like decorator to check initialisation
     def get_nodes(self):
@@ -150,8 +145,28 @@ class CalculateConnectivity(object):
         for i, elements in enumerate(edge_connect_2_element_list):
             ec2e[i,:len(elements)] = elements
 
+    def calc_element_connect_2_element(self):
+        """Calculate ElementConnect2Elem"""
+        # Assumes that calc_element_face_connectivity() and
+        # calc_face_connect_2_element has been called already
+        elc2fs = self.element_connect_2_face
+        elc2el = self.element_connect_2_element = numpy.zeros(
+            shape=elc2fs.shape, dtype=numpy.int32)
+        fc2els = self.get_face_connect_2_element()
+        for i, el_faces in enumerate(elc2fs):
+            el_faces_els = fc2els[el_faces]
+            for f_j, face_els in enumerate(el_faces_els):
+                if face_els[0] != i:
+                    elc2el[i, f_j] = face_els[0]
+                else:
+                    elc2el[i, f_j] = face_els[1]
+                    
+
     def get_edge_connect_2_element(self):
         return self.edge_connect_2_element
+
+    def get_element_connect_2_element(self):
+        return self.element_connect_2_element
         
     def get_output_listmesh(self):
         self.output_listmesh['NodeConnect2Element'] = self.node_connect_2_element
@@ -162,6 +177,7 @@ class CalculateConnectivity(object):
         self.output_listmesh['FaceNodes'] = self.face_connect_2_node
         self.output_listmesh['EdgeNodes'] = self.edge_connect_2_node
         self.output_listmesh['ElementEdges'] = self.element_connect_2_edge
+        self.output_listmesh['ElementConnect2Elem'] = self.element_connect_2_element
         return self.output_listmesh
 
 def get_all_connectivities(input_listmesh):
@@ -175,4 +191,5 @@ def get_all_connectivities(input_listmesh):
     cc.calc_face_element_connectivity()
     cc.calc_face_node_connectivity()
     cc.calc_node_element_connectivity()
+    cc.calc_element_connect_2_element()
     return cc.get_output_listmesh()
