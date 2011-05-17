@@ -122,8 +122,11 @@ class MaterialFunctionFactory(object):
             region_valuemap = dict((k, getattr(mat, valfunc)())
                                    for k, mat in mats.items())
             matfn = dolfin.Function(mat_funcspace)
-            matfn.vector()[:] = numpy.array([region_valuemap[int(i)]
-                                             for i in region_meshfn.array()])
+            try:
+                matfn.vector()[:] = numpy.array([region_valuemap[int(i)]
+                                                 for i in region_meshfn.array()])
+            except KeyError, s:
+                raise ValueError('Material number %d not found' % s.args[0])
             mat_fns[pname] = matfn
         return mat_fns
         
