@@ -11,8 +11,7 @@ import scipy.sparse
 from FenicsCode.Consts import eps0, mu0, c0, Z0
 from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
 from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
-import point_source
-reload(point_source)
+from FenicsCode.Sources import point_source
 # parameters dictionary, should be rebound by user of module
 parameters = dict(f=None, l=None, I=None, source_coord=None)
 
@@ -71,6 +70,7 @@ def run(parameters, workspace):
         return on_boundary
 
     # Assemble forms
+    print 'assembling forms'
     M = dol.uBLASSparseMatrix()
     S = dol.uBLASSparseMatrix()
     S_0 = dol.uBLASSparseMatrix()
