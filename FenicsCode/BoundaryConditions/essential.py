@@ -21,17 +21,6 @@ class EssentialBoundaryCondition(BoundaryCondition):
     # Default boundary condition is zero, i.e. PEC
     boundary_value_expression = dolfin.Expression(("0.0", "0.0", "0.0"), degree=1)
 
-    def set_function_space(self, function_space):
-        """Set function space on which the essential boundary condition is to be applied.
-
-        Parameters
-        ----------
-
-        function_space -- dolfin function space object 
-
-        """
-        self.function_space = function_space
-
     def set_boundary_value_expression(self, boundary_value_expression):
         """Set value expression for boundary condition
 

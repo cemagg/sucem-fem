@@ -13,6 +13,17 @@ class BoundaryCondition(object):
     provides nil-contribution default implementation.
     """
 
+    def set_function_space(self, function_space):
+        """Set function space on which the essential boundary condition is to be applied.
+
+        Parameters
+        ----------
+
+        function_space -- dolfin function space object 
+
+        """
+        self.function_space = function_space
+
     def get_essential_application_func(self, function_space=None):
         """Return an essential boundary condition application function.
 
