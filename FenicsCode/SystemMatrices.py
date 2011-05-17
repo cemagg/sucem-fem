@@ -6,6 +6,15 @@ from FenicsCode import Forms
 class SystemMatrices(object):
     MatrixClass = dolfin.PETScMatrix
 
+    def set_matrix_class(self, matrix_class):
+        """Set matrix class to use for system matrix.
+
+        Overrides the default value (dolfin.PETScMatrix) set in the
+        class definition
+        
+        """
+        self.MatrixClass = matrix_class
+
     def set_matrix_forms(self, matrix_forms):
         """Set matrix_forms with a dict mapping matrix names to bilinear forms"""
         self.matrix_forms = matrix_forms
