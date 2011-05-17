@@ -133,8 +133,8 @@ def get_E_field(workspace, field_pts):
     mesh = V.mesh()
     u_re = dol.Function(V)
     u_im = dol.Function(V)
-    u_re.vector()[:] = N.real(x).copy()
-    u_im.vector()[:] = N.imag(x).copy()
+    u_re.vector()[:] = N.require(N.real(x), requirements='C')
+    u_im.vector()[:] = N.require(N.imag(x), requirements='C')
     E_field = N.zeros((len(field_pts), 3), dtype=N.complex128)
     for i, fp in enumerate(field_pts):
         try: E_field[i,:] = u_re(fp) + 1j*u_im(fp)
