@@ -1,6 +1,46 @@
 from __future__ import division
+
 import dolfin
 import numpy as N
+
+class CurrentSources(object):
+    def __init__(self):
+        self.sources = []
+
+    def set_function_space(self, function_space):
+        self.function_space = function_space
+
+    def add_source(self, source):
+        source.set_function_space(self.function_space)
+        self.sources.append(source)
+        
+    def get_source_contributions(self):
+        pass
+
+class PointCurrentSource(object):
+    def set_position(self, position):
+        """Set point source position. Expects an array with x,y,z coordinates
+        """
+        self.position = N.array(position, dtype=N.float64)
+
+    def set_value(self, value):
+        """Set point value. Expects an array with x,y,z components of current
+        """
+        iscomplex = N.any(N.iscomplex(value))
+        dtype = N.complex128 if iscomplex else N.float64
+        self.value = N.array(value, dtype=dtype)
+
+    def set_function_space(self, function_space):
+        """Set function space that the source is to be applied to"""
+        self.function_space = function_space
+
+    def get_contribution(self):
+        """Get source contribution dofnos and value
+
+        See documentation of calc_pointsource_contrib for more detail
+        on the return values
+        """
+        return calc_pointsource_contrib(self.function_space, self.position, self.value)
 
 def calc_pointsource_contrib(V, source_coords, source_value):
     """Calculate the RHS contribution of a current point source (i.e. electric dipole)

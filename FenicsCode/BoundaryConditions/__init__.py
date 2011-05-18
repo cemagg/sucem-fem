@@ -1,0 +1,3 @@
+from FenicsCode.BoundaryConditions.base_boundary_condition import BoundaryCondition
+
+

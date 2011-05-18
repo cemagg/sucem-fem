@@ -4,7 +4,6 @@ import numpy as N
 import sys
 import dolfin as dol
 sys.path.append('../../')
-sys.path.append('../../fenics_test/ABC/')
 import test_data
 import driver
 reload(driver)
@@ -13,7 +12,7 @@ from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
 import dolfin as dol
 
 order = 2
-source_coord = N.array([0,0,1e-5]) 
+source_coord = N.array([0,0,0.]) 
 source_pt = dol.Point(*source_coord)
 
 parameters = dict(test_data.problem_data)
@@ -35,15 +34,15 @@ mesh = femmesh_2_dolfin_mesh(mesh_file)
 mesh.init()
 # mesh = dol.UnitCube(3,3,3)
 # mesh.coordinates()[:] -= 0.5
-# mesh.coordinates()[:] *= lam
+mesh.coordinates()[:] *= lam
 workspace['mesh'] = mesh
 
 parameters.update(dict(source_coord=source_coord,
                        order=order,
                        solver='iterative'))
 driver.run(parameters, workspace)
-last = 18
-E_1 = driver.get_E_field(workspace, test_data.r_1[0:last+1])
+E_1 = driver.get_E_field(workspace, test_data.r_1)
+last_E_1 = list(N.isnan(E_1[:,2])).index(True)
 #E_2 = driver.get_E_field(workspace, test_data.r_2)
 
 V = workspace['V']
@@ -58,10 +57,10 @@ S_0 = workspace['S_0']
 
 
 from pylab import *
-r1 = test_data.r_1[1:last+1]/lam
+r1 = test_data.r_1[1:last_E_1+1]/lam
 x1 = r1[:,0]
-E_1_ana = test_data.E_1[1:last+1]
-E_1_num = E_1[1:last+1]
+E_1_ana = test_data.E_1[1:last_E_1+1]
+E_1_num = E_1[1:last_E_1+1]
 figure(1)
 plot(x1, N.abs(E_1_num[:,0]), '-g', label='x_num')
 plot(x1, N.abs(E_1_num[:,1]), '-b', label='y_num')

@@ -5,6 +5,8 @@ from FenicsCode import BoundaryConditions
 from FenicsCode import SystemMatrices
 
 from scipy.sparse.linalg.eigen.arpack import speigs
+import FenicsCode.BoundaryConditions.essential
+import FenicsCode.BoundaryConditions.container
 
 class CombineForms(Forms.CombineGalerkinForms):
     def get_forms(self):
@@ -63,8 +65,8 @@ class EigenProblem(object):
         return int_form
 
     def _get_boundary_conditions(self):
-        bcs = BoundaryConditions.BoundaryConditions()
-        bc = BoundaryConditions.EssentialBoundaryCondition()
+        bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
+        bc = FenicsCode.BoundaryConditions.essential.EssentialBoundaryCondition()
         bc.set_function_space(self.function_space)
         class bcSubDomain(dolfin.SubDomain):
             def inside(self, x, on_boundary):
