@@ -18,10 +18,11 @@ from FenicsCode.Consts import eps0, mu0, c0, Z0
 from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
 from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
 from FenicsCode.Sources import point_source
+from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
 from FenicsCode.Utilities.MatrixIO import ( load_scipy_matrix_from_mat, save_scipy_matrix_as_mat)
 del sys.path[0]
 
-def generate_matrices ( mesh_file ):
+def generate_matrices ( mesh_file, order ):
     """
     Generate the matrices for a 1\lambda spherical domain with an infintesimal dipole at the origin.
     
@@ -32,7 +33,7 @@ def generate_matrices ( mesh_file ):
                     'I': 1.0,
                     'f': 1.0e9,
                     'source_coord': np.array([0,0,0.]),
-                    'order': 1,
+                    'order': order,
                     }
     
     lam = c0/problem_data['f']
@@ -106,6 +107,11 @@ def save_matrices ( path, id, A, b ):
     
     save_scipy_matrix_as_mat ( full_path, 'A', A )
     save_scipy_matrix_as_mat ( full_path, 'b', b )
+    
+    dofs = A.shape[0]
+    f = file ( os.path.join ( full_path, '%dDOFs.txt' % dofs), 'w' )
+    f.write ( 'DOFs = %d\n' % dofs )
+    f.close()
 
 def load_matrices ( path, id ):
     full_path = os.path.join ( path, id )
@@ -115,11 +121,11 @@ def load_matrices ( path, id ):
     return A, b 
 
 
-def generate_and_save ( problem_id ):
-    mesh_file = '../../workspace/%s.femmesh' % problem_id
+def generate_and_save ( mesh_id, order ):
+    mesh_file = '../../workspace/%s.femmesh' % mesh_id
     data_path = 'matrices'
-    A, b = generate_matrices ( mesh_file )
-    save_matrices ( data_path, problem_id, A, b )
+    A, b = generate_matrices ( mesh_file, order )
+    save_matrices ( data_path, get_problem_id(mesh_id, order), A, b )
     return A, b
     
 def load ( problem_id ):
@@ -127,13 +133,47 @@ def load ( problem_id ):
     A, b = load_matrices ( data_path, problem_id )
     return A, b
     
-def main ():
-    problem_id = 'sphere-r1m-4'
-    
-    A_s, b_s = generate_and_save( problem_id )
+def load_and_solve ( problem_id ):
     A, b = load ( problem_id )
+    print A.shape[0]
+    # solve the sparse system
+    x, res = solve_sparse_system ( A, b, True, solver='bicgstab', preconditioner='ilu' )
+    
+    # calculate the residulal
+    Ax = A.matvec ( x )
+    print 'residual: %.3e' % np.linalg.norm( Ax - b[:,0] )
+    
+    import pylab as P
+    
+    P.plot ( np.log10( np.array(res) ), 'b-' )
+    P.show()
+    
 
-    print b_s - b[:,0]
+def get_problem_id ( mesh_id, order ):
+    return '%s_p%d' % ( mesh_id, order )
+
+def generate_all ():
+    mesh_id_list = [
+                    'sphere-r1m-4',
+                    'sphere-r1m-5',
+                    'sphere-r1m-6',
+                    ]
+    
+    order_list = [ 1, 2, 3]
+    
+    for mesh_id in mesh_id_list:
+        print mesh_id
+        for order in order_list:
+            print order
+            generate_and_save(mesh_id, order)
+
+def main (  ):
+    mesh_id =  'sphere-r1m-4'
+    order = 2
+    
+    load_and_solve ( get_problem_id(mesh_id, order) )
+    
     
 if __name__ == "__main__":
     main()
+            
