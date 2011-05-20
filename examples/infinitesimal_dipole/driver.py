@@ -54,6 +54,8 @@ def run(parameters, workspace):
     order = parameters['order']
     V = dol.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", order)
 
+    print 'DOFs: ', V.dim()
+
     # Define basis and bilinear form
     k_0 = 2*N.pi*freq/c0
 
@@ -77,8 +79,6 @@ def run(parameters, workspace):
     dol.assemble(m, tensor=M, mesh=mesh)
     dol.assemble(s, tensor=S, mesh=mesh)
     dol.assemble(s_0, tensor=S_0, mesh=mesh)
-    print M.size(0)
-
 
     # Set up RHS
     b = N.zeros(M.size(0), dtype=N.complex128)
