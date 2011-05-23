@@ -12,13 +12,12 @@ import numpy as np
 import os
 import sys
 
-
 sys.path.insert(0, '../../')
 from FenicsCode.Consts import eps0, mu0, c0, Z0
 from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
 from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
 from FenicsCode.Sources import point_source
-from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
+from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system, BiCGStabSolver, GMRESSolver
 from FenicsCode.Utilities.MatrixIO import ( load_scipy_matrix_from_mat, save_scipy_matrix_as_mat)
 del sys.path[0]
 
@@ -137,16 +136,26 @@ def load_and_solve ( problem_id ):
     A, b = load ( problem_id )
     print A.shape[0]
     # solve the sparse system
-    x, res = solve_sparse_system ( A, b, True, solver='bicgstab', preconditioner='ilu' )
+    bicgstab = BiCGStabSolver ( A )
+    x = bicgstab.solve ( b )
+    bicgstab.plot_convergence ( True, False, 'BiCGStab', 'k-' )
+
+    bicgstab_ilu = BiCGStabSolver ( A, 'ilu' )
+    x = bicgstab_ilu.solve ( b )
+    bicgstab_ilu.plot_convergence ( True, False, 'BiCGStab ILU', 'r-' ) 
+    
+    bicgstab_dia = BiCGStabSolver ( A, 'diagonal' )
+    x = bicgstab_dia.solve ( b )
+    bicgstab_dia.plot_convergence ( True, True, 'BiCGStab DIA', 'b-' )
     
     # calculate the residulal
     Ax = A.matvec ( x )
     print 'residual: %.3e' % np.linalg.norm( Ax - b[:,0] )
     
-    import pylab as P
-    
-    P.plot ( np.log10( np.array(res) ), 'b-' )
-    P.show()
+#    import pylab as P
+#    
+#    P.plot ( np.log10( np.array(res) ), 'b-' )
+#    P.show()
     
 
 def get_problem_id ( mesh_id, order ):
@@ -169,7 +178,7 @@ def generate_all ():
 
 def main (  ):
     mesh_id =  'sphere-r1m-4'
-    order = 2
+    order = 1
     
     load_and_solve ( get_problem_id(mesh_id, order) )
     

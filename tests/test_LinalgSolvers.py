@@ -16,7 +16,7 @@ del sys.path[0]
 class TestSparseSolver ( unittest.TestCase ):
     def test_sparse_identity ( self ):
         import scipy.sparse
-        N = 10;
+        N = 1000;
         A = scipy.sparse.eye ( N, N )
         b = np.random.rand ( N )
         
