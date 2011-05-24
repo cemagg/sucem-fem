@@ -136,7 +136,7 @@ def load_and_solve ( mesh_id, order ):
     problem_id = get_problem_id(mesh_id, order)
     A, b = load ( problem_id )
     
-    if A is None or B is None:
+    if A is None or b is None:
         print "Either A or b do not exists. Generating and saving."
         A, b = generate_and_save( mesh_id, order )
         print "Done."
@@ -180,7 +180,7 @@ def generate_all ():
 
 def main ( ):
     mesh_id =  'sphere-r1m-4'
-    order = 1
+    order = 2
     load_and_solve ( mesh_id, order )
     
 if __name__ == "__main__":
