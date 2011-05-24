@@ -49,7 +49,12 @@ def load_scipy_matrix_from_mat ( path, name ):
     import scipy.io
     import scipy.sparse
     
-    data = scipy.io.loadmat ( os.path.join ( path, name) )[name]
+    filename =  os.path.join ( path, name)
+    
+    if not os.path.exists( filename ):
+        return None
+    
+    data = scipy.io.loadmat ( filename )[name]
     
     if type(data) is np.ndarray:
         matrix = data

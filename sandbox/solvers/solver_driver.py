@@ -132,32 +132,34 @@ def load ( problem_id ):
     A, b = load_matrices ( data_path, problem_id )
     return A, b
     
-def load_and_solve ( problem_id ):
+def load_and_solve ( mesh_id, order ):
+    problem_id = get_problem_id(mesh_id, order)
     A, b = load ( problem_id )
+    
+    if A is None or B is None:
+        print "Either A or b do not exists. Generating and saving."
+        A, b = generate_and_save( mesh_id, order )
+        print "Done."
+    
     print A.shape[0]
+    x_is_time = False
+    
     # solve the sparse system
     bicgstab = BiCGStabSolver ( A )
     x = bicgstab.solve ( b )
-    bicgstab.plot_convergence ( True, False, 'BiCGStab', 'k-' )
+    print 'BiCGStab residual: %.3e' % np.linalg.norm( A.matvec ( x ) - b )
+    bicgstab.plot_convergence ( x_is_time, False, 'BiCGStab', 'k-' )
 
     bicgstab_ilu = BiCGStabSolver ( A, 'ilu' )
     x = bicgstab_ilu.solve ( b )
-    bicgstab_ilu.plot_convergence ( True, False, 'BiCGStab ILU', 'r-' ) 
+    print 'BiCGStab ILU residual: %.3e' % np.linalg.norm( A.matvec ( x ) - b )
+    bicgstab_ilu.plot_convergence ( x_is_time, False, 'BiCGStab ILU', 'r-' ) 
     
     bicgstab_dia = BiCGStabSolver ( A, 'diagonal' )
     x = bicgstab_dia.solve ( b )
-    bicgstab_dia.plot_convergence ( True, True, 'BiCGStab DIA', 'b-' )
+    print 'BiCGStab DIA residual: %.3e' % np.linalg.norm( A.matvec ( x ) - b )
+    bicgstab_dia.plot_convergence ( x_is_time, True, 'BiCGStab DIA', 'b-' )
     
-    # calculate the residulal
-    Ax = A.matvec ( x )
-    print 'residual: %.3e' % np.linalg.norm( Ax - b[:,0] )
-    
-#    import pylab as P
-#    
-#    P.plot ( np.log10( np.array(res) ), 'b-' )
-#    P.show()
-    
-
 def get_problem_id ( mesh_id, order ):
     return '%s_p%d' % ( mesh_id, order )
 
@@ -176,12 +178,10 @@ def generate_all ():
             print order
             generate_and_save(mesh_id, order)
 
-def main (  ):
+def main ( ):
     mesh_id =  'sphere-r1m-4'
     order = 1
-    
-    load_and_solve ( get_problem_id(mesh_id, order) )
-    
+    load_and_solve ( mesh_id, order )
     
 if __name__ == "__main__":
     main()

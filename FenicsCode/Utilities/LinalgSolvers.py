@@ -13,15 +13,64 @@ class SystemSolverBase ( object ):
     A base class for the implementation of various solvers for sparse eigen systems.
     This base class provides logging functionality, but requires an extention to allow for actual solver implementation.
     """
+    def __init__ ( self, A, preconditioner_type = None ):
+        """
+        The constructor for a System Solver
+        
+        @param A: The matrix for the system that must be solved
+        @param preconditioner_type: A string indicating the type of preconditioner to be used
+        """
+        self._logging_data = { 'time': [], 'id': [], 'res': [] }
+        self._timestamp( 'init' )
+        self._A = A
+        self.set_preconditioner ( preconditioner_type )
+        self._callback_count = 0
+    
+    def _call_solver (self):
+        """
+        A stub routine that is to be implemented by an inherited class depending on the solver being used.
+        """
+        raise Exception ( "Solver driver not implemented.")
+    
+    def _callback ( self, xk ):
+        """
+        A simple callback routine used to track the progress of an iterative solver for Ax = b
+        
+        @param xk: the solution vector x at step k
+        """
+        self._callback_count += 1;
+        self._timestamp( self._callback_count, res=np.linalg.norm( self._A.matvec( xk ) - self._b ) )
+        
     def _timestamp (self, id, res=np.nan ):
         """
         Add a timestamp/id pair to the logging data used to measure the progress of the solver
+        
+        @param id: an identifier for the timestamp
+        @param res: NaN by Default. An optional residual parameter to store along with the timestamp info
         """
         self._logging_data['time'].append ( time() )
         self._logging_data['id'].append ( id )
         self._logging_data['res'].append ( res )
     
+    def set_b ( self, b ):
+        """
+        Set the right-hand side vector b in the linear system Ax = b
+        
+        @param b: the right-hand side vector
+        """
+        self._b = b
+        if len(b.shape) > 1:
+            if b.shape[0] > b.shape[1]:
+                self._b = self._b[:,0]
+            else:
+                self._b = self._b[0,:]
+
     def set_preconditioner (self, M_type ):
+        """
+        Set the preconditioner (self._M) used in the solver
+        
+        @param M_type: A string to specify the preconditioner used
+        """
         self._timestamp('preconditioner::start')
         if M_type is None:
             M = None
@@ -37,29 +86,13 @@ class SystemSolverBase ( object ):
         self._M = M
         self._timestamp('preconditioner::end')
         
-    def __init__ ( self, A, preconditioner_type = None ):
-        self._logging_data = { 'time': [], 'id': [], 'res': [] }
-        self._timestamp( 'init' )
-        self._A = A
-        self.set_preconditioner ( preconditioner_type )
-        self._callback_count = 0
-        
-    def _callback ( self, xk ):
-        self._callback_count += 1;
-        self._timestamp( self._callback_count, res=np.linalg.norm( self._A.matvec( xk ) - self._b ) )
-    
-    def set_b ( self, b ):
-        print b.shape
-        self._b = b
-        if len(b.shape) > 1:
-            if b.shape[0] > b.shape[1]:
-                self._b = self._b[:,0]
-            else:
-                self._b = self._b[0,:]
-        
-        print self._b.shape
         
     def solve ( self, b ):
+        """
+        Solve the linear system Ax = b for x
+        
+        @param b: the right-hand side vector
+        """
         self._timestamp( 'solve::begin' )
         self.set_b(b)
         
@@ -80,24 +113,30 @@ class SystemSolverBase ( object ):
         import pylab as P
         
         y_data = np.log10( np.array(self._logging_data['res']) )
+        y_label = 'Residual [log10]'
         if x_is_time:
             t0 = self._logging_data['time'][0]
             x_data = np.array(self._logging_data['time'], dtype=np.float64) - t0
+            x_label = 'Time [s]'
         else:
             index = np.where(np.isfinite(y_data))[0]
             y_data = y_data[index]
             x_data = np.zeros ( index.shape )
             for i in range(len(index)):
                 x_data[i] = self._logging_data['id'][index[i]]
-        
+            x_label = 'Iterations'
+            
         P.plot ( x_data, y_data, style, label=label )
         
+        P.xlabel ( x_label )
+        P.ylabel ( y_label )
+        
+        P.grid ( True )
         if show_plot:
             P.legend(loc='upper right')
             P.show()
     
-    def _call_solver (self):
-        raise Exception ( "solver driver not implemented")
+    
 
 class BiCGStabSolver ( SystemSolverBase ):
     """
