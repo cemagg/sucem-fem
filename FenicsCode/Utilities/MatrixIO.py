@@ -51,7 +51,7 @@ def load_scipy_matrix_from_mat ( path, name ):
     
     filename =  os.path.join ( path, name)
     
-    if not os.path.exists( filename ):
+    if not os.path.exists( filename + '.mat' ):
         return None
     
     data = scipy.io.loadmat ( filename )[name]

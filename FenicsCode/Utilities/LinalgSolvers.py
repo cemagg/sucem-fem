@@ -39,7 +39,7 @@ class SystemSolverBase ( object ):
         @param xk: the solution vector x at step k
         """
         self._callback_count += 1;
-        self._timestamp( self._callback_count, res=np.linalg.norm( self._A.matvec( xk ) - self._b ) )
+        self._timestamp( self._callback_count, res=calculate_residual ( self._A, xk, self._b ) )
         
     def _timestamp (self, id, res=np.nan ):
         """
@@ -59,11 +59,6 @@ class SystemSolverBase ( object ):
         @param b: the right-hand side vector
         """
         self._b = b
-        if len(b.shape) > 1:
-            if b.shape[0] > b.shape[1]:
-                self._b = self._b[:,0]
-            else:
-                self._b = self._b[0,:]
 
     def set_preconditioner (self, M_type ):
         """
@@ -161,6 +156,17 @@ class GMRESSolver ( SystemSolverBase ):
         @see: The SystemSolverBase class
         """
         return scipy.sparse.linalg.gmres(self._A, self._b, M=self._M, callback=self._callback )
+
+
+def calculate_residual ( A, x, b ):
+    """
+    Calculate the residual of the system Ax = b
+    
+    @param A: a matrix
+    @param x: a vector
+    @param b: a vector 
+    """
+    return np.linalg.norm( A*x - b.reshape(x.shape) )
 
 
 def solve_sparse_system ( A, b ):
