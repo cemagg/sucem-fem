@@ -61,9 +61,11 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
 
     def _get_boundary_conditions(self):
         try:
-            return self.boundary_conditions
+            bcs = self.boundary_conditions
         except AttributeError:
             raise AttributeError('set_boundary_conditions() method must be called first')
+        bcs.set_function_space(self.function_space)
+        return bcs
 
     def _get_system_matrices(self):
         bilin_forms = self.combined_forms.get_forms()

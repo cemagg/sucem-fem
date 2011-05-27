@@ -10,8 +10,9 @@ import scipy
 #
 # Local Imports
 #
+import sys
+sys.path.append('../')
 import NewCode
-import NewCode.eMAGUSImport as eMAGUSImport
 from NewCode.Meshes import BrickMesh, BrickMeshGen
 from NewCode.Utilities import Struct, partial
 from NewCode import DifferentialForm, Waveforms, PostProc
@@ -26,7 +27,7 @@ sigma_factor = 1
 runtime = 6.
 
 a,b,c = [geom_size + h*no_PML_cells*2]*3
-order = 2
+order = 1
 
 mesh = BrickMesh.Mesh(BrickMeshGen.make_rect_cavity_brick_listmesh(
     a,b,c, [h, h, h], grid_offset=[-a/2,-b/2,-c/2]))

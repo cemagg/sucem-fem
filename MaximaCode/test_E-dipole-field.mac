@@ -52,7 +52,7 @@ E_fun(t, sphcoords):=apply(E_fun_, append([t], sphcoords))$
 linspace(start, stop, no_pts):=makelist(
   start+i*(stop-start)/(no_pts-1), i, 0, no_pts-1)$
 
-time_pts: linspace(0, 25/10, 191)$
+time_pts: linspace(0, 60/10, 1001)$
 E_vals:map(lambda([pt], makelist(bfloat(E_fun(t, pt)), t, time_pts)), test_pts), fpprec:24$
 
 scatter1 (xy) := ([n: length (xy)],
@@ -66,4 +66,7 @@ scatter2 (x,y) := ([n: length (x)],
                         [gnuplot_curve_styles, ["with lines", 3]]))$
 
 E_th:makelist(-x[2]/d,x,E_vals[1])$
-E_th_2:makelist(-x[2]/d,x,E_vals[2])$ 
+E_th_2:makelist(-x[2]/d,x,E_vals[2])$
+
+write_data(E_th, "E_th.csv", comma);
+write_data(time_pts, "time_pts.csv", comma);
