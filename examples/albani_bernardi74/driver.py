@@ -31,8 +31,9 @@ from FenicsCode.ProblemConfigurations.EMVectorWaveEigen import DefaultEigenSolve
 from FenicsCode.Consts import c0
 del sys.path[0]
 
+script_path = os.path.dirname(__file__)
 # Load the mesh and the material region markers
-mesh_file = 'mesh/albani_bernardi74_fig2VII.xml'
+mesh_file = os.path.join(script_path, 'mesh/albani_bernardi74_fig2VII.xml')
 materials_mesh_file = "%s_physical_region%s" % (os.path.splitext(mesh_file))
 mesh = dol.Mesh(mesh_file)
 material_mesh_func = dol.MeshFunction('uint', mesh, materials_mesh_file)
