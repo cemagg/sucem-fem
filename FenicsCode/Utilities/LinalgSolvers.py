@@ -204,6 +204,26 @@ class UMFPACKSolver ( SystemSolverBase ):
     def plot_convergence (self, x_is_time=False, show_plot=False, label=None, style='-'):
         print "Direct solver has not convergence history"
 
+class PyAMGSolver ( SystemSolverBase ):
+    """
+    This solver uses PyAMG to solve the linear system iteratively
+    """
+    def _call_solver (self):
+        """
+        Solves the linear system (self._A)x = self._b
+        
+        @see: The SystemSolverBase class
+        """
+        import pyamg
+        x = pyamg.solve ( self._A, self._b, verb=True, tol=1e-8, maxiter=800 )
+        return x, 0
+    
+    def plot_convergence (self, x_is_time=False, show_plot=False, label=None, style='-'):
+        print "PAMG solver convergence display is not yet implemented"
+
+
+
+
 def calculate_residual ( A, x, b ):
     """
     Calculate the residual of the system Ax = b

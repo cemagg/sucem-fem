@@ -17,7 +17,7 @@ from FenicsCode.Consts import eps0, mu0, c0, Z0
 from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
 from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
 from FenicsCode.Sources import point_source
-from FenicsCode.Utilities.LinalgSolvers import BiCGStabSolver, GMRESSolver, calculate_residual, UMFPACKSolver
+from FenicsCode.Utilities.LinalgSolvers import BiCGStabSolver, GMRESSolver, calculate_residual, UMFPACKSolver, PyAMGSolver
 from FenicsCode.Utilities.MatrixIO import ( load_scipy_matrix_from_mat, save_scipy_matrix_as_mat)
 del sys.path[0]
 
@@ -121,7 +121,7 @@ def load_matrices ( path, id ):
 
 
 def generate_and_save ( mesh_id, order ):
-    mesh_file = '../../workspace/%s.femmesh' % mesh_id
+    mesh_file = 'meshes/%s.femmesh' % mesh_id
     data_path = 'matrices'
     A, b = generate_matrices ( mesh_file, order )
     save_matrices ( data_path, get_problem_id(mesh_id, order), A, b )
@@ -169,16 +169,20 @@ def load_and_solve ( mesh_id, order ):
     print 'GMRES residual: %.3e' % calculate_residual ( A, x, b )
     gmres.print_timing_info ()
 
-#    gmres_ilu = GMRESSolver ( A, 'ilu' )
+#    gmres_ilu = GMRESSolver ( A, 'diagonal' )
 #    x = gmres_ilu.solve ( b )
 #    print 'GMRES ILU residual: %.3e' % calculate_residual ( A, x, b )
 #    gmres_ilu.print_timing_info ()
     
-    umfpack = UMFPACKSolver ( A )
-    x = umfpack.solve ( b )
-    print 'UMFPACK residual: %.3e' % calculate_residual ( A, x, b )
-    umfpack.print_timing_info ()
-#    umfpack.print_logging_data ()
+#    umfpack = UMFPACKSolver ( A )
+#    x = umfpack.solve ( b )
+#    print 'UMFPACK residual: %.3e' % calculate_residual ( A, x, b )
+#    umfpack.print_timing_info ()
+
+#    pyamg_s = PyAMGSolver ( A )
+#    x = pyamg_s.solve ( b )
+#    print 'PyAMG residual: %.3e' % calculate_residual ( A, x, b )
+#    pyamg_s.print_timing_info ()
     
 def get_problem_id ( mesh_id, order ):
     return '%s_p%d' % ( mesh_id, order )
@@ -188,9 +192,14 @@ def generate_all ():
                     'sphere-r1m-4',
                     'sphere-r1m-5',
                     'sphere-r1m-6',
+                    'sphere-r1m-7',
+                    'sphere-r1m-8',
+                    'sphere-r1m-9',
+                    'sphere-r1m-10',
+                    'sphere-r1m-15',
                     ]
     
-    order_list = [ 1, 2, 3]
+    order_list = [ 1, 2,]
     
     for mesh_id in mesh_id_list:
         print mesh_id
@@ -199,10 +208,11 @@ def generate_all ():
             generate_and_save(mesh_id, order)
 
 def main ( ):
-    mesh_id =  'sphere-r1m-4'
+    mesh_id =  'sphere-r1m-10'
     order = 1
     load_and_solve ( mesh_id, order )
     
 if __name__ == "__main__":
     main()
+#    generate_all()
             
