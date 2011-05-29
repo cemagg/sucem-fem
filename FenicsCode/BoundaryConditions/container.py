@@ -39,3 +39,12 @@ class BoundaryConditions(object):
             bilin_form = bilin_form + bc.get_bilinear_form()
 
         return bilin_form
+
+    def set_function_space(self, function_space):
+        """Set all the boundary conditions in the collection's function_space
+        """
+        self.function_space = function_space
+        for bc in self.boundary_conditions.values():
+            bc.set_function_space(function_space)
+
+    

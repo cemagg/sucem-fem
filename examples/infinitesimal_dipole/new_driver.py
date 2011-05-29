@@ -5,6 +5,8 @@ sys.path.append('../../')
 import numpy as N
 import os
 import dolfin
+import FenicsCode
+import FenicsCode.BoundaryConditions.ABC
 from FenicsCode.Consts import eps0, mu0, c0
 from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
 import setup_mesh
@@ -29,9 +31,15 @@ mesh = setup_mesh.get_centred_cube(domain_size, max_edge_len, source_coord)
 material_mesh_func = dolfin.MeshFunction('uint', mesh, 3)
 material_mesh_func.set_all(0)
 materials = {0:dict(eps_r=1, mu_r=1),}
+abc = FenicsCode.BoundaryConditions.ABC.ABCBoundaryCondition()
+abc.set_region_number(1)
+bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
+bcs.add_boundary_condition(abc)
 dp = DrivenProblemABC()
 dp.set_mesh(mesh)
 dp.set_basis_order(order)
 dp.set_material_regions(materials)
 dp.set_region_meshfunction(material_mesh_func)
+dp.set_boundary_conditions(bcs)
+
 dp.init_problem()

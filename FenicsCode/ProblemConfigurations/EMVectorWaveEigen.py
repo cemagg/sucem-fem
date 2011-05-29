@@ -21,6 +21,7 @@ class CombineForms(Forms.CombineGalerkinForms):
 
 class EigenProblem(object):
     element_type = "Nedelec 1st kind H(curl)"
+    CombineForms = CombineForms        
 
     def set_mesh(self, mesh):
         self.mesh = mesh
@@ -76,7 +77,7 @@ class EigenProblem(object):
         return bcs
 
     def _get_combined_forms(self):
-        comb_forms = CombineForms()
+        comb_forms = self.CombineForms()
         comb_forms.set_interior_forms(self.interior_forms)
         comb_forms.set_boundary_conditions(self.boundary_conditions)
         return comb_forms
