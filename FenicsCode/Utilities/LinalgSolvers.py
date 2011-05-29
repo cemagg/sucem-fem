@@ -39,7 +39,10 @@ class SystemSolverBase ( object ):
         @param xk: the solution vector x at step k
         """
         self._callback_count += 1;
-        self._timestamp( self._callback_count, res=calculate_residual ( self._A, xk, self._b ) )
+        if type(xk) is float:
+            self._timestamp( self._callback_count, res=xk )
+        else:
+            self._timestamp( self._callback_count, res=calculate_residual ( self._A, xk, self._b ) )
         
     def _timestamp (self, id, res=np.nan ):
         """
@@ -132,6 +135,35 @@ class SystemSolverBase ( object ):
             P.show()
     
     
+    def _get_time_for_id (self, id ):
+        return self._logging_data['time'][self._logging_data['id'].index(id)]
+    
+    def _get_elapsed_time ( self, id0, id1, force_total=False ):
+        if force_total:
+            return self._logging_data['time'][-1] - self._logging_data['time'][0]
+         
+        return self._get_time_for_id(id1) - self._get_time_for_id(id0)
+        
+    def print_logging_data ( self ):
+        for k in self._logging_data:
+            print k
+            print self._logging_data[k]
+    
+    def print_timing_info ( self ):
+        """
+        Output the information contained in the logging data
+        """
+        
+            
+        solve_time = self._get_elapsed_time('solve::begin', 'solve::end')
+        print 'solve time:', solve_time
+        preconditioner_time = self._get_elapsed_time('preconditioner::start', 'preconditioner::end')
+        print 'preconditioner time:', preconditioner_time
+        
+        print 'total time:', self._get_elapsed_time(None, None, True)
+        
+        
+        
 
 class BiCGStabSolver ( SystemSolverBase ):
     """
@@ -157,6 +189,20 @@ class GMRESSolver ( SystemSolverBase ):
         """
         return scipy.sparse.linalg.gmres(self._A, self._b, M=self._M, callback=self._callback )
 
+class UMFPACKSolver ( SystemSolverBase ):
+    """
+    This solver uses the UMFPACK fuctionality provided by scipy
+    """
+    def _call_solver (self):
+        """
+        Solves the linear system (self._A)x = self._b
+        
+        @see: The SystemSolverBase class
+        """
+        return scipy.sparse.linalg.spsolve ( self._A, self._b, use_umfpack=True ), 0
+    
+    def plot_convergence (self, x_is_time=False, show_plot=False, label=None, style='-'):
+        print "Direct solver has not convergence history"
 
 def calculate_residual ( A, x, b ):
     """

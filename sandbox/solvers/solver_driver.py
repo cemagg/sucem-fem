@@ -17,7 +17,7 @@ from FenicsCode.Consts import eps0, mu0, c0, Z0
 from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
 from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
 from FenicsCode.Sources import point_source
-from FenicsCode.Utilities.LinalgSolvers import BiCGStabSolver, GMRESSolver, calculate_residual
+from FenicsCode.Utilities.LinalgSolvers import BiCGStabSolver, GMRESSolver, calculate_residual, UMFPACKSolver
 from FenicsCode.Utilities.MatrixIO import ( load_scipy_matrix_from_mat, save_scipy_matrix_as_mat)
 del sys.path[0]
 
@@ -145,20 +145,40 @@ def load_and_solve ( mesh_id, order ):
     x_is_time = False
     
     # solve the sparse system
-    bicgstab = BiCGStabSolver ( A )
-    x = bicgstab.solve ( b )
-    print 'BiCGStab residual: %.3e' % calculate_residual ( A, x, b )
-    bicgstab.plot_convergence ( x_is_time, False, 'BiCGStab', 'k-' )
-
-    bicgstab_ilu = BiCGStabSolver ( A, 'ilu' )
-    x = bicgstab_ilu.solve ( b )
-    print 'BiCGStab ILU residual: %.3e' % calculate_residual ( A, x, b )
-    bicgstab_ilu.plot_convergence ( x_is_time, False, 'BiCGStab ILU', 'r-' ) 
+#    bicgstab = BiCGStabSolver ( A )
+#    x = bicgstab.solve ( b )
+#    print 'BiCGStab residual: %.3e' % calculate_residual ( A, x, b )
+#    bicgstab.print_timing_info()
     
-    bicgstab_dia = BiCGStabSolver ( A, 'diagonal' )
-    x = bicgstab_dia.solve ( b )
-    print 'BiCGStab DIA residual: %.3e' % calculate_residual ( A, x, b )
-    bicgstab_dia.plot_convergence ( x_is_time, True, 'BiCGStab DIA', 'b-' )
+#    bicgstab.plot_convergence ( x_is_time, False, 'BiCGStab', 'k-' )
+
+#    bicgstab_ilu = BiCGStabSolver ( A, 'ilu' )
+#    x = bicgstab_ilu.solve ( b )
+#    print 'BiCGStab ILU residual: %.3e' % calculate_residual ( A, x, b )
+#    bicgstab_ilu.print_timing_info ()
+
+#    bicgstab_ilu.plot_convergence ( x_is_time, False, 'BiCGStab ILU', 'r-' ) 
+    
+#    bicgstab_dia = BiCGStabSolver ( A, 'diagonal' )
+#    x = bicgstab_dia.solve ( b )
+#    print 'BiCGStab DIA residual: %.3e' % calculate_residual ( A, x, b )
+#    bicgstab_dia.plot_convergence ( x_is_time, True, 'BiCGStab DIA', 'b-' )
+
+    gmres = GMRESSolver ( A )
+    x = gmres.solve ( b )
+    print 'GMRES residual: %.3e' % calculate_residual ( A, x, b )
+    gmres.print_timing_info ()
+
+#    gmres_ilu = GMRESSolver ( A, 'ilu' )
+#    x = gmres_ilu.solve ( b )
+#    print 'GMRES ILU residual: %.3e' % calculate_residual ( A, x, b )
+#    gmres_ilu.print_timing_info ()
+    
+    umfpack = UMFPACKSolver ( A )
+    x = umfpack.solve ( b )
+    print 'UMFPACK residual: %.3e' % calculate_residual ( A, x, b )
+    umfpack.print_timing_info ()
+#    umfpack.print_logging_data ()
     
 def get_problem_id ( mesh_id, order ):
     return '%s_p%d' % ( mesh_id, order )
