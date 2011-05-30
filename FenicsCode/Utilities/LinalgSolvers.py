@@ -202,7 +202,7 @@ class UMFPACKSolver ( SystemSolverBase ):
         return scipy.sparse.linalg.spsolve ( self._A, self._b, use_umfpack=True ), 0
     
     def plot_convergence (self, x_is_time=False, show_plot=False, label=None, style='-'):
-        print "Direct solver has not convergence history"
+        print "Direct solver has no convergence history"
 
 class PyAMGSolver ( SystemSolverBase ):
     """
