@@ -9,6 +9,7 @@ import FenicsCode
 import FenicsCode.BoundaryConditions.ABC
 from FenicsCode.Consts import eps0, mu0, c0
 from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
+from FenicsCode.Sources import point_source
 import setup_mesh
 sys.path.insert(0, '../../')
 from test_data import problem_data
@@ -22,7 +23,7 @@ freq = problem_data['f']
 lam = c0/freq
 source_coord = N.array([0,0,0.]) 
 ## Discretisation settings
-order = 2
+order = 1
 domain_size = N.array([2*lam]*3)
 max_edge_len = lam/6
 mesh = setup_mesh.get_centred_cube(domain_size, max_edge_len, source_coord)
@@ -41,5 +42,10 @@ dp.set_basis_order(order)
 dp.set_material_regions(materials)
 dp.set_region_meshfunction(material_mesh_func)
 dp.set_boundary_conditions(bcs)
-
+current_sources = point_source.CurrentSources()
+dipole_source = point_source.PointCurrentSource()
+dipole_source.set_position(source_coord)
+dipole_source.set_value(source_value)
+current_sources.add_source(dipole_source)
+dp.set_sources(current_sources)
 dp.init_problem()

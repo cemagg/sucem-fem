@@ -11,8 +11,11 @@ class CurrentSources(object):
         self.function_space = function_space
 
     def add_source(self, source):
-        source.set_function_space(self.function_space)
         self.sources.append(source)
+
+    def init_sources(self):
+        for src in self.sources:
+            src.set_function_space(self.function_space)
         
     def get_source_contributions(self):
         pass

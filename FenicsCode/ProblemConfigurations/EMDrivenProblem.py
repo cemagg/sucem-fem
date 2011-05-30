@@ -1,3 +1,4 @@
+
 from __future__ import division
 
 import numpy as N
@@ -34,12 +35,15 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
     freespace wave-number
     
     """
+
+    CombineForms = CombineForms
+    
     def set_boundary_conditions(self, bcs):
         """Set boundary conditions with a BoundaryConditions object"""
         self.boundary_conditions = bcs
 
-    def set_current_sources(self, current_sources):
-        self.current_sources = current_sources
+    def set_sources(self, sources):
+        self.sources = sources
 
     def set_frequency(self, frequency):
         """Set simulation frequency in Hz"""
@@ -57,8 +61,8 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
 
     def init_problem(self):
         super(DrivenProblemABC, self).init_problem()
-        self._get_system_vectors()
-
+        self.system_vector = self._get_system_vector()
+ 
     def _get_boundary_conditions(self):
         try:
             bcs = self.boundary_conditions
@@ -75,3 +79,7 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
         sysmats.set_boundary_conditions(self.boundary_conditions)
         return sysmats.calc_system_matrices()
 
+    def _get_system_vector(self):
+        self.sources.set_function_space(self.function_space)
+        self.sources.init_sources()
+        return self.sources.get_source_contributions()
