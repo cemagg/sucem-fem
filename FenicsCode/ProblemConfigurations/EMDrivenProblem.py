@@ -7,7 +7,7 @@ import dolfin
 from FenicsCode.ProblemConfigurations import EMVectorWaveEigen
 from FenicsCode import Forms 
 from FenicsCode import SystemMatrices
-from FenicsCode.Consts import c0
+from FenicsCode.Consts import c0, Z0
 from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
 
 class CombineForms(Forms.CombineGalerkinForms):
@@ -20,7 +20,7 @@ class CombineForms(Forms.CombineGalerkinForms):
 class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
     """Set up driven problem, potentially terminated by an ABC
 
-    Assumes lossless, frequeny independent materials, and that the
+    Assumes lossless, frequency independent materials, and that the
     boundary bilinear form is:
 
         dot(cross(n, u), cross(n, v))
@@ -50,19 +50,25 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
         self.frequency = frequency
 
     def get_LHS_matrix(self):
-        k0 = 2*N.pi*freq/c0
+        k0 = 2*N.pi*self.frequency/c0
         M = dolfin_ublassparse_to_scipy_csr(self.system_matrices['M'])
         S = dolfin_ublassparse_to_scipy_csr(self.system_matrices['S'])
         S_0 = dolfin_ublassparse_to_scipy_csr(self.system_matrices['S_0'])
-        return S - k0**2*M + 1j*k_0*S_0
+        return S - k0**2*M + 1j*k0*S_0
+
+    def get_global_dimension(self):
+        """Return total number of system dofs, including Dirichlet constrained dofs
+        """
+        return self.function_space.dofmap().global_dimension()
 
     def get_RHS(self):
-        pass
+        RHS = N.zeros(self.get_global_dimension(), N.complex128)
+        dofnos, contribs = self._get_RHS_contributions()
+        k0 = 2*N.pi*self.frequency/c0
+        contribs = 1j*k0*Z0*contribs
+        RHS[dofnos] += contribs
+        return RHS
 
-    def init_problem(self):
-        super(DrivenProblemABC, self).init_problem()
-        self.system_vector = self._get_system_vector()
- 
     def _get_boundary_conditions(self):
         try:
             bcs = self.boundary_conditions
@@ -79,7 +85,7 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
         sysmats.set_boundary_conditions(self.boundary_conditions)
         return sysmats.calc_system_matrices()
 
-    def _get_system_vector(self):
+    def _get_RHS_contributions(self):
         self.sources.set_function_space(self.function_space)
         self.sources.init_sources()
         return self.sources.get_source_contributions()

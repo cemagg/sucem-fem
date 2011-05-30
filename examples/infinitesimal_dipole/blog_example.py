@@ -123,95 +123,97 @@ def calc_pointsource_contrib(V, source_coords, source_value):
     rhs_contribs = N.sum(el_basis_vals*source_value, axis=1)
     return dofnos, rhs_contribs
 
+def main():
 
-# Define mesh
-domain_subdivisions = N.array(N.ceil(N.sqrt(2)*domain_size/max_edge_len), N.uint)
-print 'Numer of domain subdomain_subdivisions: ', domain_subdivisions
+    # Define mesh
+    domain_subdivisions = N.array(N.ceil(N.sqrt(2)*domain_size/max_edge_len), N.uint)
+    print 'Numer of domain subdomain_subdivisions: ', domain_subdivisions
 
-mesh = dolfin.UnitCube(*domain_subdivisions)
-# Transform mesh to correct dimensions
-mesh.coordinates()[:] *= domain_size
-# Centred around [0,0,0]
-mesh.coordinates()[:] -= domain_size/2
-## Translate mesh slightly so that source coordinate lies at
-## centroid of an element
-source_elnos = mesh.all_intersected_entities(source_point)
-closest_elno = source_elnos[(N.argmin([source_point.distance(dolfin.Cell(mesh, i).midpoint())
-                              for i in source_elnos]))]
-centre_pt = dolfin.Cell(mesh, closest_elno).midpoint()
-centre_coord = N.array([centre_pt.x(), centre_pt.y(), centre_pt.z()])
-# There seems to be an issue with the intersect operator if the
-# mesh coordinates are changed after calling it for the first
-# time. Since we called it to find the centroid, we should init a
-# new mesh
-mesh_coords = mesh.coordinates().copy()
-mesh = dolfin.UnitCube(*domain_subdivisions)
-mesh.coordinates()[:] = mesh_coords
-mesh.coordinates()[:] -= centre_coord
-##
+    mesh = dolfin.UnitCube(*domain_subdivisions)
+    # Transform mesh to correct dimensions
+    mesh.coordinates()[:] *= domain_size
+    # Centred around [0,0,0]
+    mesh.coordinates()[:] -= domain_size/2
+    ## Translate mesh slightly so that source coordinate lies at
+    ## centroid of an element
+    source_elnos = mesh.all_intersected_entities(source_point)
+    closest_elno = source_elnos[(N.argmin([source_point.distance(dolfin.Cell(mesh, i).midpoint())
+                                  for i in source_elnos]))]
+    centre_pt = dolfin.Cell(mesh, closest_elno).midpoint()
+    centre_coord = N.array([centre_pt.x(), centre_pt.y(), centre_pt.z()])
+    # There seems to be an issue with the intersect operator if the
+    # mesh coordinates are changed after calling it for the first
+    # time. Since we called it to find the centroid, we should init a
+    # new mesh
+    mesh_coords = mesh.coordinates().copy()
+    mesh = dolfin.UnitCube(*domain_subdivisions)
+    mesh.coordinates()[:] = mesh_coords
+    mesh.coordinates()[:] -= centre_coord
+    ##
 
-# Define function space
-V = dolfin.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", order)
+    # Define function space
+    V = dolfin.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", order)
 
-k_0 = 2*N.pi*freq/c0                    # Freespace wave number
-# Definite test- and trial functions
-u = dolfin.TrialFunction(V)
-v = dolfin.TestFunction(V)
+    k_0 = 2*N.pi*freq/c0                    # Freespace wave number
+    # Definite test- and trial functions
+    u = dolfin.TrialFunction(V)
+    v = dolfin.TestFunction(V)
 
-# Define the bilinear forms
-m = eps_r*inner(v, u)*dx                # Mass form
-s = (1/mu_r)*dot(curl(v), curl(u))*dx   # Stiffness form
+    # Define the bilinear forms
+    m = eps_r*inner(v, u)*dx                # Mass form
+    s = (1/mu_r)*dot(curl(v), curl(u))*dx   # Stiffness form
 
-n = V.cell().n                           # Get the surface normal
-s_0 = inner(cross(n, v), cross(n, u))*ds # ABC boundary condition form
+    n = V.cell().n                           # Get the surface normal
+    s_0 = inner(cross(n, v), cross(n, u))*ds # ABC boundary condition form
 
-# Assemble forms using uBLASS matrices so that we can easily export to scipy
-print 'Assembling forms'
-M = dolfin.uBLASSparseMatrix()
-S = dolfin.uBLASSparseMatrix()
-S_0 = dolfin.uBLASSparseMatrix()
-dolfin.assemble(m, tensor=M, mesh=mesh)
-dolfin.assemble(s, tensor=S, mesh=mesh)
-dolfin.assemble(s_0, tensor=S_0, mesh=mesh)
-print 'Number of degrees of freedom: ', M.size(0)
-
-
-# Set up RHS
-b = N.zeros(M.size(0), dtype=N.complex128)
-dofnos, rhs_contrib = calc_pointsource_contrib(V, source_coord, source_value)
-
-rhs_contrib = 1j*k_0*Z0*rhs_contrib
-b[dofnos] += rhs_contrib
-
-Msp = dolfin_ublassparse_to_scipy_csr(M)
-Ssp = dolfin_ublassparse_to_scipy_csr(S)
-S_0sp = dolfin_ublassparse_to_scipy_csr(S_0)
-
-# A is the system matrix that must be solved
-A = Ssp - k_0**2*Msp + 1j*k_0*S_0sp     
+    # Assemble forms using uBLASS matrices so that we can easily export to scipy
+    print 'Assembling forms'
+    M = dolfin.uBLASSparseMatrix()
+    S = dolfin.uBLASSparseMatrix()
+    S_0 = dolfin.uBLASSparseMatrix()
+    dolfin.assemble(m, tensor=M, mesh=mesh)
+    dolfin.assemble(s, tensor=S, mesh=mesh)
+    dolfin.assemble(s_0, tensor=S_0, mesh=mesh)
+    print 'Number of degrees of freedom: ', M.size(0)
 
 
-solved = False;
-if solver == 'iterative':
-    # solve using scipy bicgstab
-    print 'solve using scipy bicgstab'
-    x = solve_sparse_system ( A, b )
-elif solver == 'direct':
-    import scipy.sparse.linalg
-    A_lu = scipy.sparse.linalg.factorized(A.T)
-    x = A_lu(b)
-else: raise ValueError("solver must have value 'iterative' or 'direct'")
+    # Set up RHS
+    b = N.zeros(M.size(0), dtype=N.complex128)
+    dofnos, rhs_contrib = calc_pointsource_contrib(V, source_coord, source_value)
 
-dolfin.set_log_active(False) # evaluation seems to make a lot of noise
-u_re = dolfin.Function(V)
-u_im = dolfin.Function(V)
-# N.require is important, since dolfin seems to expect a contiguous array
-u_re.vector()[:] = N.require(N.real(x), requirements='C')
-u_im.vector()[:] = N.require(N.imag(x), requirements='C')
-E_field = N.zeros((len(field_pts), 3), dtype=N.complex128)
-for i, fp in enumerate(field_pts):
-    try: E_field[i,:] = u_re(fp) + 1j*u_im(fp)
-    except (RuntimeError, StandardError): E_field[i,:] = N.nan + 1j*N.nan
+    rhs_contrib = 1j*k_0*Z0*rhs_contrib
+    b[dofnos] += rhs_contrib
+
+    Msp = dolfin_ublassparse_to_scipy_csr(M)
+    Ssp = dolfin_ublassparse_to_scipy_csr(S)
+    S_0sp = dolfin_ublassparse_to_scipy_csr(S_0)
+
+    # A is the system matrix that must be solved
+    A = Ssp - k_0**2*Msp + 1j*k_0*S_0sp     
+
+
+    solved = False;
+    if solver == 'iterative':
+        # solve using scipy bicgstab
+        print 'solve using scipy bicgstab'
+        x = solve_sparse_system ( A, b )
+    elif solver == 'direct':
+        import scipy.sparse.linalg
+        A_lu = scipy.sparse.linalg.factorized(A.T)
+        x = A_lu(b)
+    else: raise ValueError("solver must have value 'iterative' or 'direct'")
+
+    dolfin.set_log_active(False) # evaluation seems to make a lot of noise
+    u_re = dolfin.Function(V)
+    u_im = dolfin.Function(V)
+    # N.require is important, since dolfin seems to expect a contiguous array
+    u_re.vector()[:] = N.require(N.real(x), requirements='C')
+    u_im.vector()[:] = N.require(N.imag(x), requirements='C')
+    E_field = N.zeros((len(field_pts), 3), dtype=N.complex128)
+    for i, fp in enumerate(field_pts):
+        try: E_field[i,:] = u_re(fp) + 1j*u_im(fp)
+        except (RuntimeError, StandardError): E_field[i,:] = N.nan + 1j*N.nan
+
 
 ## Analytical result z-component. x- and y- components are zero for
 ## z-directed dipole.
@@ -273,19 +275,21 @@ analytical_pts = N.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0
 0.74, 0.75, 0.76, 0.77, 0.78, 0.79, 0.8, 0.81, 0.82, 0.83, 0.84, 0.85, 0.86, 
 0.87, 0.88, 0.89, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99]) 
 
+if __name__ == '__main__':
+    main()
 
-from pylab import *
-r1 = field_pts[:]/lam
-x1 = r1[:,0]
-E_ana = N.abs(analytical_result)
-E_num = E_field
-figure()
-plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
-plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
-plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
-plot(analytical_pts, E_ana, '--r', label='z_ana')
-ylabel('E-field Magnitude')
-xlabel('Distance (wavelengths)')
-legend(loc='best')
-grid(True)
-show()
+    from pylab import *
+    r1 = field_pts[:]/lam
+    x1 = r1[:,0]
+    E_ana = N.abs(analytical_result)
+    E_num = E_field
+    figure()
+    plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
+    plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
+    plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
+    plot(analytical_pts, E_ana, '--r', label='z_ana')
+    ylabel('E-field Magnitude')
+    xlabel('Distance (wavelengths)')
+    legend(loc='best')
+    grid(True)
+    show()
