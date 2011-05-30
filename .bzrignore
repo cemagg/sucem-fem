@@ -6,3 +6,4 @@ NewCode/tests/testdata/test_eMAGUSImport/+test_tet.out
 *.msh.opt
 .project
 .pydevproject
+tests/data
