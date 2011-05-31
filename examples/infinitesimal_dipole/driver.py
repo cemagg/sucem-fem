@@ -4,139 +4,80 @@ import sys
 sys.path.append('../../')
 import numpy as N
 import os
-import dolfin as dol
-from dolfin import dot, cross, curl, inner, dx, ds
-import scipy.sparse
-
-from FenicsCode.Consts import eps0, mu0, c0, Z0
-from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
-from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
+import dolfin
+import FenicsCode
+import FenicsCode.BoundaryConditions.ABC
+from FenicsCode.Consts import eps0, mu0, c0
+from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
 from FenicsCode.Sources import point_source
-# parameters dictionary, should be rebound by user of module
-parameters = dict(f=None, l=None, I=None, source_coord=None)
+from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
+from FenicsCode.Utilities.MeshGenerators import get_centred_cube
+from FenicsCode.PostProcessing import Reconstruct
 
+sys.path.insert(0, '../../')
+from test_data import problem_data
+del sys.path[0]
 
-def run(parameters, workspace):
-    # Define material and frequency
-    eps_r = 1;
-    mu_r = 1;
-    freq = parameters['f'];
-    source_coord = parameters['source_coord']
-    source_point = dol.Point(*source_coord)
-    source_value = N.array([0,0,1.])*parameters['I']*parameters['l']
+## Problem parameters
+I = problem_data['I']                   # Dipole current
+l = problem_data['l']                   # Dipole length
+source_value = N.array([0,0,1.])*I*l
+freq = problem_data['f']
+lam = c0/freq
+source_coord = N.array([0,0,0.]) 
+## Discretisation settings
+order = 2
+domain_size = N.array([2*lam]*3)
+max_edge_len = lam/6
+mesh = get_centred_cube(domain_size, max_edge_len, source_coord)
+# Request information:
+field_pts = N.array([lam,0,0])*(N.arange(88)/100+1/10)[:, N.newaxis]
 
-    # Define mesh
-    if 'mesh' in workspace:    
-        mesh = workspace['mesh']
-    else:
-        mesh = dol.UnitCube(*parameters['domain_subdivisions'])
-        # Transform mesh to correct dimensions
-        mesh.coordinates()[:] *= parameters['domain_size']
-        mesh.coordinates()[:] -= parameters['domain_size']/2
-        ## Translate mesh slightly so that source coordinate lies at
-        ## centroid of an element
-        source_elnos = mesh.all_intersected_entities(source_point)
-        closest_elno = source_elnos[(N.argmin([source_point.distance(dol.Cell(mesh, i).midpoint())
-                                      for i in source_elnos]))]
-        centre_pt = dol.Cell(mesh, closest_elno).midpoint()
-        centre_coord = N.array([centre_pt.x(), centre_pt.y(), centre_pt.z()])
-        # There seems to be an issue with the intersect operator if the
-        # mesh coordinates are changed after calling it for the first
-        # time. Since we called it to find the centroid, we should init a
-        # new mesh
-        mesh_coords = mesh.coordinates().copy()
-        mesh = dol.UnitCube(*parameters['domain_subdivisions'])
-        mesh.coordinates()[:] = mesh_coords
-        mesh.coordinates()[:] -= centre_coord
-        ##
+## Implementation
+material_mesh_func = dolfin.MeshFunction('uint', mesh, 3)
+material_mesh_func.set_all(0)
+materials = {0:dict(eps_r=1, mu_r=1),}
+abc = FenicsCode.BoundaryConditions.ABC.ABCBoundaryCondition()
+abc.set_region_number(1)
+bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
+bcs.add_boundary_condition(abc)
+dp = DrivenProblemABC()
+dp.set_mesh(mesh)
+dp.set_basis_order(order)
+dp.set_material_regions(materials)
+dp.set_region_meshfunction(material_mesh_func)
+dp.set_boundary_conditions(bcs)
+current_sources = point_source.CurrentSources()
+dipole_source = point_source.PointCurrentSource()
+dipole_source.set_position(source_coord)
+dipole_source.set_value(source_value)
+current_sources.add_source(dipole_source)
+dp.set_sources(current_sources)
+dp.init_problem()
+dp.set_frequency(freq)
 
-    # Define function space
-    order = parameters['order']
-    V = dol.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", order)
+A = dp.get_LHS_matrix()
+b = dp.get_RHS()
+print 'solve using scipy bicgstab'
+x = solve_sparse_system ( A, b )
 
-    print 'DOFs: ', V.dim()
+recon = Reconstruct(dp.function_space)
+recon.set_dof_values(x)
+E_field = recon.reconstruct_points(field_pts)
 
-    # Define basis and bilinear form
-    k_0 = 2*N.pi*freq/c0
-
-    u = dol.TrialFunction(V)
-    v = dol.TestFunction(V)
-
-    m = eps_r*inner(v, u)*dx                # Mass form
-    s = (1/mu_r)*dot(curl(v), curl(u))*dx   # Stiffness form
-
-    n = V.cell().n
-    s_0 = inner(cross(n, v), cross(n, u))*ds
-
-    def boundary(x, on_boundary):
-        return on_boundary
-
-    # Assemble forms
-    print 'assembling forms'
-    M = dol.uBLASSparseMatrix()
-    S = dol.uBLASSparseMatrix()
-    S_0 = dol.uBLASSparseMatrix()
-    dol.assemble(m, tensor=M, mesh=mesh)
-    dol.assemble(s, tensor=S, mesh=mesh)
-    dol.assemble(s_0, tensor=S_0, mesh=mesh)
-
-    # Set up RHS
-    b = N.zeros(M.size(0), dtype=N.complex128)
-    dofnos, rhs_contrib = point_source.calc_pointsource_contrib(
-        V, source_coord, source_value)
-
-    rhs_contrib = 1j*k_0*Z0*rhs_contrib
-    b[dofnos] += rhs_contrib
-
-    Msp = dolfin_ublassparse_to_scipy_csr(M)
-    Ssp = dolfin_ublassparse_to_scipy_csr(S)
-    S_0sp = dolfin_ublassparse_to_scipy_csr(S_0)
-    A = Ssp - k_0**2*Msp + 1j*k_0*S_0sp 
-    
-    
-    solved = False;
-    try:
-        if parameters['solver'] == 'iterative':
-            # solve using scipy bicgstab
-            print 'solve using scipy bicgstab'
-            x = solve_sparse_system ( A, b )
-            solved = True;
-    except KeyError:
-        pass
-
-    if not solved:            
-        import scipy.sparse.linalg
-        A_lu = scipy.sparse.linalg.factorized(A.T)
-        x = A_lu(b)
-        solved = True
-    
-    #print ml
-
-    workspace['V'] = V
-    workspace['u'] = u
-    workspace['x'] = x
-    workspace['A'] = A
-    workspace['M'] = Msp
-    workspace['S'] = Ssp
-    workspace['S_0'] = S_0sp
-    workspace['Sdol'] = S
-    workspace['Mdol'] = M
-    workspace['S_0dol'] = S_0
-    workspace['b'] = b
-    workspace['rhs_dofnos'] = dofnos
-    workspace['rhs_contrib'] = rhs_contrib
-
-def get_E_field(workspace, field_pts):
-    dol.set_log_active(False)
-    x = workspace['x']
-    V = workspace['V']
-    mesh = V.mesh()
-    u_re = dol.Function(V)
-    u_im = dol.Function(V)
-    u_re.vector()[:] = N.require(N.real(x), requirements='C')
-    u_im.vector()[:] = N.require(N.imag(x), requirements='C')
-    E_field = N.zeros((len(field_pts), 3), dtype=N.complex128)
-    for i, fp in enumerate(field_pts):
-        try: E_field[i,:] = u_re(fp) + 1j*u_im(fp)
-        except (RuntimeError, StandardError): E_field[i,:] = N.nan + 1j*N.nan
-    return E_field
+from pylab import *
+r1 = field_pts[:]/lam
+x1 = r1[:,0]
+from blog_example import analytical_pts, analytical_result
+E_ana = N.abs(analytical_result)
+E_num = E_field
+figure()
+plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
+plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
+plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
+plot(analytical_pts, E_ana, '--r', label='z_ana')
+ylabel('E-field Magnitude')
+xlabel('Distance (wavelengths)')
+legend(loc='best')
+grid(True)
+show()

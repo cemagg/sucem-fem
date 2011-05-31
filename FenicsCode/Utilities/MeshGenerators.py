@@ -4,6 +4,11 @@ import numpy as N
 import dolfin
 
 def get_centred_cube(domain_size, max_edge_len, centred_element_coordinate=None):
+    """ Generate a cube mesh centred arount [0,0,0]
+
+    optionally translates mesh slightly such that
+    centred_element_coordinate is at the centre of an element.
+    """
     domain_subdivisions = N.array(N.ceil(N.sqrt(2)*domain_size/max_edge_len), N.uint)
     mesh = dolfin.UnitCube(*domain_subdivisions)
     # Transform mesh to correct dimensions
