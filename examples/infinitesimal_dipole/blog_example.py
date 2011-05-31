@@ -214,6 +214,23 @@ def main():
         try: E_field[i,:] = u_re(fp) + 1j*u_im(fp)
         except (RuntimeError, StandardError): E_field[i,:] = N.nan + 1j*N.nan
 
+    from pylab import *
+    r1 = field_pts[:]/lam
+    x1 = r1[:,0]
+    E_ana = N.abs(analytical_result)
+    E_num = E_field
+    figure()
+    plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
+    plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
+    plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
+    plot(analytical_pts, E_ana, '--r', label='z_ana')
+    ylabel('E-field Magnitude')
+    xlabel('Distance (wavelengths)')
+    legend(loc='best')
+    grid(True)
+    show()
+
+
 
 ## Analytical result z-component. x- and y- components are zero for
 ## z-directed dipole.
@@ -277,19 +294,3 @@ analytical_pts = N.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0
 
 if __name__ == '__main__':
     main()
-
-    from pylab import *
-    r1 = field_pts[:]/lam
-    x1 = r1[:,0]
-    E_ana = N.abs(analytical_result)
-    E_num = E_field
-    figure()
-    plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
-    plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
-    plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
-    plot(analytical_pts, E_ana, '--r', label='z_ana')
-    ylabel('E-field Magnitude')
-    xlabel('Distance (wavelengths)')
-    legend(loc='best')
-    grid(True)
-    show()
