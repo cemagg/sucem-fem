@@ -13,7 +13,7 @@ class SystemSolverBase ( object ):
     A base class for the implementation of various solvers for sparse eigen systems.
     This base class provides logging functionality, but requires an extention to allow for actual solver implementation.
     """
-    def __init__ ( self, A, preconditioner_type = None ):
+    def __init__ ( self, A, preconditioner_type=None ):
         """
         The constructor for a System Solver
         
@@ -235,17 +235,18 @@ def calculate_residual ( A, x, b ):
     return np.linalg.norm( A*x - b.reshape(x.shape) )
 
 
-def solve_sparse_system ( A, b ):
+def solve_sparse_system ( A, b, preconditioner_type='ilu' ):
     """
     This function solves the sparse linear system Ax = b for A a scipy sparse matrix, and b a numpy or scipy array
     
-    An incomplete LU preconditioner is used with the bicgstab iterative solver
+    By default an incomplete LU preconditioner is used with the bicgstab iterative solver
     
     @param A: a square matrix 
     @param b: the RHS vector
+    @param preconditioner_type: Preconditioner type string
     """
     
-    solver = BiCGStabSolver ( A, 'ilu' )
+    solver = BiCGStabSolver ( A, preconditioner_type )
     x = solver.solve(b)
     return x
     
