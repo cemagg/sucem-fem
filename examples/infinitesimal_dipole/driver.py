@@ -59,7 +59,7 @@ dp.set_frequency(freq)
 A = dp.get_LHS_matrix()
 b = dp.get_RHS()
 print 'solve using scipy bicgstab'
-x = solve_sparse_system ( A, b )
+x = solve_sparse_system ( A, b, preconditioner_type='diagonal' )
 
 recon = Reconstruct(dp.function_space)
 recon.set_dof_values(x)
