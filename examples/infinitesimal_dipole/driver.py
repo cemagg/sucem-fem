@@ -26,7 +26,7 @@ freq = problem_data['f']
 lam = c0/freq
 source_coord = N.array([0,0,0.]) 
 ## Discretisation settings
-order = 2
+order = 1
 domain_size = N.array([2*lam]*3)
 max_edge_len = lam/6
 mesh = get_centred_cube(domain_size, max_edge_len, source_coord)
