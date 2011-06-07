@@ -1,0 +1,28 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 0.8.5 ] */
+
+/* [wxMaxima: input   start ] */
+load(vect);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+declare([Ei, Er, Hi, Hr, Mi, Mr, Ji, Jr, Ni, Nr, Li, Lr, rhat, rprime, nhat], [nonscalar, real]);
+declare([k0, Z0], [scalar, real]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+E:Er+%i*Ei; 
+H:%i/(k0*Z0)*(crl*Er + %i*crl*Ei); 
+Hi:imagpart(H); Hr:realpart(H);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+N:(Jr + %i*Ji)*%e^(%i*k0*rprimerhat);realpart(N);imagpart(N);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+Hr;Hi;
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
