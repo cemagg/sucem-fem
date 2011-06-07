@@ -7,18 +7,18 @@ import dolfin
 import sys
 sys.path.append('../../')
 from FenicsCode.Consts import Z0, c0
-from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
+from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from ntff import NTFF
 
-fname = 'dofs_sph-2-sphere-r1m-6.pickle'
+#fname = 'dofs-2-0.599584916-0.0499654096667.pickle'
+#fname = 'dofs-2-1.199169832-0.0499654096667.pickle'
+fname = 'interpdofs-3-0.599584916-0.0499654096667.pickle'
 theta_deg = N.linspace(0, 180, 91)
 phi_deg = 0
 data = pickle.load(open(fname))
 lam = c0/data['freq']
 k0 = data['freq']*2*N.pi/c0
-mesh_file = '../solvers/meshes/%s.femmesh' % data['mesh_id']
-mesh = femmesh_2_dolfin_mesh(mesh_file)
-mesh.coordinates()[:] *= lam 
+mesh = get_centred_cube(data['domain_size'], data['max_edge_len'])
 V = dolfin.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", data['order'])
 
 ntff = NTFF(V)
