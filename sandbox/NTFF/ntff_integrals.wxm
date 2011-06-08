@@ -1,0 +1,194 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 0.8.5 ] */
+
+/* [wxMaxima: input   start ] */
+/* Has side effect of binding hash tables as values 
+rather than symbol properties*/
+use_fast_arrays:true;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+H_phi:%i*k0*l*I/(4*%pi)*sin(theta)*%e^(-%i*k0*r)/r;
+E_theta:Z0*H_phi;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+f0:10^9;c0:299792458;k0:2*%pi*f0/c0;I:1;l:1;theta_ff:0,phi_ff:0;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+load("vect");
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+declare(".", commutative);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+theta_hat:[cos(theta)*cos(phi), cos(theta)*sin(phi), -sin(theta)];
+phi_hat:[-sin(phi), cos(phi), 0];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+theta:acos(z/r);
+phi:atan2(y,x);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+crl_theta_phi(A_theta):=1/r*diff(r*A_theta, r);
+crl_theta_r(A_theta):=1/(r*sin(theta))*diff(A_theta, phi);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+J:n~H;M:-n~E;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+integrand_N:J*%e^(%i*k0*rvec.rhat);
+integrand_L:M*%e^(%i*k0*rvec.rhat);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+E:E_theta*theta_hat;H:H_phi*phi_hat;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+face_integrand(integrand, faceno, theta_ff, phi_ff):=block([
+normals:[[-1,0,0], [0,-1,0], [0,0,-1], [1,0,0], [0,1,0], [0,0,1]],
+const_substs:[[x=-1/2], [y=-1/2], [z=-1/2], [x=1/2], [y=1/2], [z=1/2]]
+],
+express(subst(const_substs[faceno], ev(
+integrand, r:sqrt(x^2+y^2+z^2), n:normals[faceno], 
+rhat:[sin(theta_ff)*cos(phi_ff), sin(theta_ff)*sin(phi_ff), cos(theta_ff)],
+rvec:[x,y,z],eval,eval))));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+integrand_components(integrand):=(block([itg, itg_reimx, itg_reimy, itg_reimz],
+itg_reimx['complex]:integrand[1],
+itg_reimx['re]:realpart(integrand[1]),
+itg_reimx['im]:imagpart(integrand[1]),
+itg['x]:itg_reimx,
+itg_reimy['complex]:integrand[2],
+itg_reimy['re]:realpart(integrand[2]),
+itg_reimy['im]:imagpart(integrand[2]),
+itg['y]:itg_reimy,
+itg_reimz['complex]:integrand[3],
+itg_reimz['re]:realpart(integrand[3]),
+itg_reimz['im]:imagpart(integrand[3]),
+itg['z]:itg_reimz,
+itg));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: hide output   ] */
+/* [wxMaxima: input   start ] */
+N1_integrand:integrand_components(face_integrand(integrand_N, 1, theta_ff, phi_ff))$
+N2_integrand:integrand_components(face_integrand(integrand_N, 2, theta_ff, phi_ff))$
+N3_integrand:integrand_components(face_integrand(integrand_N, 3, theta_ff, phi_ff))$
+N4_integrand:integrand_components(face_integrand(integrand_N, 4, theta_ff, phi_ff))$
+N5_integrand:integrand_components(face_integrand(integrand_N, 5, theta_ff, phi_ff))$
+N6_integrand:integrand_components(face_integrand(integrand_N, 6, theta_ff, phi_ff))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+load (dblint);dblint_x:200$dblint_y:200;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+floatfn(fname, expr, u1, u2):=(define(funmake(fname, [ev(u1),ev(u2)]), 
+float(ev(expr,float,eval,float))), fname);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+N1_x_re: dblint(floatfn(f, N1_integrand['x]['re], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_x_im: dblint(floatfn(f, N1_integrand['x]['im], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_y_re: dblint(floatfn(f, N1_integrand['y]['re], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_y_im: dblint(floatfn(f, N1_integrand['y]['im], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_z_re: dblint(floatfn(f, N1_integrand['z]['re], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_z_im: dblint(floatfn(f, N1_integrand['z]['im], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+N2_x_re: dblint(floatfn(f, N2_integrand['x]['re], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_x_im: dblint(floatfn(f, N2_integrand['x]['im], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_y_re: dblint(floatfn(f, N2_integrand['y]['re], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_y_im: dblint(floatfn(f, N2_integrand['y]['im], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_z_re: dblint(floatfn(f, N2_integrand['z]['re], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_z_im: dblint(floatfn(f, N2_integrand['z]['im], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+N3_x_re: dblint(floatfn(f, N3_integrand['x]['re], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N3_x_im: dblint(floatfn(f, N3_integrand['x]['im], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N3_y_re: dblint(floatfn(f, N3_integrand['y]['re], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N3_y_im: dblint(floatfn(f, N3_integrand['y]['im], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N3_z_re: dblint(floatfn(f, N3_integrand['z]['re], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N3_z_im: dblint(floatfn(f, N3_integrand['z]['im], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+N4_x_re: dblint(floatfn(f, N4_integrand['x]['re], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N4_x_im: dblint(floatfn(f, N4_integrand['x]['im], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N4_y_re: dblint(floatfn(f, N4_integrand['y]['re], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N4_y_im: dblint(floatfn(f, N4_integrand['y]['im], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N4_z_re: dblint(floatfn(f, N4_integrand['z]['re], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N4_z_im: dblint(floatfn(f, N4_integrand['z]['im], 'y, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+N5_x_re: dblint(floatfn(f, N5_integrand['x]['re], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N5_x_im: dblint(floatfn(f, N5_integrand['x]['im], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N5_y_re: dblint(floatfn(f, N5_integrand['y]['re], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N5_y_im: dblint(floatfn(f, N5_integrand['y]['im], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N5_z_re: dblint(floatfn(f, N5_integrand['z]['re], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N5_z_im: dblint(floatfn(f, N5_integrand['z]['im], 'x, 'z), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+N6_x_re: dblint(floatfn(f, N6_integrand['x]['re], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N6_x_im: dblint(floatfn(f, N6_integrand['x]['im], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N6_y_re: dblint(floatfn(f, N6_integrand['y]['re], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N6_y_im: dblint(floatfn(f, N6_integrand['y]['im], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N6_z_re: dblint(floatfn(f, N6_integrand['z]['re], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N6_z_im: dblint(floatfn(f, N6_integrand['z]['im], 'x, 'y), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
