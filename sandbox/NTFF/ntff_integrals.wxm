@@ -15,7 +15,8 @@ E_theta:Z0*H_phi;
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
-f0:10^9;c0:299792458;k0:2*%pi*f0/c0;I:1;l:1;theta_ff:0,phi_ff:0;
+f0:10^9; c0:299792458; k0:2*%pi*f0/c0; I:1; l:1; theta_ff:%pi/2; phi_ff:0;
+mu0:%pi*4*10^(-7); Z0:mu0*c0; rhat:[sin(theta_ff)*cos(phi_ff), sin(theta_ff)*sin(phi_ff), cos(theta_ff)];
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
@@ -32,7 +33,7 @@ phi_hat:[-sin(phi), cos(phi), 0];
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
-/*theta:acos(z/r); phi:atan2(y,x);*/ 1;
+/*theta:acos(zz/r); phi:atan2(y,x);*/ 1;
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
@@ -58,8 +59,7 @@ face_integrand(integrand, faceno, theta_ff, phi_ff):=block([
 normals:[[-1,0,0], [0,-1,0], [0,0,-1], [1,0,0], [0,1,0], [0,0,1]],
 tmp, rtmp],
 tmp:express(ev(integrand, n:normals[faceno])),
-tmp:ev(tmp, rhat:[sin(theta_ff)*cos(phi_ff), sin(theta_ff)*sin(phi_ff), cos(theta_ff)]),
-tmp:ev(tmp, rvec:[x,y,z]),
+tmp:ev(tmp, rvec:[x,y,zz]),
 tmp);
 /* [wxMaxima: input   end   ] */
 
@@ -76,8 +76,24 @@ itg['y]:itg_reimy,
 itg_reimz['complex]:integrand[3],
 itg_reimz['re]:realpart(integrand[3]),
 itg_reimz['im]:imagpart(integrand[3]),
-itg['z]:itg_reimz,
+itg['zz]:itg_reimz,
 itg));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+load (dblint);dblint_x:100$dblint_y:100;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+const_substs:[[x=-1/2], [y=-1/2], [zz=-1/2], [x=1/2], [y=1/2], [zz=1/2]];
+floatfn2(fname, expr, u1, u2, sublis):=(define(funmake(fname, [ev(u1),ev(u2)]), 
+block([
+r:sqrt(float(x^2+y^2+zz^2)), theta:acos(zz/r),
+phi:atan2(y,x)],
+r:float(subst(sublis, r)), 
+theta:float(subst(sublis,theta)),
+phi:float(subst(sublis,phi)),
+float(ev(expr, eval, float)))), fname);
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
@@ -87,53 +103,43 @@ N3_integrand:integrand_components(face_integrand(integrand_N, 3, theta_ff, phi_f
 N4_integrand:integrand_components(face_integrand(integrand_N, 4, theta_ff, phi_ff))$
 N5_integrand:integrand_components(face_integrand(integrand_N, 5, theta_ff, phi_ff))$
 N6_integrand:integrand_components(face_integrand(integrand_N, 6, theta_ff, phi_ff))$
-/* [wxMaxima: input   end   ] */
-
-/* [wxMaxima: input   start ] */
-load (dblint);dblint_x:20$dblint_y:20;
-/* [wxMaxima: input   end   ] */
-
-/* [wxMaxima: input   start ] */
-const_substs:[[x=-1/2], [y=-1/2], [z=-1/2], [x=1/2], [y=1/2], [z=1/2]];
-floatfn2(fname, expr, u1, u2, sublis):=(define(funmake(fname, [ev(u1),ev(u2)]), 
-block([
-r:sqrt(float(x^2+y^2+z^2)), theta:acos(z/r),
-phi:atan2(y,x)],
-r:float(subst(sublis, r)), 
-theta:float(subst(sublis,theta)),
-phi:float(subst(sublis,phi)),
-float(ev(expr, eval, float)))), fname);
+L1_integrand:integrand_components(face_integrand(integrand_L, 1, theta_ff, phi_ff))$
+L2_integrand:integrand_components(face_integrand(integrand_L, 2, theta_ff, phi_ff))$
+L3_integrand:integrand_components(face_integrand(integrand_L, 3, theta_ff, phi_ff))$
+L4_integrand:integrand_components(face_integrand(integrand_L, 4, theta_ff, phi_ff))$
+L5_integrand:integrand_components(face_integrand(integrand_L, 5, theta_ff, phi_ff))$
+L6_integrand:integrand_components(face_integrand(integrand_L, 6, theta_ff, phi_ff))$
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
 fno:1$
-N1_x_re: dblint(floatfn2(f, N1_integrand['x]['re], 'y, 'z, const_substs[fno]), 
+L1_x_re: dblint(floatfn2(f, L1_integrand['x]['re], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N1_x_im: dblint(floatfn2(f, N1_integrand['x]['im], 'y, 'z, const_substs[fno]), 
+L1_x_im: dblint(floatfn2(f, L1_integrand['x]['im], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N1_y_re: dblint(floatfn2(f, N1_integrand['y]['re], 'y, 'z, const_substs[fno]), 
+L1_y_re: dblint(floatfn2(f, L1_integrand['y]['re], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N1_y_im: dblint(floatfn2(f, N1_integrand['y]['im], 'y, 'z, const_substs[fno]), 
+L1_y_im: dblint(floatfn2(f, L1_integrand['y]['im], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N1_z_re: dblint(floatfn2(f, N1_integrand['z]['re], 'y, 'z, const_substs[fno]), 
+L1_z_re: dblint(floatfn2(f, L1_integrand['zz]['re], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N1_z_im: dblint(floatfn2(f, N1_integrand['z]['im], 'y, 'z, const_substs[fno]), 
+L1_z_im: dblint(floatfn2(f, L1_integrand['zz]['im], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
 fno:2$
-N2_x_re: dblint(floatfn2(f, N2_integrand['x]['re], 'x, 'z, const_substs[fno]), 
+L2_x_re: dblint(floatfn2(f, L2_integrand['x]['re], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N2_x_im: dblint(floatfn2(f, N2_integrand['x]['im], 'x, 'z, const_substs[fno]), 
+L2_x_im: dblint(floatfn2(f, L2_integrand['x]['im], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N2_y_re: dblint(floatfn2(f, N2_integrand['y]['re], 'x, 'z, const_substs[fno]), 
+L2_y_re: dblint(floatfn2(f, L2_integrand['y]['re], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N2_y_im: dblint(floatfn2(f, N2_integrand['y]['im], 'x, 'z, const_substs[fno]), 
+L2_y_im: dblint(floatfn2(f, L2_integrand['y]['im], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N2_z_re: dblint(floatfn2(f, N2_integrand['z]['re], 'x, 'z, const_substs[fno]), 
+L2_z_re: dblint(floatfn2(f, L2_integrand['zz]['re], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N2_z_im: dblint(floatfn2(f, N2_integrand['z]['im], 'x, 'z, const_substs[fno]), 
+L2_z_im: dblint(floatfn2(f, L2_integrand['zz]['im], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 /* [wxMaxima: input   end   ] */
 
@@ -141,7 +147,121 @@ lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 fno:3$
 sublis:const_substs[fno]$
 f(x,y):=block([
-r:sqrt(x^2+y^2+z^2), theta:acos(z/r), 
+r:sqrt(x^2+y^2+zz^2), theta:acos(zz/r), 
+phi:(if is(equal(x, 0)) and is(equal(y, 0)) then 0 else atan2(y,x))
+],
+r:float(subst(sublis, r)),
+theta:float(subst(sublis,theta)),
+phi:float(subst(sublis,phi)),
+float(ev(subst(sublis, expr), eval)))$
+expr:L3_integrand['x]['re]$
+L3_x_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L3_integrand['x]['im]$
+L3_x_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L3_integrand['y]['re]$
+L3_y_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L3_integrand['y]['im]$
+L3_y_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L3_integrand['zz]['re]$
+L3_z_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L3_integrand['zz]['im]$
+L3_z_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fno:4$
+L4_x_re: dblint(floatfn2(f, L4_integrand['x]['re], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L4_x_im: dblint(floatfn2(f, L4_integrand['x]['im], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L4_y_re: dblint(floatfn2(f, L4_integrand['y]['re], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L4_y_im: dblint(floatfn2(f, L4_integrand['y]['im], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L4_z_re: dblint(floatfn2(f, L4_integrand['zz]['re], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L4_z_im: dblint(floatfn2(f, L4_integrand['zz]['im], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fno:5$
+L5_x_re: dblint(floatfn2(f, L5_integrand['x]['re], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L5_x_im: dblint(floatfn2(f, L5_integrand['x]['im], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L5_y_re: dblint(floatfn2(f, L5_integrand['y]['re], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L5_y_im: dblint(floatfn2(f, L5_integrand['y]['im], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L5_z_re: dblint(floatfn2(f, L5_integrand['zz]['re], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+L5_z_im: dblint(floatfn2(f, L5_integrand['zz]['im], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fno:6$
+sublis:const_substs[fno]$
+f(x,y):=block([
+r:sqrt(x^2+y^2+zz^2), theta:acos(zz/r), 
+phi:(if is(equal(x, 0)) and is(equal(y, 0)) then 0 else atan2(y,x))
+],
+r:float(subst(sublis, r)),
+theta:float(subst(sublis,theta)),
+phi:float(subst(sublis,phi)),
+float(ev(subst(sublis, expr), eval)))$
+expr:L6_integrand['x]['re]$
+L6_x_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L6_integrand['x]['im]$
+L6_x_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L6_integrand['y]['re]$
+L6_y_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L6_integrand['y]['im]$
+L6_y_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L6_integrand['zz]['re]$
+L6_z_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+expr:L6_integrand['zz]['im]$
+L6_z_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fno:1$
+N1_x_re: dblint(floatfn2(f, N1_integrand['x]['re], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_x_im: dblint(floatfn2(f, N1_integrand['x]['im], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_y_re: dblint(floatfn2(f, N1_integrand['y]['re], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_y_im: dblint(floatfn2(f, N1_integrand['y]['im], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_z_re: dblint(floatfn2(f, N1_integrand['zz]['re], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N1_z_im: dblint(floatfn2(f, N1_integrand['zz]['im], 'y, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fno:2$
+N2_x_re: dblint(floatfn2(f, N2_integrand['x]['re], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_x_im: dblint(floatfn2(f, N2_integrand['x]['im], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_y_re: dblint(floatfn2(f, N2_integrand['y]['re], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_y_im: dblint(floatfn2(f, N2_integrand['y]['im], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_z_re: dblint(floatfn2(f, N2_integrand['zz]['re], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+N2_z_im: dblint(floatfn2(f, N2_integrand['zz]['im], 'x, 'zz, const_substs[fno]), 
+lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fno:3$
+sublis:const_substs[fno]$
+f(x,y):=block([
+r:sqrt(x^2+y^2+zz^2), theta:acos(zz/r), 
 phi:(if is(equal(x, 0)) and is(equal(y, 0)) then 0 else atan2(y,x))
 ],
 r:float(subst(sublis, r)),
@@ -156,41 +276,41 @@ expr:N3_integrand['y]['re]$
 N3_y_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 expr:N3_integrand['y]['im]$
 N3_y_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-expr:N3_integrand['z]['re]$
+expr:N3_integrand['zz]['re]$
 N3_z_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-expr:N3_integrand['z]['im]$
+expr:N3_integrand['zz]['im]$
 N3_z_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
 fno:4$
-N4_x_re: dblint(floatfn2(f, N4_integrand['x]['re], 'y, 'z, const_substs[fno]), 
+N4_x_re: dblint(floatfn2(f, N4_integrand['x]['re], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N4_x_im: dblint(floatfn2(f, N4_integrand['x]['im], 'y, 'z, const_substs[fno]), 
+N4_x_im: dblint(floatfn2(f, N4_integrand['x]['im], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N4_y_re: dblint(floatfn2(f, N4_integrand['y]['re], 'y, 'z, const_substs[fno]), 
+N4_y_re: dblint(floatfn2(f, N4_integrand['y]['re], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N4_y_im: dblint(floatfn2(f, N4_integrand['y]['im], 'y, 'z, const_substs[fno]), 
+N4_y_im: dblint(floatfn2(f, N4_integrand['y]['im], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N4_z_re: dblint(floatfn2(f, N4_integrand['z]['re], 'y, 'z, const_substs[fno]), 
+N4_z_re: dblint(floatfn2(f, N4_integrand['zz]['re], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N4_z_im: dblint(floatfn2(f, N4_integrand['z]['im], 'y, 'z, const_substs[fno]), 
+N4_z_im: dblint(floatfn2(f, N4_integrand['zz]['im], 'y, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 /* [wxMaxima: input   end   ] */
 
 /* [wxMaxima: input   start ] */
 fno:5$
-N5_x_re: dblint(floatfn2(f, N5_integrand['x]['re], 'x, 'z, const_substs[fno]), 
+N5_x_re: dblint(floatfn2(f, N5_integrand['x]['re], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N5_x_im: dblint(floatfn2(f, N5_integrand['x]['im], 'x, 'z, const_substs[fno]), 
+N5_x_im: dblint(floatfn2(f, N5_integrand['x]['im], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N5_y_re: dblint(floatfn2(f, N5_integrand['y]['re], 'x, 'z, const_substs[fno]), 
+N5_y_re: dblint(floatfn2(f, N5_integrand['y]['re], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N5_y_im: dblint(floatfn2(f, N5_integrand['y]['im], 'x, 'z, const_substs[fno]), 
+N5_y_im: dblint(floatfn2(f, N5_integrand['y]['im], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N5_z_re: dblint(floatfn2(f, N5_integrand['z]['re], 'x, 'z, const_substs[fno]), 
+N5_z_re: dblint(floatfn2(f, N5_integrand['zz]['re], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-N5_z_im: dblint(floatfn2(f, N5_integrand['z]['im], 'x, 'z, const_substs[fno]), 
+N5_z_im: dblint(floatfn2(f, N5_integrand['zz]['im], 'x, 'zz, const_substs[fno]), 
 lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 /* [wxMaxima: input   end   ] */
 
@@ -198,7 +318,7 @@ lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 fno:6$
 sublis:const_substs[fno]$
 f(x,y):=block([
-r:sqrt(x^2+y^2+z^2), theta:acos(z/r), 
+r:sqrt(x^2+y^2+zz^2), theta:acos(zz/r), 
 phi:(if is(equal(x, 0)) and is(equal(y, 0)) then 0 else atan2(y,x))
 ],
 r:float(subst(sublis, r)),
@@ -213,12 +333,56 @@ expr:N6_integrand['y]['re]$
 N6_y_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 expr:N6_integrand['y]['im]$
 N6_y_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-expr:N6_integrand['z]['re]$
+expr:N6_integrand['zz]['re]$
 N6_z_re: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
-expr:N6_integrand['z]['im]$
+expr:N6_integrand['zz]['im]$
 N6_z_im: dblint(f, lambda([x],-1/2), lambda([x], 1/2), -1/2, 1/2);
 /* [wxMaxima: input   end   ] */
 
+/* [wxMaxima: input   start ] */
+L_x_re:L1_x_re + L2_x_re + L3_x_re + L4_x_re + L5_x_re + L6_x_re$
+L_x_im:L1_x_im + L2_x_im + L3_x_im + L4_x_im + L5_x_im + L6_x_im$
+L_y_re:L1_y_re + L2_y_re + L3_y_re + L4_y_re + L5_y_re + L6_y_re$
+L_y_im:L1_y_im + L2_y_im + L3_y_im + L4_y_im + L5_y_im + L6_y_im$
+L_z_re:L1_z_re + L2_z_re + L3_z_re + L4_z_re + L5_z_re + L6_z_re$
+L_z_im:L1_z_im + L2_z_im + L3_z_im + L4_z_im + L5_z_im + L6_z_im$
+N_x_re:N1_x_re + N2_x_re + N3_x_re + N4_x_re + N5_x_re + N6_x_re$
+N_x_im:N1_x_im + N2_x_im + N3_x_im + N4_x_im + N5_x_im + N6_x_im$
+N_y_re:N1_y_re + N2_y_re + N3_y_re + N4_y_re + N5_y_re + N6_y_re$
+N_y_im:N1_y_im + N2_y_im + N3_y_im + N4_y_im + N5_y_im + N6_y_im$
+N_z_re:N1_z_re + N2_z_re + N3_z_re + N4_z_re + N5_z_re + N6_z_re$
+N_z_im:N1_z_im + N2_z_im + N3_z_im + N4_z_im + N5_z_im + N6_z_im$
+L_re:[L_x_re, L_y_re, L_z_re]$
+L_im:[L_x_im, L_y_im, L_z_im]$
+N_re:[N_x_%e^(-%i*k0*r)re, N_y_re, N_z_re]$
+N_im:[N_x_im, N_y_im, N_z_im]$
+L:L_re+%i*L_im$
+N:N_re+%i*N_im$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+expand(float(k0*(Z0*N[3] + L[1])/4/%pi, float));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+theta_ff;L;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+N1_integrand['zz]['re];
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+float(rectform(ev(E_theta, r:1, theta:%pi/2)));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+ev(E_theta, r:1);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+E_theta;l;I;float(k0);float(Z0);float(k0*Z0/4/%pi);
+/* [wxMaxima: input   end   ] */
 
 /* Maxima can't load/batch files which end with a comment! */
 "Created with wxMaxima"$

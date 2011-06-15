@@ -14,6 +14,8 @@ class NTFF(object):
         self.rprime = V.cell().x
         self.E_r = dolfin.Function(V)
         self.E_i = dolfin.Function(V)
+        self._L = []
+        self._N = []
 
     def set_dofs(self, dofs):
         x_r = N.real(dofs).copy()
@@ -79,12 +81,28 @@ class NTFF(object):
         L_i_theta = dot(theta_hat, L_i)*ds
         L_i_phi = dot(phi_hat, L_i)*ds
 
+        # from ufl.algorithms import estimate_total_polynomial_degree
+        # print "L degree: ", estimate_total_polynomial_degree(L_r_theta)
+
         #------------------------------
         # Now evaluate numerically, adding the real and imaginary parts
+        # ffc_opt = {"quadrature_degree": 2, "representation": "quadrature"}
+        # L_theta = dolfin.assemble(L_r_theta, form_compiler_parameters=ffc_opt) \
+        #           + 1j*dolfin.assemble(L_i_theta, form_compiler_parameters=ffc_opt)
+        # L_phi = dolfin.assemble(L_r_phi, form_compiler_parameters=ffc_opt) \
+        #         + 1j*dolfin.assemble(L_i_phi, form_compiler_parameters=ffc_opt)
+        # N_theta = dolfin.assemble(N_r_theta, form_compiler_parameters=ffc_opt) \
+        #           + 1j*dolfin.assemble(N_i_theta, form_compiler_parameters=ffc_opt)
+        # N_phi = dolfin.assemble(N_r_phi, form_compiler_parameters=ffc_opt) \
+        #         + 1j*dolfin.assemble(N_i_phi, form_compiler_parameters=ffc_opt)    
+
         L_theta = dolfin.assemble(L_r_theta) + 1j*dolfin.assemble(L_i_theta)
         L_phi = dolfin.assemble(L_r_phi) + 1j*dolfin.assemble(L_i_phi)
         N_theta = dolfin.assemble(N_r_theta) + 1j*dolfin.assemble(N_i_theta)
         N_phi = dolfin.assemble(N_r_phi) + 1j*dolfin.assemble(N_i_phi)    
+
+        self._L.append([L_theta, L_phi])
+        self._N.append([N_theta, N_phi])
 
         #------------------------------
         # Calculate the far fields normalised to radius 1.

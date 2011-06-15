@@ -11,6 +11,8 @@ from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
 from ntff import NTFF
 
 fname = 'dofs_sph-2-sphere-r1m-6.pickle'
+#fname = 'dofs_sph-1lam-3-sphere-r1m-6.pickle'
+#fname = 'dofs_sph-2lam-2-sphere-r1m-15.pickle'
 theta_deg = N.linspace(0, 180, 91)
 phi_deg = 0
 data = pickle.load(open(fname))
@@ -18,7 +20,7 @@ lam = c0/data['freq']
 k0 = data['freq']*2*N.pi/c0
 mesh_file = '../solvers/meshes/%s.femmesh' % data['mesh_id']
 mesh = femmesh_2_dolfin_mesh(mesh_file)
-mesh.coordinates()[:] *= lam 
+mesh.coordinates()[:] *= lam*1
 V = dolfin.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", data['order'])
 
 ntff = NTFF(V)

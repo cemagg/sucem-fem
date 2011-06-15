@@ -10,9 +10,12 @@ from FenicsCode.Consts import Z0, c0
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from ntff import NTFF
 
-#fname = 'dofs-2-0.599584916-0.0499654096667.pickle'
+
+#dolfin.parameters['form_compiler']['quadrature_degree'] = '8'
+#dolfin.parameters['form_compiler']['quadrature_degree'] = '8'
+fname = 'dofs-2-0.599584916-0.0499654096667.pickle'
 #fname = 'dofs-2-1.199169832-0.0499654096667.pickle'
-fname = 'interpdofs-3-0.599584916-0.0499654096667.pickle'
+#fname = 'interpdofs-2-0.599584916-0.0499654096667.pickle'
 theta_deg = N.linspace(0, 180, 91)
 phi_deg = 0
 data = pickle.load(open(fname))

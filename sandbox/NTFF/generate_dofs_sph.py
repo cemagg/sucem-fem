@@ -23,7 +23,7 @@ l = lam/1000                            # Dipole length
 source_value = N.array([0,0,1.])*I*l
 source_coord = N.array([0,0,0.]) 
 ## Discretisation settings
-order = 2
+order = 3
 mesh_id_list = [
     'sphere-r1m-4',
     'sphere-r1m-5',
@@ -34,10 +34,10 @@ mesh_id_list = [
     'sphere-r1m-10',
     'sphere-r1m-15',
     ]
-mesh_id = mesh_id_list[-1]
+mesh_id = mesh_id_list[2]
 mesh_file = '../solvers/meshes/%s.femmesh' % mesh_id
 mesh = femmesh_2_dolfin_mesh(mesh_file)
-mesh.coordinates()[:] *= 2*lam
+mesh.coordinates()[:] *= 1*lam
 # Request information:
 field_pts = N.array([lam,0,0])*(N.arange(88)/100+1/10)[:, N.newaxis]
 
@@ -74,7 +74,7 @@ recon.set_dof_values(x)
 E_field = recon.reconstruct_points(field_pts)
 
 import pickle
-fname = 'dofs_sph-2lam-%d-%s.pickle' % (order, mesh_id)
+fname = 'dofs_sph-1lam-%d-%s.pickle' % (order, mesh_id)
 pickle.dump(
     dict(x=x, order=order, mesh_id=mesh_id, freq=freq),
     open(fname, 'w'))
