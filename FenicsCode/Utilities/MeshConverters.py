@@ -14,7 +14,10 @@ def listmesh_2_dolfin_mesh(listmesh, reorder=False):
     me.init_vertices(len(listmesh['Nodes']))
     me.init_cells(len(listmesh['ElementNodes']))
     dm.coordinates()[:,:] = listmesh['Nodes']
-    dm.cells()[:,:] = listmesh['ElementNodes']
+    #dm.cells()[:,:] = listmesh['ElementNodes']
+    for i, enodes in enumerate(listmesh['ElementNodes']):
+        me.add_cell(i, *enodes)
+    me.close()
     if reorder: dm.order()
     return dm
 
