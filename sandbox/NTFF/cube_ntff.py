@@ -10,9 +10,14 @@ from FenicsCode.Consts import Z0, c0
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from ntff import NTFF
 
+dolfin.parameters['optimize_form'] = True
+dolfin.parameters['optimize'] = True
+dolfin.parameters['optimize_use_dofmap_cache'] = True
+dolfin.parameters['optimize_use_tensor_cache'] = True
+dolfin.parameters['form_compiler']['optimize'] = True
 
-#dolfin.parameters['form_compiler']['quadrature_degree'] = '8'
-#dolfin.parameters['form_compiler']['quadrature_degree'] = '8'
+dolfin.parameters['form_compiler']['cpp_optimize'] = True
+#dolfin.parameters['form_compiler']['cpp_optimize_flags'] = '-O3'
 fname = 'reference_dofs-2-0.149896229-0.0499654096667.pickle'
 #fname = 'dofs-2-0.599584916-0.0499654096667.pickle'
 #fname = 'dofs-2-1.199169832-0.0499654096667.pickle'

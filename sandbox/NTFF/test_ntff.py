@@ -32,7 +32,7 @@ class NTFFEnvironment(object):
 class test_surface_ntff(unittest.TestCase):
     test_data_file = 'reference_surface_ntff-2-0.149896229-0.0499654096667.pickle'
     rtol=1e-12
-    atol=1e-16
+    atol=1e-7
     
     def setUp(self):
         desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
@@ -43,7 +43,6 @@ class test_surface_ntff(unittest.TestCase):
         env = self.environment
         self.DUT.set_frequency(env.frequency)
         self.DUT.set_dofs(env.discretisation_dofs)
-        self.DUT.init_calc()
         actual_E_ff = [self.DUT.calc_pt(th_deg, ph_deg)
                        for th_deg, ph_deg in zip(env.theta_coords, env.phi_coords)]
         self.assertTrue(N.allclose(actual_E_ff, env.desired_E_ff,
