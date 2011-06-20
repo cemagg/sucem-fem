@@ -13,7 +13,7 @@ from ntff import NTFF
 
 #dolfin.parameters['form_compiler']['quadrature_degree'] = '8'
 #dolfin.parameters['form_compiler']['quadrature_degree'] = '8'
-fname = 'refrence_dofs-2-0.149896229-0.0499654096667.pickle'
+fname = 'reference_dofs-2-0.149896229-0.0499654096667.pickle'
 #fname = 'dofs-2-0.599584916-0.0499654096667.pickle'
 #fname = 'dofs-2-1.199169832-0.0499654096667.pickle'
 #fname = 'interpdofs-2-0.599584916-0.0499654096667.pickle'
