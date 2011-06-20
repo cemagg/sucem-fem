@@ -10,7 +10,7 @@ import FenicsCode.BoundaryConditions.ABC
 from FenicsCode.Consts import eps0, mu0, c0
 from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
 from FenicsCode.Sources import point_source
-from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
+from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system, UMFPACKSolver
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from FenicsCode.PostProcessing import Reconstruct
 
@@ -23,12 +23,14 @@ l = lam/1000                            # Dipole length
 source_value = N.array([0,0,1.])*I*l
 source_coord = N.array([0,0,0.]) 
 ## Discretisation settings
-order = 3
-domain_size = N.array([2*lam]*3)
+order = 2
+domain_size = N.array([lam]*3)*0.5
 max_edge_len = lam/6
 mesh = get_centred_cube(domain_size, max_edge_len, source_coord)
 # Request information:
-field_pts = N.array([lam,0,0])*(N.arange(88)/100+1/10)[:, N.newaxis]
+field_pts = N.array(
+    [N.max(domain_size)/2-max_edge_len/2,0,0]
+    )*(N.arange(88)/100+1/10)[:, N.newaxis]
 
 ## Implementation
 material_mesh_func = dolfin.MeshFunction('uint', mesh, 3)
@@ -55,8 +57,10 @@ dp.set_frequency(freq)
 
 A = dp.get_LHS_matrix()
 b = dp.get_RHS()
-print 'solve using scipy bicgstab'
-x = solve_sparse_system ( A, b, preconditioner_type='diagonal' )
+#print 'solve using scipy bicgstab'
+#x = solve_sparse_system ( A, b, preconditioner_type='diagonal' )
+print 'solve using scipy UMFPACK'
+x = UMFPACKSolver(A).solve(b)
 
 recon = Reconstruct(dp.function_space)
 recon.set_dof_values(x)
