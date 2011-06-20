@@ -16,6 +16,7 @@ class NTFF(object):
         self.E_i = dolfin.Function(V)
         self._L = []
         self._N = []
+        self._r_fac = []
 
     def set_dofs(self, dofs):
         x_r = N.real(dofs).copy()
@@ -101,12 +102,13 @@ class NTFF(object):
         N_theta = dolfin.assemble(N_r_theta) + 1j*dolfin.assemble(N_i_theta)
         N_phi = dolfin.assemble(N_r_phi) + 1j*dolfin.assemble(N_i_phi)    
 
-        self._L.append([L_theta, L_phi])
-        self._N.append([N_theta, N_phi])
 
         #------------------------------
         # Calculate the far fields normalised to radius 1.
         r_fac = 1j*k0*N.exp(-1j*k0)/(4*N.pi)
         E_theta = -r_fac*(L_phi + Z0*N_theta)
         E_phi = r_fac*(L_theta - Z0*N_phi)
+        self._L.append([L_theta, L_phi])
+        self._N.append([N_theta, N_phi])
+        self._r_fac.append(r_fac)
         return (E_theta, E_phi)

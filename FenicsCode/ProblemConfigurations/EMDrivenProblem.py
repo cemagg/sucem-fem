@@ -65,7 +65,7 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
         RHS = N.zeros(self.get_global_dimension(), N.complex128)
         dofnos, contribs = self._get_RHS_contributions()
         k0 = 2*N.pi*self.frequency/c0
-        contribs = 1j*k0*Z0*contribs
+        contribs = -1j*k0*Z0*contribs
         RHS[dofnos] += contribs
         return RHS
 
