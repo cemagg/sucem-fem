@@ -1,111 +1,133 @@
 from __future__ import division
 
-import numpy as N
+import numpy as np
 import dolfin
 from dolfin import curl, cross, dx, ds, Constant, dot
 from FenicsCode.Consts import Z0, c0
 
-class NTFF(object):
+class SurfaceNTFFForms(object):
     def __init__(self, function_space):
         self.function_space = V = function_space
-        # Outward pointing normal
         self.n = V.cell().n
         # \vec{r'}, i.e. rprime is simply the position vector
         self.rprime = V.cell().x
         self.E_r = dolfin.Function(V)
         self.E_i = dolfin.Function(V)
+        self.k0 = dolfin.Expression('k0')
+        self.r_hat = dolfin.Expression(
+            ['sin(theta)*cos(phi)', 'sin(theta)*sin(phi)', 'cos(theta)'])
+        self.theta_hat = dolfin.Expression(
+            ['cos(theta)*cos(phi)', 'cos(theta)*sin(phi)', '-sin(theta)'])
+        self.phi_hat = dolfin.Expression(['-sin(phi)', 'cos(phi)', '0.'])
+        # phase term to be used in sin/cos
+        self.phase = self.k0*dot(self.rprime, self.r_hat)
+
+    def set_dofs(self, dofs):
+        x_r = np.real(dofs).copy()
+        x_i = np.imag(dofs).copy()
+        self.E_r.vector()[:] = x_r
+        self.E_i.vector()[:] = x_i
+
+    def get_N_form(self):
+        try:
+            return self.N_form
+        except AttributeError:
+            pass
+        # Set up magnetic field and equivalent electric current forms
+        H_r = -curl(self.E_i)/(self.k0*Z0)
+        H_i = curl(self.E_r)/(self.k0*Z0)
+        J_r = cross(self.n, H_r)
+        J_i = cross(self.n, H_i)
+        #------------------------------
+        # Set up form for far field potential N
+        theta_hat = self.theta_hat
+        phi_hat = self.phi_hat
+        phase = self.phase
+        N_r = J_r*dolfin.cos(phase) - J_i*dolfin.sin(phase)
+        N_i = J_r*dolfin.sin(phase) + J_i*dolfin.cos(phase)
+        # UFL does not seem to like vector valued functionals, so we split the
+        # final functional from into theta and phi components
+        self.N_form = dict(
+            r_theta=dot(theta_hat, N_r)*ds,
+            r_phi=dot(phi_hat, N_r)*ds,
+            i_theta=dot(theta_hat, N_i)*ds,
+            i_phi=dot(phi_hat, N_i)*ds)
+        return self.N_form
+
+    def get_L_form(self):
+        try:
+            return self.L_form
+        except AttributeError:
+            pass
+        # Set up eqivalent magnetic current forms
+        M_r = -cross(self.n, self.E_r)
+        M_i = -cross(self.n, self.E_i)
+        #------------------------------
+        # Set up form for far field potential L
+        theta_hat = self.theta_hat
+        phi_hat = self.phi_hat
+        phase = self.phase
+        L_r = M_r*dolfin.cos(phase) - M_i*dolfin.sin(phase)
+        L_i = M_r*dolfin.sin(phase) + M_i*dolfin.cos(phase)
+        self.L_form = dict(
+            r_theta=dot(theta_hat, L_r)*ds,
+            r_phi=dot(phi_hat, L_r)*ds,
+            i_theta=dot(theta_hat, L_i)*ds,
+            i_phi=dot(phi_hat, L_i)*ds)
+        return self.L_form
+
+
+    def assemble_N(self):
+        #------------------------------
+        # evaluate numerically, adding the real and imaginary parts
+        N = self.get_N_form()
+        N_theta = dolfin.assemble(N['r_theta']) + 1j*dolfin.assemble(N['i_theta'])
+        N_phi = dolfin.assemble(N['r_phi']) + 1j*dolfin.assemble(N['i_phi'])
+        return (N_theta, N_phi)
+
+    def assemble_L(self):
+        #------------------------------
+        # evaluate numerically, adding the real and imaginary parts
+        L = self.get_L_form()
+        L_theta = dolfin.assemble(L['r_theta']) + 1j*dolfin.assemble(L['i_theta'])
+        L_phi = dolfin.assemble(L['r_phi']) + 1j*dolfin.assemble(L['i_phi'])
+        return (L_theta, L_phi)
+
+    def set_parms(self, theta, phi, k0):
+        self.k0.k0 = k0
+        self.theta_hat.theta = theta
+        self.theta_hat.phi = phi
+        self.phi_hat.theta = theta
+        self.phi_hat.phi = phi
+        self.r_hat.theta = theta
+        self.r_hat.phi = phi
+
+
+class NTFF(object):
+    def __init__(self, function_space):
+        self.function_space = V = function_space
+        # Outward pointing normal
+        self.forms = SurfaceNTFFForms(V)
         self._L = []
         self._N = []
         self._r_fac = []
 
     def set_dofs(self, dofs):
-        x_r = N.real(dofs).copy()
-        x_i = N.imag(dofs).copy()
-        self.E_r.vector()[:] = x_r
-        self.E_i.vector()[:] = x_i
-        #------------------------------
-        # Set up eqivalent magnetic current forms
-        self.M_r = -cross(self.n, self.E_r)
-        self.M_i = -cross(self.n, self.E_i)
+        self.forms.set_dofs(dofs)
 
     def set_frequency(self, frequency):
         self.frequency = frequency
-        self.init_calc()
-
-    def init_calc(self):
-        self.k0 = k0 = self.frequency*2*N.pi/c0
-        #------------------------------
-        # Set up magnetic field and equivalent electric current forms
-        self.H_r = -curl(self.E_i)/(self.k0*Z0)
-        self.H_i = curl(self.E_r)/(self.k0*Z0)
-        self.J_r = cross(self.n, self.H_r)
-        self.J_i = cross(self.n, self.H_i)
-        
-        
+        self.k0 = self.frequency*2*np.pi/c0
+            
     def calc_pt(self, theta_deg, phi_deg):
-        theta = N.deg2rad(theta_deg)
-        phi = N.deg2rad(phi_deg)
-        rhat_ = N.array([N.sin(theta)*N.cos(phi),
-                         N.sin(theta)*N.sin(phi),
-                         N.cos(theta)], dtype=N.float64)
-        theta_hat_ = N.array([N.cos(theta)*N.cos(phi),
-                              N.cos(theta)*N.sin(phi),
-                              -N.sin(theta)], dtype=N.float64)
-        phi_hat_ = N.array([-N.sin(phi), N.cos(phi), 0.], dtype=N.float64)
-        rhat = Constant(list(rhat_))
-        theta_hat = Constant(list(theta_hat_))
-        phi_hat = Constant(list(phi_hat_))
-        M_r = self.M_r
-        M_i = self.M_i
-        J_r = self.J_r
-        J_i = self.J_i
-        k0 = self.k0 
-        # phase term to be used in sin/cos
-        phase = k0*dot(self.rprime, rhat)
-        #------------------------------
-        # Set up form for far field potential N
-        N_r = J_r*dolfin.cos(phase) - J_i*dolfin.sin(phase)
-        N_i = J_r*dolfin.sin(phase) + J_i*dolfin.cos(phase)
-        # UFL does not seem to like vector valued functionals, so we split the
-        # final functional from into theta and phi components
-        N_r_theta = dot(theta_hat, N_r)*ds
-        N_r_phi = dot(phi_hat, N_r)*ds
-        N_i_theta = dot(theta_hat, N_i)*ds
-        N_i_phi = dot(phi_hat, N_i)*ds
-
-        #------------------------------
-        # Set up form for far field potential L
-        L_r = M_r*dolfin.cos(phase) - M_i*dolfin.sin(phase)
-        L_i = M_r*dolfin.sin(phase) + M_i*dolfin.cos(phase)
-        L_r_theta = dot(theta_hat, L_r)*ds
-        L_r_phi = dot(phi_hat, L_r)*ds
-        L_i_theta = dot(theta_hat, L_i)*ds
-        L_i_phi = dot(phi_hat, L_i)*ds
-
-        # from ufl.algorithms import estimate_total_polynomial_degree
-        # print "L degree: ", estimate_total_polynomial_degree(L_r_theta)
-
-        #------------------------------
-        # Now evaluate numerically, adding the real and imaginary parts
-        # ffc_opt = {"quadrature_degree": 2, "representation": "quadrature"}
-        # L_theta = dolfin.assemble(L_r_theta, form_compiler_parameters=ffc_opt) \
-        #           + 1j*dolfin.assemble(L_i_theta, form_compiler_parameters=ffc_opt)
-        # L_phi = dolfin.assemble(L_r_phi, form_compiler_parameters=ffc_opt) \
-        #         + 1j*dolfin.assemble(L_i_phi, form_compiler_parameters=ffc_opt)
-        # N_theta = dolfin.assemble(N_r_theta, form_compiler_parameters=ffc_opt) \
-        #           + 1j*dolfin.assemble(N_i_theta, form_compiler_parameters=ffc_opt)
-        # N_phi = dolfin.assemble(N_r_phi, form_compiler_parameters=ffc_opt) \
-        #         + 1j*dolfin.assemble(N_i_phi, form_compiler_parameters=ffc_opt)    
-
-        L_theta = dolfin.assemble(L_r_theta) + 1j*dolfin.assemble(L_i_theta)
-        L_phi = dolfin.assemble(L_r_phi) + 1j*dolfin.assemble(L_i_phi)
-        N_theta = dolfin.assemble(N_r_theta) + 1j*dolfin.assemble(N_i_theta)
-        N_phi = dolfin.assemble(N_r_phi) + 1j*dolfin.assemble(N_i_phi)    
-
-
+        theta = np.deg2rad(theta_deg)
+        phi = np.deg2rad(phi_deg)
+        self.forms.set_parms(theta, phi, self.k0)
+        L_theta, L_phi = self.forms.assemble_L()
+        N_theta, N_phi = self.forms.assemble_N()
         #------------------------------
         # Calculate the far fields normalised to radius 1.
-        r_fac = 1j*k0*N.exp(-1j*k0)/(4*N.pi)
+        r_fac = 1j*self.k0*np.exp(-1j*self.k0)/(4*np.pi)
         E_theta = -r_fac*(L_phi + Z0*N_theta)
         E_phi = r_fac*(L_theta - Z0*N_phi)
         self._L.append([L_theta, L_phi])
