@@ -75,7 +75,7 @@ class SystemSolverBase ( object ):
         elif M_type.lower() == 'diagonal':
             M = scipy.sparse.spdiags(1./self._A.diagonal(), 0, self._A.shape[0], self._A.shape[1])
         elif M_type.lower() == 'ilu':
-            self._M_data = scipy.sparse.linalg.spilu ( self._A.tocsc() )
+            self._M_data = scipy.sparse.linalg.spilu ( self._A.tocsc(), drop_tol=1e-8, fill_factor=1  )
             M = scipy.sparse.linalg.LinearOperator ( self._A.shape, self._M_data.solve )
         else:
             print "Warning: Preconditioner type '%s' not recognised. Not using preconditioner." % M_type
