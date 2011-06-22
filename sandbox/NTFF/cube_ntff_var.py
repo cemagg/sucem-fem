@@ -9,9 +9,9 @@ sys.path.append('../../')
 from FenicsCode.Consts import Z0, c0
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from surface_ntff import NTFF
-import ntff_variational
-reload(ntff_variational)
-from ntff_variational import VariationalNTFF
+import variational_ntff
+reload(variational_ntff)
+from variational_ntff import VariationalNTFF
 
 dolfin.parameters['optimize_form'] = True
 dolfin.parameters['optimize'] = True
@@ -104,7 +104,7 @@ print '| | %f | %f | %f | %f | %f | %f |' % (pattern_err_old, pattern_err_new,
 ff_result_data = dict(E_ff=E_ff, E_theta_analytical=E_theta_an,
                       theta_deg=theta_deg, phi_deg=phi_deg)
 pickle.dump(dict(ff_result_data=ff_result_data, nf_input_data=data),
-            open(fname.replace('dofs', 'volume_ntff'), 'w'))
+            open(fname.replace('dofs', 'variational_ntff'), 'w'))
 
 
 

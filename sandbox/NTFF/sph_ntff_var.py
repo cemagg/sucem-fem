@@ -9,9 +9,9 @@ sys.path.append('../../')
 from FenicsCode.Consts import Z0, c0
 from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
 from surface_ntff import NTFF
-import ntff_variational
-reload(ntff_variational)
-from ntff_variational import VariationalNTFF
+import variational_ntff
+reload(variational_ntff)
+from variational_ntff import VariationalNTFF
 
 fname = 'dofs_sph-2-sphere-r1m-6.pickle'
 #fname = 'dofs_sph-1lam-3-sphere-r1m-6.pickle'
