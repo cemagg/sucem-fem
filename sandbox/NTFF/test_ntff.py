@@ -49,8 +49,8 @@ class test_surface_ntff(unittest.TestCase):
                                    rtol=self.rtol, atol=self.atol))
         
 
-class test_volumetric_ntff(test_surface_ntff):
-    test_data_file = 'reference_volume_ntff-2-0.149896229-0.0499654096667.pickle'
+class test_variational_ntff(test_surface_ntff):
+    test_data_file = 'reference_variational_ntff-2-0.149896229-0.0499654096667.pickle'
     def setUp(self):
         desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
         self.environment = NTFFEnvironment(desired_file)
