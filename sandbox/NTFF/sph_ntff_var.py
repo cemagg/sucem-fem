@@ -8,7 +8,7 @@ import sys
 sys.path.append('../../')
 from FenicsCode.Consts import Z0, c0
 from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
-from ntff import NTFF
+from surface_ntff import NTFF
 import ntff_variational
 reload(ntff_variational)
 from ntff_variational import VariationalNTFF

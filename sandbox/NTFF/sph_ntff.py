@@ -8,7 +8,7 @@ import sys
 sys.path.append('../../')
 from FenicsCode.Consts import Z0, c0
 from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
-from ntff import NTFF
+from surface_ntff import NTFF
 
 fname = 'dofs_sph-2-sphere-r1m-6.pickle'
 #fname = 'dofs_sph-1lam-3-sphere-r1m-6.pickle'

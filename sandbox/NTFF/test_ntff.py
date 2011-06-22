@@ -8,7 +8,7 @@ from FenicsCode.Testing import Paths
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 
 # Module under test:
-import ntff
+import surface_ntff
 
 
 class NTFFEnvironment(object):
@@ -37,7 +37,7 @@ class test_surface_ntff(unittest.TestCase):
     def setUp(self):
         desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
         self.environment = NTFFEnvironment(desired_file)
-        self.DUT = ntff.NTFF(self.environment.discretisation_space)
+        self.DUT = surface_ntff.NTFF(self.environment.discretisation_space)
 
     def test_ff(self):
         env = self.environment
@@ -48,3 +48,11 @@ class test_surface_ntff(unittest.TestCase):
         self.assertTrue(N.allclose(actual_E_ff, env.desired_E_ff,
                                    rtol=self.rtol, atol=self.atol))
         
+
+class test_volumetric_ntff(test_surface_ntff):
+    test_data_file = 'reference_volume_ntff-2-0.149896229-0.0499654096667.pickle'
+    def setUp(self):
+        desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
+        self.environment = NTFFEnvironment(desired_file)
+        #self.DUT = surface_ntff.NTFF(self.environment.discretisation_space)
+    

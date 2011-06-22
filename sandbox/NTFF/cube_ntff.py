@@ -8,7 +8,7 @@ import sys
 sys.path.append('../../')
 from FenicsCode.Consts import Z0, c0
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
-from ntff import NTFF
+from surface_ntff import NTFF
 
 dolfin.parameters['optimize_form'] = True
 dolfin.parameters['optimize'] = True
