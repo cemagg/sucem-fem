@@ -9,6 +9,7 @@ from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 
 # Module under test:
 import surface_ntff
+import variational_ntff
 
 
 class NTFFEnvironment(object):
@@ -54,5 +55,5 @@ class test_variational_ntff(test_surface_ntff):
     def setUp(self):
         desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
         self.environment = NTFFEnvironment(desired_file)
-        #self.DUT = surface_ntff.NTFF(self.environment.discretisation_space)
+        self.DUT = variational_ntff.NTFF(self.environment.discretisation_space)
     

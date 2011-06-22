@@ -1,9 +1,10 @@
 from __future__ import division
 
-import numpy as N
+import numpy as np
 import dolfin
 from dolfin import curl, cross, dx, ds, Constant, dot
 from FenicsCode.Consts import Z0, c0
+from surface_ntff import SurfaceNTFFForms
 
 class SurfaceInterpolant(object):
     """Calculate a complex surface interpolant on a 3D domain"""
@@ -49,17 +50,17 @@ class SurfaceInterpolant(object):
             V, self.interpolant_expression_Im, boundary)
         bc_Re.apply(self.u_r.vector())
         bc_Im.apply(self.u_i.vector())
-        x = N.zeros(self.u_r.vector().size(), N.complex128)
+        x = np.zeros(self.u_r.vector().size(), np.complex128)
         x[:] = self.u_r.vector().array() + 1j*self.u_i.vector().array()
         return x
 
 class TransformTestingFunction(object):
     def __init__(self, rhat, ahat, k0):
         self.rhat, self.ahat, self.k0 = rhat, ahat, k0
-        self.constfac = 1j/k0*N.cross(rhat, N.cross(ahat, rhat))
+        self.constfac = 1j/k0*np.cross(rhat, np.cross(ahat, rhat))
         
     def __call__(self, rprime):
-        return self.constfac*N.exp(1j*self.k0*N.dot(self.rhat, rprime))
+        return self.constfac*np.exp(1j*self.k0*np.dot(self.rhat, rprime))
 
 class CalcEMFunctional(object):
     """Evaluate EM functional, assuming freespace
@@ -95,14 +96,14 @@ class CalcEMFunctional(object):
         return form_r, form_i
 
     def set_E_dofs(self, E_dofs):
-        x_r = N.real(E_dofs).copy()
-        x_i = N.imag(E_dofs).copy()
+        x_r = np.real(E_dofs).copy()
+        x_i = np.imag(E_dofs).copy()
         self.E_r.vector()[:] = x_r
         self.E_i.vector()[:] = x_i
         
     def set_g_dofs(self, g_dofs):
-        x_r = N.real(g_dofs).copy()
-        x_i = N.imag(g_dofs).copy()
+        x_r = np.real(g_dofs).copy()
+        x_i = np.imag(g_dofs).copy()
         self.g_r.vector()[:] = x_r
         self.g_i.vector()[:] = x_i
 
@@ -112,7 +113,7 @@ class CalcEMFunctional(object):
         I_i = dolfin.assemble(self.form_i)
         return I_r + 1j*I_i
 
-class VariationalNTFF(object):
+class NTFF(object):
     def __init__(self, function_space, testing_space=None):
         self.function_space = function_space
         if testing_space is None: 
@@ -120,25 +121,45 @@ class VariationalNTFF(object):
         self.testing_space = testing_space 
         self.functional = CalcEMFunctional(function_space, testing_space)
         self.testing_interpolator = SurfaceInterpolant(testing_space)
+        self.forms = SurfaceNTFFForms(self.function_space)
 
     def set_k0(self, k0):
         self.k0 = k0
         self.functional.set_k0(k0)
 
-    def set_E_dofs(self, E_dofs):
-        self.functional.set_E_dofs(E_dofs)
+    def set_frequency(self, frequency):
+        self.frequency = frequency
+        self.set_k0(self.frequency*2*np.pi/c0)
+
+    def set_dofs(self, dofs):
+        self.functional.set_E_dofs(dofs)
+        self.forms.set_dofs(dofs)
 
     def calc_pt(self, theta_deg, phi_deg):
+        # H-field contribution using variational calculation
+        E_H_theta, E_H_phi = self.calc_pt_E_H(theta_deg, phi_deg)
+        theta = np.deg2rad(theta_deg)
+        phi = np.deg2rad(phi_deg)
+        self.forms.set_parms(theta, phi, self.k0)
+        L_theta, L_phi = self.forms.assemble_L()
+        #------------------------------
+        # Calculate the far fields normalised to radius 1.
+        r_fac = 1j*self.k0*np.exp(-1j*self.k0)/(4*np.pi)
+        E_theta = r_fac*(-L_phi + E_H_theta)
+        E_phi = r_fac*(L_theta + E_H_phi)
+        return (E_theta, E_phi)
+    
+    def calc_pt_E_H(self, theta_deg, phi_deg):
         print theta_deg
-        theta = N.deg2rad(theta_deg)
-        phi = N.deg2rad(phi_deg)
-        rhat = N.array([N.sin(theta)*N.cos(phi),
-                        N.sin(theta)*N.sin(phi),
-                        N.cos(theta)], dtype=N.float64)
-        theta_hat = N.array([N.cos(theta)*N.cos(phi),
-                             N.cos(theta)*N.sin(phi),
-                             -N.sin(theta)], dtype=N.float64)
-        phi_hat = N.array([-N.sin(phi), N.cos(phi), 0.], dtype=N.float64)
+        theta = np.deg2rad(theta_deg)
+        phi = np.deg2rad(phi_deg)
+        rhat = np.array([np.sin(theta)*np.cos(phi),
+                        np.sin(theta)*np.sin(phi),
+                        np.cos(theta)], dtype=np.float64)
+        theta_hat = np.array([np.cos(theta)*np.cos(phi),
+                             np.cos(theta)*np.sin(phi),
+                             -np.sin(theta)], dtype=np.float64)
+        phi_hat = np.array([-np.sin(phi), np.cos(phi), 0.], dtype=np.float64)
         E_H_theta = self.calc_ff_func(rhat, theta_hat)
         E_H_phi = self.calc_ff_func(rhat, phi_hat)
         return E_H_theta, E_H_phi

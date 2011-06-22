@@ -11,7 +11,7 @@ from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from surface_ntff import NTFF
 import variational_ntff
 reload(variational_ntff)
-from variational_ntff import VariationalNTFF
+from variational_ntff import NTFF as var_NTFF
 
 dolfin.parameters['optimize_form'] = True
 dolfin.parameters['optimize'] = True
@@ -38,10 +38,10 @@ mesh = get_centred_cube(data['domain_size'], data['max_edge_len'])
 V = dolfin.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", data['order'])
 Vt = dolfin.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", data['order']+testing_boost)
 
-varntff = VariationalNTFF(V, Vt)
+varntff = var_NTFF(V, Vt)
 varntff.set_k0(k0)
-varntff.set_E_dofs(data['x'])
-E_H_ff = N.array([varntff.calc_pt(th_deg, ph_deg)
+varntff.set_dofs(data['x'])
+E_H_ff = N.array([varntff.calc_pt_E_H(th_deg, ph_deg)
                   for th_deg, ph_deg in zip(theta_deg, phi_deg)])
 
 ntff = NTFF(V)
