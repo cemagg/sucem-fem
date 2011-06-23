@@ -13,12 +13,15 @@ import variational_ntff
 reload(variational_ntff)
 from variational_ntff import NTFF as var_NTFF
 
-dolfin.parameters['optimize_form'] = True
-dolfin.parameters['optimize'] = True
-dolfin.parameters['optimize_use_dofmap_cache'] = True
-dolfin.parameters['optimize_use_tensor_cache'] = True
-dolfin.parameters['form_compiler']['optimize'] = True
-dolfin.parameters['form_compiler']['cpp_optimize'] = True
+optimise = int(sys.argv[1])
+
+if optimise:
+    dolfin.parameters['optimize_form'] = True
+    dolfin.parameters['optimize'] = True
+    dolfin.parameters['optimize_use_dofmap_cache'] = True
+    dolfin.parameters['optimize_use_tensor_cache'] = True
+    dolfin.parameters['form_compiler']['optimize'] = True
+    dolfin.parameters['form_compiler']['cpp_optimize'] = True
 
 fname = 'reference_dofs-2-0.149896229-0.0499654096667.pickle'
 #fname = 'dofs-3-0.599584916-0.0499654096667.pickle'
