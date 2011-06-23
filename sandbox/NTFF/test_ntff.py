@@ -11,7 +11,50 @@ from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 import surface_ntff
 import variational_ntff
 
+dolfin.parameters['optimize_form'] = True
+dolfin.parameters['optimize'] = True
+dolfin.parameters['optimize_use_dofmap_cache'] = True
+dolfin.parameters['optimize_use_tensor_cache'] = True
+dolfin.parameters['form_compiler']['optimize'] = True
+dolfin.parameters['form_compiler']['cpp_optimize'] = True
 
+
+
+class test_interpolant(unittest.TestCase):
+    test_data_file = 'interpolant_test_data.pickle'
+    rtol=1e-10
+    atol=1e-6
+
+    def setUp(self):
+        desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
+        self.desired_data = pickle.load(desired_file)
+
+class test_interpolant_function(test_interpolant):
+    def test_function(self):
+        dd = self.desired_data
+        k0, ahats, rhat = dd['k0'], dd['ahats'], dd['rhat']
+        ahats, coords = dd['ahats'], dd['coords']
+        for i, ahat in enumerate(ahats):
+            ttf = variational_ntff.TransformTestingFunction(rhat, ahat, k0)
+            actual_vals = (N.array([ttf(r) for r in coords]))
+            desired_vals = dd['vals'][i]
+            self.assertTrue(N.allclose(actual_vals, desired_vals,
+                                       rtol=self.rtol, atol=self.atol))
+            
+class test_interpolant_expression(test_interpolant):
+    def setUp(self):
+        super(test_interpolant_expression, self).setUp()
+        
+
+    def test_expression_re(self):
+        dd = self.desired_data
+        k0, ahats, rhat = dd['k0'], dd['ahats'], dd['rhat']
+        ahats, coords = dd['ahats'], dd['coords']
+        for i, ahat in enumerate(ahats):
+            desired_vals = dd['vals'][i].real
+            
+        
+        
 class NTFFEnvironment(object):
     def __init__(self, datafile):
         test_data = pickle.load(datafile)

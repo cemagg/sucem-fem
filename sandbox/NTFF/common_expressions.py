@@ -12,3 +12,5 @@ get_theta_hat = lambda : dolfin.Expression(
 get_phi_hat = lambda : dolfin.Expression(['-sin(phi)', 'cos(phi)', '0.'])
 
 get_phase = lambda k0, rprime, r_hat : k0*dot(rprime, r_hat)
+
+get_3d_vector = lambda : dolfin.Expression(['x1', 'x2', 'x3'])

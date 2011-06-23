@@ -21,12 +21,13 @@ dolfin.parameters['form_compiler']['optimize'] = True
 dolfin.parameters['form_compiler']['cpp_optimize'] = True
 
 
-fname = 'reference_dofs-2-0.149896229-0.0499654096667.pickle'
+#fname = 'reference_dofs-2-0.149896229-0.0499654096667.pickle'
+fname = 'dofs-3-0.149896229-0.0499654096667.pickle'
 #fname = 'dofs-3-0.599584916-0.0499654096667.pickle'
 #fname = 'dofs-2-1.199169832-0.0499654096667.pickle'
 #fname = 'interpdofs-2-0.599584916-0.0499654096667.pickle'
-#theta_deg = N.linspace(0, 180, 71)
-theta_deg = N.array([0, 13, 79, 90, 140, 179])
+theta_deg = N.linspace(0, 180, 71)
+#theta_deg = N.array([0, 13, 79, 90, 140, 179])
 no_ff_pts = len(theta_deg)
 phi_deg = N.zeros(no_ff_pts)
 #phi_deg = N.linspace(0, 360, no_ff_pts)
@@ -103,8 +104,8 @@ print '| | %f | %f | %f | %f | %f | %f |' % (pattern_err_old, pattern_err_new,
                                              beam_err_old_th, beam_err_new_th)
 ff_result_data = dict(E_ff=E_ff, E_theta_analytical=E_theta_an,
                       theta_deg=theta_deg, phi_deg=phi_deg)
-pickle.dump(dict(ff_result_data=ff_result_data, nf_input_data=data),
-            open(fname.replace('dofs', 'variational_ntff'), 'w'))
+# pickle.dump(dict(ff_result_data=ff_result_data, nf_input_data=data),
+#             open(fname.replace('dofs', 'variational_ntff'), 'w'))
 
 
 
