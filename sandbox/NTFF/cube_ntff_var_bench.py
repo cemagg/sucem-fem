@@ -20,14 +20,11 @@ dolfin.parameters['optimize_use_tensor_cache'] = True
 dolfin.parameters['form_compiler']['optimize'] = True
 dolfin.parameters['form_compiler']['cpp_optimize'] = True
 
-from sys import argv
-
-no_ff_pts = int(argv[1])
-
 fname = 'reference_dofs-2-0.149896229-0.0499654096667.pickle'
 #fname = 'dofs-3-0.599584916-0.0499654096667.pickle'
 #fname = 'dofs-2-1.199169832-0.0499654096667.pickle'
 #fname = 'interpdofs-2-0.599584916-0.0499654096667.pickle'
+no_ff_pts = 40
 theta_deg = N.linspace(0, 180, no_ff_pts)
 #theta_deg = N.array([0, 13, 79, 90, 140, 179])
 no_ff_pts = len(theta_deg)
@@ -44,8 +41,16 @@ Vt = dolfin.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", data['order']+testin
 varntff = var_NTFF(V, Vt)
 varntff.set_k0(k0)
 varntff.set_dofs(data['x'])
-E_H_ff = N.array([varntff.calc_pt_E_H(th_deg, ph_deg)
-                  for th_deg, ph_deg in zip(theta_deg, phi_deg)])
 
 
+def run_pts(pts):
+    E_H_ff = N.array([varntff.calc_pt_E_H(th_deg, ph_deg)
+                      for th_deg, ph_deg in zip(theta_deg, phi_deg)[0:pts]])
+
+import time
+run_pts(1)
+start = time.time()
+run_pts(no_ff_pts)
+stop = time.time()
+print 'runtime for %d far-field points: %f (s)' % (no_ff_pts, stop-start)
 
