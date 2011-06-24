@@ -75,29 +75,31 @@ class TransformTestingFunction(object):
         return self.constfac*np.exp(1j*self.k0*np.dot(self.rhat, rprime))
 
 class TransformTestingExpression(object):
-    def __init__(self, function_space):
-        self.function_space = function_space
-        self.rprime = self.function_space.cell().x
-        self.k0 = common_expressions.get_k0()
-        self.rhat = common_expressions.get_3d_vector()
-        self.constfac = common_expressions.get_3d_vector()
-        self.phase = common_expressions.get_phase(self.k0, self.rprime, self.rhat)
+    def __init__(self):
+        self.expr_r = dolfin.Expression([
+            '-cf_x*sin(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
+            '-cf_y*sin(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
+            '-cf_z*sin(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)'
+            ])
+        self.expr_i = dolfin.Expression([
+            'cf_x*cos(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
+            'cf_y*cos(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
+            'cf_z*cos(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
+            ])
         
     def set_parms(self, rhat, ahat, k0):
         crossy = np.cross(rhat, np.cross(ahat, rhat))
         constfac = crossy/k0
-        self.constfac.x1, self.constfac.x2, self.constfac.x3 = constfac
-        self.rhat.x1, self.rhat.x2, self.rhat.x3 = rhat
-        self.k0.k0 = k0
+        self._set_expr_parms(self.expr_r, rhat, k0, constfac)
+        self._set_expr_parms(self.expr_i, rhat, k0, constfac)
 
-    def get_form(self):
-        try:
-            return self.form_r, self.form_i
-        except AttributeError:
-            pass
-        self.form_r = -self.constfac*sin(self.phase)
-        self.form_i = self.constfac*cos(self.phase)
-        return self.form_r, self.form_i
+    def _set_expr_parms(self, expr, rhat, k0, constfac):
+        expr.cf_x, expr.cf_y, expr.cf_z = constfac
+        expr.k0 = k0
+        expr.rhat_x, expr.rhat_y, expr.rhat_z = rhat
+
+    def get_expression(self):
+        return self.expr_r, self.expr_i
     
 class CalcEMFunctional(object):
     """Evaluate EM functional, assuming freespace
@@ -160,8 +162,7 @@ class NTFF(object):
         self.functional = CalcEMFunctional(function_space, testing_space)
         self.testing_interpolator = SurfaceInterpolant(testing_space)
         self.surface_forms = SurfaceNTFFForms(self.function_space)
-        self.testing_expression_gen = TransformTestingExpression(
-            self.function_space)
+        self.testing_expression_gen = TransformTestingExpression()
 
     def set_k0(self, k0):
         self.k0 = k0
@@ -206,7 +207,7 @@ class NTFF(object):
     def calc_ff_func(self, rhat, ahat):
         #fit_fn = TransformTestingFunction(rhat, ahat, self.k0)
         self.testing_expression_gen.set_parms(rhat, ahat, self.k0)
-        fit_expr_r, fit_expr_i = self.testing_expression_gen.get_form()
+        fit_expr_r, fit_expr_i = self.testing_expression_gen.get_expression()
         #self.testing_interpolator.set_interpolant(fit_fn)
         self.testing_interpolator.set_interpolant_expression(fit_expr_r, fit_expr_i)
         g_dofs = self.testing_interpolator.calculate_interpolation()

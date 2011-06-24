@@ -23,7 +23,7 @@ dolfin.parameters['form_compiler']['cpp_optimize'] = True
 class test_interpolant(unittest.TestCase):
     test_data_file = 'interpolant_test_data.pickle'
     rtol=1e-10
-    atol=1e-6
+    atol=1e-7
 
     def setUp(self):
         desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
@@ -44,15 +44,21 @@ class test_interpolant_function(test_interpolant):
 class test_interpolant_expression(test_interpolant):
     def setUp(self):
         super(test_interpolant_expression, self).setUp()
+        self.DUT = variational_ntff.TransformTestingExpression()
         
-
     def test_expression_re(self):
         dd = self.desired_data
         k0, ahats, rhat = dd['k0'], dd['ahats'], dd['rhat']
         ahats, coords = dd['ahats'], dd['coords']
         for i, ahat in enumerate(ahats):
             desired_vals = dd['vals'][i].real
-            
+            self.DUT.set_parms(rhat, ahat, k0)
+            expr_r = self.DUT.get_expression()[0]
+            actual_vals = N.zeros((len(coords),3), N.float64)
+            for j, coord in enumerate(coords):
+                expr_r.eval(actual_vals[j,:], coord)
+            self.assertTrue(N.allclose(actual_vals, desired_vals,
+                                       rtol=self.rtol, atol=self.atol))
         
         
 class NTFFEnvironment(object):
