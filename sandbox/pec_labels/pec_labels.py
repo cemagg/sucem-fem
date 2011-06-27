@@ -52,10 +52,10 @@ def gmsh_to_dolfin_mesh ( ifilename, handler ):
         if line.find("$Elements") == 0:
 
             line = ifile.readline()
-            num_cells  = int(line)
+            num_elements = int(line)
             num_cells_counted = 0
-            if num_cells == 0:
-                _error("No cells found in gmsh file.")
+            if num_elements == 0:
+                _error("No elements found in gmsh file.")
             line = ifile.readline()
 
             # Now iterate through elements to find largest dimension.  Gmsh
@@ -119,8 +119,19 @@ def gmsh_to_dolfin_mesh ( ifilename, handler ):
     num_vertices_read = 0
     num_cells_read = 0
 
-    while state != 10:
+    # Now handle the facet markings
+    if len(tags_for_dim[highest_dim-1]) > 0:
+        # first construct the mesh
+        from dolfin import MeshEditor, Mesh
+        mesh = Mesh()
+        me = MeshEditor ()
+        me.open( mesh, highest_dim, highest_dim )
+    else:
+        me = None
+    
 
+    while state != 10:
+        
         # Read next line
         line = ifile.readline()
         if not line: break
@@ -148,6 +159,8 @@ def gmsh_to_dolfin_mesh ( ifilename, handler ):
         elif state == 4:
             num_vertices = len(vertex_dict)
             handler.start_vertices(num_vertices)
+            if me is not None:
+                me.init_vertices ( num_vertices )
             state = 5
         elif state == 5:
             (node_no, x, y, z) = line.split()
@@ -159,6 +172,14 @@ def gmsh_to_dolfin_mesh ( ifilename, handler ):
                 continue
             nodelist[int(node_no)] = num_vertices_read
             handler.add_vertex(num_vertices_read, [x, y, z])
+            if me is not None:
+                if highest_dim == 1:
+                    me.add_vertex( num_vertices_read, x)
+                elif highest_dim == 2:
+                    me.add_vertex( num_vertices_read, x, y)
+                elif highest_dim == 3:
+                    me.add_vertex( num_vertices_read, x, y, z)
+                    
             num_vertices_read +=1
 
             if num_vertices == num_vertices_read:
@@ -172,6 +193,9 @@ def gmsh_to_dolfin_mesh ( ifilename, handler ):
                 state = 8
         elif state == 8:
             handler.start_cells(num_cells_counted)
+            if me is not None:
+                me.init_cells( num_cells_counted )
+                
             state = 9
         elif state == 9:
             element = line.split()
@@ -183,21 +207,28 @@ def gmsh_to_dolfin_mesh ( ifilename, handler ):
                 dim = 0
             if dim == highest_dim:
                 node_num_list = [vertex_dict[int(node)] for node in element[3 + num_tags:]]
-                node_num_list.sort()
                 for node in node_num_list:
                     if not node in nodelist:
                         _error("Vertex %d of %s %d not previously defined." %
                               (node, gmsh_cell_type[dim], num_cells_read))
                 cell_nodes = [nodelist[n] for n in node_num_list]
                 handler.add_cell(num_cells_read, cell_nodes)
+                
+                if me is not None:
+                    me.add_cell( num_cells_read, *cell_nodes )
+                    
                 num_cells_read +=1
 
             if num_cells_counted == num_cells_read:
                 handler.end_cells()
+                if me is not None:
+                    me.close()
                 state = 10
         elif state == 10:
             break
-
+    
+    
+            
     # Write mesh function based on the Physical Regions defined by
     # gmsh, but only if they are not all zero. All zero physical
     # regions indicate that no physical regions were defined.
@@ -206,12 +237,66 @@ def gmsh_to_dolfin_mesh ( ifilename, handler ):
         
     tags = tags_for_dim[highest_dim]
     physical_regions = tuple(tag[0] for tag in tags)
-    if not all(tag == 0 for tag in tags):
-        handler.start_meshfunction("physical_region", dim, num_cells)
+    if not all(tag == 0 for tag in physical_regions):
+        handler.start_meshfunction("physical_region", dim, num_cells_counted)
         for i, physical_region in enumerate(physical_regions):
             handler.add_entity_meshfunction(i, physical_region)
         handler.end_meshfunction()
     
+    # Now process the facet markers
+    tags = tags_for_dim[highest_dim-1]
+    if len(tags) > 0:
+        
+        print tags
+        print vertices_used[highest_dim-1]
+        
+        physical_regions = tuple(tag[0] for tag in tags)
+        if not all(tag == 0 for tag in physical_regions):
+            mesh.init(highest_dim-1,0)
+        
+            # Get the facet-node connectivity information (reshape as a row of node indices per facet)
+            facets_as_nodes = mesh.topology()(highest_dim-1,0)().reshape ( mesh.num_facets(), highest_dim )
+            
+#            from dolfin import MeshFunction
+#            # Create and initialise the mesh function
+#            facet_mark_function = MeshFunction ( 'uint', mesh, highest_dim-1 )
+#            facet_mark_function.set_all( 0 )
+            handler.start_meshfunction("facet_region", highest_dim-1, mesh.num_facets() )
+            
+            facets_to_check = range( mesh.num_facets() )
+            
+            data = [int(0*k) for k in range(len(facets_to_check)) ]
+            
+            for i, physical_region in enumerate(physical_regions):
+                nodes = [n-1 for n in vertices_used[highest_dim-1][2*i:(2*i+highest_dim)]]
+                nodes.sort()
+                
+                if physical_region != 0:
+                    found = False
+                    for j in range(len(facets_to_check)):
+                        index = facets_to_check[j]
+                        if all ( facets_as_nodes[index,k] == nodes[k] for k in range(len(nodes)) ):
+                            found = True;
+                            facets_to_check.pop(j)
+                            # set the value of the mesh function
+#                            facet_mark_function[index] = physical_region
+                            data[index] = physical_region                
+                            break;
+                        
+                    if not found:
+                        raise Exception ( "The facet (%d) was not found to mark: %s" % (i, nodes) )
+            
+#            fname = os.path.splitext('tmp.xml')[0]
+#            mesh_function_file = File("%s_%s.xml" % (fname, "facet_region"))
+#            mesh_function_file << facet_mark_function
+            
+            for index, physical_region in enumerate ( data ):
+                handler.add_entity_meshfunction(index, physical_region)
+            handler.end_meshfunction()    
+            
+            mf = MeshFunction ( 'uint', mesh, 'tmp_facet_region.xml' )
+            plot ( mf, interactive=True )
+            
     # Check that we got all data
     if state == 10:
         print "Conversion done"
