@@ -23,7 +23,7 @@ l = lam/1000                            # Dipole length
 source_value = N.array([0,0,1.])*I*l
 source_coord = N.array([0,0,0.]) 
 ## Discretisation settings
-order = 2
+order = 3
 domain_size = N.array([lam]*3)*0.5
 max_edge_len = lam/6
 mesh = get_centred_cube(domain_size, max_edge_len, source_coord)

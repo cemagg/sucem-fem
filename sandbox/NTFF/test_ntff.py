@@ -8,9 +8,59 @@ from FenicsCode.Testing import Paths
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 
 # Module under test:
-import ntff
+import surface_ntff
+import variational_ntff
+
+dolfin.parameters['optimize_form'] = True
+dolfin.parameters['optimize'] = True
+dolfin.parameters['optimize_use_dofmap_cache'] = True
+dolfin.parameters['optimize_use_tensor_cache'] = True
+dolfin.parameters['form_compiler']['optimize'] = True
+dolfin.parameters['form_compiler']['cpp_optimize'] = True
 
 
+
+class test_interpolant(unittest.TestCase):
+    test_data_file = 'interpolant_test_data.pickle'
+    rtol=1e-10
+    atol=1e-7
+
+    def setUp(self):
+        desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
+        self.desired_data = pickle.load(desired_file)
+
+class test_interpolant_function(test_interpolant):
+    def test_function(self):
+        dd = self.desired_data
+        k0, ahats, rhat = dd['k0'], dd['ahats'], dd['rhat']
+        ahats, coords = dd['ahats'], dd['coords']
+        for i, ahat in enumerate(ahats):
+            ttf = variational_ntff.TransformTestingFunction(rhat, ahat, k0)
+            actual_vals = (N.array([ttf(r) for r in coords]))
+            desired_vals = dd['vals'][i]
+            self.assertTrue(N.allclose(actual_vals, desired_vals,
+                                       rtol=self.rtol, atol=self.atol))
+            
+class test_interpolant_expression(test_interpolant):
+    def setUp(self):
+        super(test_interpolant_expression, self).setUp()
+        self.DUT = variational_ntff.TransformTestingExpression()
+        
+    def test_expression_re(self):
+        dd = self.desired_data
+        k0, ahats, rhat = dd['k0'], dd['ahats'], dd['rhat']
+        ahats, coords = dd['ahats'], dd['coords']
+        for i, ahat in enumerate(ahats):
+            desired_vals = dd['vals'][i].real
+            self.DUT.set_parms(rhat, ahat, k0)
+            expr_r = self.DUT.get_expression()[0]
+            actual_vals = N.zeros((len(coords),3), N.float64)
+            for j, coord in enumerate(coords):
+                expr_r.eval(actual_vals[j,:], coord)
+            self.assertTrue(N.allclose(actual_vals, desired_vals,
+                                       rtol=self.rtol, atol=self.atol))
+        
+        
 class NTFFEnvironment(object):
     def __init__(self, datafile):
         test_data = pickle.load(datafile)
@@ -37,7 +87,7 @@ class test_surface_ntff(unittest.TestCase):
     def setUp(self):
         desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
         self.environment = NTFFEnvironment(desired_file)
-        self.DUT = ntff.NTFF(self.environment.discretisation_space)
+        self.DUT = surface_ntff.NTFF(self.environment.discretisation_space)
 
     def test_ff(self):
         env = self.environment
@@ -48,3 +98,11 @@ class test_surface_ntff(unittest.TestCase):
         self.assertTrue(N.allclose(actual_E_ff, env.desired_E_ff,
                                    rtol=self.rtol, atol=self.atol))
         
+
+class test_variational_ntff(test_surface_ntff):
+    test_data_file = 'reference_variational_ntff-2-0.149896229-0.0499654096667.pickle'
+    def setUp(self):
+        desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
+        self.environment = NTFFEnvironment(desired_file)
+        self.DUT = variational_ntff.NTFF(self.environment.discretisation_space)
+    
