@@ -22,7 +22,9 @@ class CombineForms(Forms.CombineGalerkinForms):
 class EigenProblem(object):
     element_type = "Nedelec 1st kind H(curl)"
     CombineForms = CombineForms        
-
+    material_regions = None
+    region_meshfunction = None
+    
     def set_mesh(self, mesh):
         self.mesh = mesh
 

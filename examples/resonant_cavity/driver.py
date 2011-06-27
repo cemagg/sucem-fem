@@ -22,20 +22,12 @@ mesh.coordinates()[:,0] = a*mesh.coordinates()[:,0]
 mesh.coordinates()[:,1] = b*mesh.coordinates()[:,1]
 mesh.coordinates()[:,2] = d*mesh.coordinates()[:,2]
  
-material_mesh_func = dol.MeshFunction('uint', mesh, 3 )
-material_mesh_func.set_all ( 1001 )
-# Define the dielectric properties of the regions in the mesh
-materials = {1000:dict(eps_r=16),
-             1001:dict(eps_r=1)}
-
 # Use 3rd order basis functions 
 order = 3
 # Set up the eigen problem
 ep = EigenProblem()
 ep.set_mesh(mesh)
 ep.set_basis_order(order)
-ep.set_material_regions(materials)
-ep.set_region_meshfunction(material_mesh_func)
 ep.init_problem()
 
 # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
