@@ -4,6 +4,7 @@ import numpy as np
 import dolfin
 from dolfin import curl, cross, dx, ds, Constant, dot, sin, cos
 from FenicsCode.Consts import Z0, c0
+from FenicsCode import Geometry 
 from surface_ntff import SurfaceNTFFForms
 import common_expressions
 
@@ -120,18 +121,29 @@ class CalcEMFunctional(object):
         self.E_i = dolfin.Function(V)
         self.g_r = dolfin.Function(Vt)
         self.g_i = dolfin.Function(Vt)
+        self.dx = dx
+        self.cell_domains = None
         
     def set_k0(self, k0):
         self.k0 = k0
         self.form_r, self.form_i = self._get_forms()
 
+    def set_cell_domains(self, cell_domains, cell_mark_value):
+        """Set cell domain mesh function
+
+        Needed if the functional is to be calculated over only part of the domain
+        """
+        self.cell_domains = cell_domains
+        self.cell_mark_value = cell_mark_value
+        self.dx = dx(self.cell_mark_value)
+        
     def _get_forms(self):
         E_r, E_i, g_r, g_i = self.E_r, self.E_i, self.g_r, self.g_i
         k0 = self.k0
         form_r = (dot(curl(E_r), curl(g_r)) - dot(curl(E_i), curl(g_i)) \
-                  + k0**2*dot(E_r, g_r) - dot(E_i, g_i))*dx
+                  + k0**2*dot(E_r, g_r) - dot(E_i, g_i))*self.dx
         form_i = (dot(curl(E_r), curl(g_i)) + dot(curl(E_i), curl(g_r)) \
-                  + k0**2*dot(E_r, g_i) - dot(E_i, g_r))*dx
+                  + k0**2*dot(E_r, g_i) - dot(E_i, g_r))*self.dx
         return form_r, form_i
 
     def set_E_dofs(self, E_dofs):
@@ -148,8 +160,8 @@ class CalcEMFunctional(object):
 
     def calc_functional(self):
         """Calculate functional using given E, g and k0 values"""
-        I_r = dolfin.assemble(self.form_r)
-        I_i = dolfin.assemble(self.form_i)
+        I_r = dolfin.assemble(self.form_r, cell_domains=self.cell_domains)
+        I_i = dolfin.assemble(self.form_i, cell_domains=self.cell_domains)
 
         return I_r + 1j*I_i
 
@@ -161,8 +173,14 @@ class NTFF(object):
         self.testing_space = testing_space 
         self.functional = CalcEMFunctional(function_space, testing_space)
         self.testing_interpolator = SurfaceInterpolant(testing_space)
+        self.cell_domains = dolfin.CellFunction('uint', self.function_space.mesh())
+        self.cell_domains.set_all(0)
+        self.cell_region = 1
+        boundary_cells = Geometry.BoundaryEdgeCells(self.function_space.mesh())
+        boundary_cells.mark(self.cell_domains, self.cell_region)
         self.surface_forms = SurfaceNTFFForms(self.function_space)
         self.testing_expression_gen = TransformTestingExpression()
+        self.functional.set_cell_domains(self.cell_domains, self.cell_region)
 
     def set_k0(self, k0):
         self.k0 = k0
@@ -213,3 +231,4 @@ class NTFF(object):
         g_dofs = self.testing_interpolator.calculate_interpolation()
         self.functional.set_g_dofs(g_dofs)
         return self.functional.calc_functional()
+
