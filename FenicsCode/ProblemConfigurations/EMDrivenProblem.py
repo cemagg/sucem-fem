@@ -4,11 +4,11 @@ from __future__ import division
 import numpy as N
 import dolfin
 
-from FenicsCode.ProblemConfigurations import EMVectorWaveEigen
 from FenicsCode import Forms 
 from FenicsCode import SystemMatrices
 from FenicsCode.Consts import c0, Z0
 from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
+from EMProblem import EMProblem
 
 class CombineForms(Forms.CombineGalerkinForms):
     def get_forms(self):
@@ -17,7 +17,7 @@ class CombineForms(Forms.CombineGalerkinForms):
         ABC_form = self.boundary_conditions.get_bilinear_form()
         return dict(M=m, S=s, S_0=ABC_form)
 
-class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
+class DrivenProblemABC(EMProblem):
     """Set up driven problem, potentially terminated by an ABC
 
     Assumes lossless, frequency independent materials, and that the
@@ -36,11 +36,7 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
     
     """
 
-    CombineForms = CombineForms
-    
-    def set_boundary_conditions(self, bcs):
-        """Set boundary conditions with a BoundaryConditions object"""
-        self.boundary_conditions = bcs
+    FormCombiner = CombineForms
 
     def set_sources(self, sources):
         self.sources = sources
@@ -56,11 +52,6 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
         S_0 = dolfin_ublassparse_to_scipy_csr(self.system_matrices['S_0'])
         return S - k0**2*M + 1j*k0*S_0
 
-    def get_global_dimension(self):
-        """Return total number of system dofs, including Dirichlet constrained dofs
-        """
-        return self.function_space.dofmap().global_dimension()
-
     def get_RHS(self):
         RHS = N.zeros(self.get_global_dimension(), N.complex128)
         dofnos, contribs = self._get_RHS_contributions()
@@ -69,21 +60,8 @@ class DrivenProblemABC(EMVectorWaveEigen.EigenProblem):
         RHS[dofnos] += contribs
         return RHS
 
-    def _get_boundary_conditions(self):
-        try:
-            bcs = self.boundary_conditions
-        except AttributeError:
-            raise AttributeError('set_boundary_conditions() method must be called first')
-        bcs.set_function_space(self.function_space)
-        return bcs
-
-    def _get_system_matrices(self):
-        bilin_forms = self.combined_forms.get_forms()
-        sysmats = SystemMatrices.SystemMatrices()
-        sysmats.set_matrix_class(dolfin.uBLASSparseMatrix)
-        sysmats.set_matrix_forms(bilin_forms)
-        sysmats.set_boundary_conditions(self.boundary_conditions)
-        return sysmats.calc_system_matrices()
+    def _init_system_matrices (self):
+        EMProblem._init_system_matrices( self, matrix_class=dolfin.uBLASSparseMatrix )
 
     def _get_RHS_contributions(self):
         self.sources.set_function_space(self.function_space)

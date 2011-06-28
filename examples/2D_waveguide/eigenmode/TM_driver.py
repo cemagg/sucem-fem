@@ -1,7 +1,11 @@
 __author__ = "Evan Lezar"
 __date__ = "28 June 2011"
 
-"""A simple 2D eigenproblem"""
+"""A simple 2D eigenproblem which calculates the TM modes of a square guide.
+
+Note that this is done by modelling the Magnetic field and as such no dirichlet BCs are used.
+
+Only natural boundary conditions."""
 
 import sys
 import numpy as N
@@ -23,12 +27,11 @@ mesh.coordinates()[:,0] = a*mesh.coordinates()[:,0]
 mesh.coordinates()[:,1] = b*mesh.coordinates()[:,1]
  
 # Use 3rd order basis functions 
-order = 3
+order = 4
 # Set up the eigen problem
 ep = EigenProblem()
 ep.set_mesh(mesh)
 ep.set_basis_order(order)
-ep.set_boundary_conditions(pec=True)
 ep.init_problem()
 
 # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
@@ -79,7 +82,7 @@ for m in range(steps):
     for n in range(steps):
         l = 0
         i = (m,n)
-        if i.count(0) < 2:
+        if i.count(0) == 0:
             ids.append((m,n,l))
             values.append(k_mnl ( abd, m, n, l, True ))
 
