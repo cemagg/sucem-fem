@@ -11,14 +11,6 @@ from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from FenicsCode.PostProcessing import surface_ntff
 from FenicsCode.PostProcessing import variational_ntff
 
-dolfin.parameters['optimize_form'] = True
-dolfin.parameters['optimize'] = True
-dolfin.parameters['optimize_use_dofmap_cache'] = True
-dolfin.parameters['optimize_use_tensor_cache'] = True
-dolfin.parameters['form_compiler']['optimize'] = True
-dolfin.parameters['form_compiler']['cpp_optimize'] = True
-
-
 class test_interpolant(unittest.TestCase):
     test_data_file = 'interpolant_test_data.pickle'
     rtol=1e-10
