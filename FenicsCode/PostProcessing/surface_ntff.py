@@ -4,7 +4,7 @@ import numpy as np
 import dolfin
 from dolfin import curl, cross, dx, ds, Constant, dot
 from FenicsCode.Consts import Z0, c0
-import common_expressions
+import FenicsCode.PostProcessing.ntff_expressions as ntff_expressions
 
 class SurfaceNTFFForms(object):
     def __init__(self, function_space):
@@ -14,12 +14,12 @@ class SurfaceNTFFForms(object):
         self.rprime = V.cell().x
         self.E_r = dolfin.Function(V)
         self.E_i = dolfin.Function(V)
-        self.r_hat = common_expressions.get_r_hat()
-        self.k0 = common_expressions.get_k0()
-        self.theta_hat = common_expressions.get_theta_hat()
-        self.phi_hat = common_expressions.get_phi_hat()
+        self.r_hat = ntff_expressions.get_r_hat()
+        self.k0 = ntff_expressions.get_k0()
+        self.theta_hat = ntff_expressions.get_theta_hat()
+        self.phi_hat = ntff_expressions.get_phi_hat()
         # phase term to be used in sin/cos
-        self.phase = common_expressions.get_phase(self.k0, self.rprime, self.r_hat)
+        self.phase = ntff_expressions.get_phase(self.k0, self.rprime, self.r_hat)
 
     def set_dofs(self, dofs):
         x_r = np.real(dofs).copy()

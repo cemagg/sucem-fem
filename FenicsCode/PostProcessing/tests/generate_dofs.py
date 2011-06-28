@@ -1,7 +1,7 @@
 from __future__ import division
 
 import sys
-sys.path.append('../../')
+sys.path.append('../../../')
 import numpy as N
 import os
 import dolfin
@@ -18,12 +18,12 @@ from FenicsCode.PostProcessing import Reconstruct
 ## Problem parameters
 freq = 1e9
 lam = c0/freq
-I = 1.                                  # Dipole current
+I = 1.                                 # Dipole current
 l = lam/1000                            # Dipole length
 source_value = N.array([0,0,1.])*I*l
 source_coord = N.array([0,0,0.]) 
 ## Discretisation settings
-order = 3
+order = 2
 domain_size = N.array([lam]*3)*0.5
 max_edge_len = lam/6
 mesh = get_centred_cube(domain_size, max_edge_len, source_coord)
@@ -73,20 +73,21 @@ pickle.dump(
          max_edge_len=max_edge_len, freq=freq),
     open(fname, 'w'))
 
-from pylab import *
-r1 = field_pts[:]/lam
-x1 = r1[:,0]
-sys.path.append('../../examples/infinitesimal_dipole')
-from blog_example import analytical_pts, analytical_result
-E_ana = N.abs(analytical_result)
-E_num = E_field
-figure()
-plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
-plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
-plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
-plot(analytical_pts, E_ana, '--r', label='z_ana')
-ylabel('E-field Magnitude')
-xlabel('Distance (wavelengths)')
-legend(loc='best')
-grid(True)
-show()
+# from pylab import *
+# r1 = field_pts[:]/lam
+# x1 = r1[:,0]
+# sys.path.append('../../../examples/infinitesimal_dipole')
+# from blog_example import analytical_pts, analytical_result
+# E_ana = N.abs(analytical_result)
+# E_num = E_field
+# figure()
+# plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
+# plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
+# plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
+# plot(analytical_pts, E_ana, '--r', label='z_ana')
+# ylabel('E-field Magnitude')
+# xlabel('Distance (wavelengths)')
+# legend(loc='best')
+# grid(True)
+# show()
+
