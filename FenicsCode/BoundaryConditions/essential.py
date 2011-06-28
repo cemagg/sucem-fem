@@ -80,7 +80,11 @@ class EssentialBoundaryCondition(BoundaryCondition):
         """
         if function_space: V = function_space
         else: V = self.function_space
-        u_bdry = self.boundary_value_expression
+        
+        if V.mesh().geometry().dim() == 3:
+            u_bdry = self.boundary_value_expression
+        else:
+            u_bdry = dolfin.Expression(("0.0", "0.0"), degree=1)
         
         if self.mesh_function:
             self._dirichletBC = dolfin.DirichletBC(

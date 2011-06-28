@@ -24,6 +24,7 @@ class EigenProblem(object):
     CombineForms = CombineForms        
     material_regions = None
     region_meshfunction = None
+    bcs = None
     
     def set_mesh(self, mesh):
         self.mesh = mesh
@@ -68,15 +69,16 @@ class EigenProblem(object):
         return int_form
 
     def _get_boundary_conditions(self):
-        bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
-        bc = FenicsCode.BoundaryConditions.essential.EssentialBoundaryCondition()
-        bc.set_function_space(self.function_space)
-        class bcSubDomain(dolfin.SubDomain):
-            def inside(self, x, on_boundary):
-                return on_boundary
-        bc.init_with_subdomain(bcSubDomain(), 0)
-        bcs.add_boundary_condition(bc)
-        return bcs
+        if self.bcs is None:
+            self.bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
+            bc = FenicsCode.BoundaryConditions.essential.EssentialBoundaryCondition()
+            bc.set_function_space(self.function_space)
+            class bcSubDomain(dolfin.SubDomain):
+                def inside(self, x, on_boundary):
+                    return on_boundary
+            bc.init_with_subdomain(bcSubDomain(), 0)
+            self.bcs.add_boundary_condition(bc)
+        return self.bcs
 
     def _get_combined_forms(self):
         comb_forms = self.CombineForms()
