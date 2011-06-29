@@ -40,6 +40,67 @@ def k_mnl ( abd, m, n, l=0, normalize = False):
         return root*np.pi
 
 
+class Test3D(unittest.TestCase):
+    def test_cube_resonant_cavity(self):
+        mesh = dolfin.UnitCube ( 4, 4, 4 )
+        a = 1.0
+        b = 1.0
+        d = 1.0
+        mesh.coordinates()[:,0] = a*mesh.coordinates()[:,0]
+        mesh.coordinates()[:,1] = b*mesh.coordinates()[:,1]
+        mesh.coordinates()[:,2] = d*mesh.coordinates()[:,2]
+         
+        # Use 3rd order basis functions 
+        order = 3
+        # Set up the eigen problem
+        ep = EigenProblem()
+        ep.set_mesh(mesh)
+        ep.set_basis_order(order)
+        ep.set_boundary_conditions(pec=True)
+        ep.init_problem()
+        
+        # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
+        sigma = 1.1
+        es = DefaultEigenSolver()
+        es.set_eigenproblem(ep)
+        es.set_sigma(sigma)
+        
+        # Solve the eigenproblem
+        eigs_w, eigs_v = es.solve_problem(10)
+        
+        # Output the results
+        res = np.array(sorted(eigs_w)[0:])
+        res = np.sqrt(res)/np.pi
+        
+        steps = 3
+        abd = (a, b, d)
+        ids = []
+        values = []
+        for m in range(steps):
+            for n in range(steps):
+                for l in range(steps):
+                    i = (m,n,l)
+                    if i.count(0) < 2:
+                        ids.append((m,n,l))
+                        values.append(k_mnl ( abd, m, n, l, True ))
+                    
+                    # mode is both a TE and TM mode            
+                    if i.count( 0 ) == 0:
+                        ids.append((m,n,l))
+                        values.append(k_mnl ( abd, m, n, l, True ))
+        
+        r = 0;
+        errors = np.zeros_like(res)
+        for i in np.argsort(values).tolist():
+            if r < len(res):
+                errors[r] = np.linalg.norm( res[r] - values[i])/np.linalg.norm( values[i] )
+                r += 1
+            else:
+                break;
+        
+        np.testing.assert_array_almost_equal( errors, np.zeros_like(res), 4 )
+
+
 class Test2D(unittest.TestCase):
     def test_TE_modes(self):
         mesh = dolfin.UnitSquare ( 5, 5 )
@@ -84,11 +145,9 @@ class Test2D(unittest.TestCase):
 
         r = 0;
         errors = np.zeros_like(res)
-#        print "mnl, analytical, calculated, relative error"
         for i in np.argsort(values).tolist():
             if r < len(res):
                 errors[r] = np.linalg.norm( res[r] - values[i])/np.linalg.norm( values[i] )
-#                print "%d%d%d, " % (ids[i]), "%9.3f, %10.3f, %.2e" % ( values[i], res[r], errors[r] )
                 
                 r += 1
             else:
@@ -137,11 +196,9 @@ class Test2D(unittest.TestCase):
 
         r = 0;
         errors = np.zeros_like(res)
-#        print "mnl, analytical, calculated, relative error"
         for i in np.argsort(values).tolist():
             if r < len(res):
                 errors[r] = np.linalg.norm( res[r] - values[i])/np.linalg.norm( values[i] )
-#                print "%d%d, " % (ids[i]), "%9.3f, %10.3f, %.2e" % ( values[i], res[r], errors[r] )
         
                 r += 1
             else:
