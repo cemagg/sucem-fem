@@ -2,6 +2,7 @@ __author__ = "Evan Lezar"
 __date__ = "28 July 2011"
 
 import dolfin
+import numpy 
 
 from FenicsCode import Forms 
 from FenicsCode import Materials 
@@ -13,16 +14,14 @@ class EMProblem(object):
     """
     A base class for solving electromagnetic problems
     """
-    element_type = "Nedelec 1st kind H(curl)"
-    mesh = None
-    order = None
-    function_space = None
-    material_regions = None
-    region_meshfunction = None
-    boundary_conditions = FenicsCode.BoundaryConditions.container.BoundaryConditions()
-    
     def __init__ (self):
-        pass
+        self.element_type = "Nedelec 1st kind H(curl)"
+        self.mesh = None
+        self.order = None
+        self.function_space = None
+        self.material_regions = None
+        self.region_meshfunction = None
+        self.boundary_conditions = FenicsCode.BoundaryConditions.container.BoundaryConditions()
     
     def get_global_dimension(self):
         """Return total number of system dofs, including Dirichlet constrained dofs
@@ -54,15 +53,17 @@ class EMProblem(object):
                         return on_boundary
                 
                 walls = bcSubDomain()
-                mesh_function = dolfin.MeshFunction('uint', self.mesh, self.mesh.geometry().dim()-1)
+                mesh_function = dolfin.MeshFunction('uint', self.mesh, self.mesh.topology().dim()-1)
                 mesh_function.set_all ( 0 )
-                walls.mark(mesh_function, 1)
+                walls.mark(mesh_function, 999)
                 
-                bc.init_with_meshfunction(mesh_function, 1)
+                bc.init_with_meshfunction(mesh_function, 999)
                 self.boundary_conditions.add_boundary_condition(bc)
             elif 'meshfunction' in kwargs and 'bc_region' in kwargs:
                 bc = FenicsCode.BoundaryConditions.essential.EssentialBoundaryCondition()
                 bc.init_with_meshfunction(meshfunction, bc_region)
+                self.boundary_conditions.add_boundary_condition(bc)
+            
         else:
             self.boundary_conditions = bcs
     

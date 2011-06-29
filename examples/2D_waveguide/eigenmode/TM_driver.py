@@ -26,7 +26,7 @@ b = 1.0
 mesh.coordinates()[:,0] = a*mesh.coordinates()[:,0]
 mesh.coordinates()[:,1] = b*mesh.coordinates()[:,1]
  
-# Use 3rd order basis functions 
+# Use 4th order basis functions 
 order = 4
 # Set up the eigen problem
 ep = EigenProblem()
