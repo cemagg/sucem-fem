@@ -2,7 +2,6 @@ __author__ = "Evan Lezar"
 __date__ = "28 July 2011"
 
 import dolfin
-import numpy 
 
 from FenicsCode import Forms 
 from FenicsCode import Materials 
