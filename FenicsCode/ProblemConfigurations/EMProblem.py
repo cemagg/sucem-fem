@@ -40,7 +40,11 @@ class EMProblem(object):
     def set_boundary_conditions(self, bcs=None, **kwargs):
         """
         Set the boundary conditions for the problem based on the keyword arguments passed
-        or with the boundary condition object profided
+        or with the boundary condition object provided
+        
+        @keyword pec: A value of true indicates that the boundary condition is a pure PEC dirichlet
+        @keyword meshfunction: The dolfin MeshFunction object that must be used to intitialise the bc
+        @keyword bc_region: The region (meshfunction value) that must be used to apply the bc 
         """
         if bcs is None:
             if 'pec' in kwargs and kwargs['pec']:
@@ -48,8 +52,17 @@ class EMProblem(object):
                 class bcSubDomain(dolfin.SubDomain):
                     def inside(self, x, on_boundary):
                         return on_boundary
-                bc.init_with_subdomain(bcSubDomain(), 0)
+                
+                walls = bcSubDomain()
+                mesh_function = dolfin.MeshFunction('uint', self.mesh, self.mesh.geometry().dim()-1)
+                mesh_function.set_all ( 0 )
+                walls.mark(mesh_function, 1)
+                
+                bc.init_with_meshfunction(mesh_function, 1)
                 self.boundary_conditions.add_boundary_condition(bc)
+            elif 'meshfunction' in kwargs and 'bc_region' in kwargs:
+                bc = FenicsCode.BoundaryConditions.essential.EssentialBoundaryCondition()
+                bc.init_with_meshfunction(meshfunction, bc_region)
         else:
             self.boundary_conditions = bcs
     

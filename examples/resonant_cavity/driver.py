@@ -28,6 +28,7 @@ order = 3
 ep = EigenProblem()
 ep.set_mesh(mesh)
 ep.set_basis_order(order)
+ep.set_boundary_conditions(pec=True)
 ep.init_problem()
 
 # Set up eigen problem solver where sigma is the shift to use in the shift-invert process

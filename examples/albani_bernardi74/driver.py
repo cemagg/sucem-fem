@@ -47,6 +47,7 @@ order = 3
 ep = EigenProblem()
 ep.set_mesh(mesh)
 ep.set_basis_order(order)
+ep.set_boundary_conditions(pec=True)
 ep.set_material_regions(materials)
 ep.set_region_meshfunction(material_mesh_func)
 ep.init_problem()
