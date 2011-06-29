@@ -41,10 +41,10 @@ class BoundaryEdges(object):
         if boundary_facefun is None:
             boundary_facefun = dolfin.FaceFunction('uint', mesh)
             boundary_facefun.set_all(0)
+            domain_boundary = dolfin.DomainBoundary()
+            domain_boundary.mark(boundary_facefun, boundary_value)
         self.boundary_facefun = boundary_facefun
         self.boundary_value = boundary_value
-        domain_boundary = dolfin.DomainBoundary()
-        domain_boundary.mark(boundary_facefun, boundary_value)
         self.ensure_initialised = EnsureInitialised(self.mesh)
         
     def mark(self, edge_meshfun, value):
@@ -54,4 +54,35 @@ class BoundaryEdges(object):
         for face in dolfin.SubsetIterator(self.boundary_facefun,
                                           self.boundary_value):
             edge_array[face.entities(1)] = value
+
+class BoundaryEdgeCells(object):
+    """Find and mark cells connected the domain boundary through edges"""
+    def __init__(self, mesh):
+        self.edge_boundary_value = 1
+        boundary_edgefun = dolfin.EdgeFunction('uint', mesh)
+        boundary_edgefun.set_all(0)
+        boundary_edges = BoundaryEdges(mesh)
+        boundary_edges.mark(boundary_edgefun, self.edge_boundary_value)
+        self.boundary_edgefun = boundary_edgefun
+
+    def mark(self, cell_meshfun, value):
+        cells_connected2edges = CellsConnected2Edges(
+            self.boundary_edgefun, self.edge_boundary_value)
+        cells_connected2edges.mark(cell_meshfun, value)
+        
+
+class CellsConnected2Edges(object):
+    def __init__(self, boundary_edgefun, boundary_value):
+        self.boundary_edgefun = boundary_edgefun
+        self.boundary_value = boundary_value
+        self.mesh = boundary_edgefun.mesh()
+        self.ensure_initialised = EnsureInitialised(self.mesh)
+
+    def mark(self, cell_meshfun, value):
+        cell_array = cell_meshfun.array()
+        self.ensure_initialised(1,3)    # edge -> cell connectivity
+        for edge in dolfin.SubsetIterator(self.boundary_edgefun,
+                                          self.boundary_value):
+            cell_array[edge.entities(3)] = value
+         
 

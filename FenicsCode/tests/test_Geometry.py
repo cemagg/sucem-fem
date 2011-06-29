@@ -4,6 +4,7 @@ import unittest
 import dolfin
 import numpy as np
 
+from FenicsCode.Testing.Meshes import InscribedTet
 # Module under test
 from FenicsCode import Geometry 
 
@@ -38,3 +39,21 @@ class test_BoundaryEdges(unittest.TestCase):
             if np.allclose(coordvals,0) or np.allclose(coordvals, 1):
                 return True
         return False
+
+class test_BoundaryEdgeCells(unittest.TestCase):
+    def setUp(self):
+        self.mesh = InscribedTet().get_dolfin_mesh()
+        self.DUT = Geometry.BoundaryEdgeCells(self.mesh)
+
+    def test_mark(self):
+        mark_value = 3
+        desired_edgecells = np.ones(self.mesh.num_cells())*mark_value
+        # All except last tet are edge-connected to the boundary for
+        # the inscribed tet mesh
+        desired_edgecells[-1] = 0
+        cell_fn = dolfin.CellFunction('uint', self.mesh)
+        self.DUT.mark(cell_fn, mark_value)
+        self.assertTrue(np.all(cell_fn.array() == desired_edgecells))
+        
+
+    
