@@ -50,7 +50,8 @@ class TestMatrixIO ( unittest.TestCase ):
     def test_save_and_load_complex_matrix ( self ):
         import scipy.sparse
         N = 1000;
-        A = scipy.sparse.rand ( N, N, format='csr' ) + 1j*scipy.sparse.rand ( N, N, format='csr' )
+        A = np.random.rand(N, N) + 1j*np.random.rand(N, N)
+        A = scipy.sparse.csr_matrix(A)
         self.__save_and_load_test( 'A_save_and_load_complex', A)
     
     def test_save_and_load_1D_column ( self ):
