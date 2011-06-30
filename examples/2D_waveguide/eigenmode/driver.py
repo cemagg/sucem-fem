@@ -9,8 +9,8 @@ import os
 import dolfin as dol
 
 sys.path.insert(0, '../../../')
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigen import EigenProblem
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigen import DefaultEigenSolver
+from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
+from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
 from FenicsCode.Consts import c0
 del sys.path[0]
 
