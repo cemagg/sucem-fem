@@ -60,7 +60,7 @@ class EMProblem(object):
                 self.boundary_conditions.add_boundary_condition(bc)
             elif 'meshfunction' in kwargs and 'bc_region' in kwargs:
                 bc = FenicsCode.BoundaryConditions.essential.EssentialBoundaryCondition()
-                bc.init_with_meshfunction(meshfunction, bc_region)
+                bc.init_with_meshfunction(kwargs['meshfunction'], kwargs['bc_region'])
                 self.boundary_conditions.add_boundary_condition(bc)
             
         else:

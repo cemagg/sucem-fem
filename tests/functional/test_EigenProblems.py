@@ -7,12 +7,13 @@ This is a functional test for the solution of eigenproblems
 
 import dolfin
 import numpy as np
+import os
 import sys
 import unittest
 
 sys.path.insert(0, '../../')
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigen import EigenProblem
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigen import DefaultEigenSolver
+from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
+from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
 from FenicsCode.Consts import c0
 del sys.path[0]
 
@@ -41,6 +42,68 @@ def k_mnl ( abd, m, n, l=0, normalize = False):
 
 
 class Test3D(unittest.TestCase):
+    def test_gmsh_resonant_cavity(self):
+        mesh_folder = "../data/meshes"
+        mesh_base_name = "rectangular_prism"
+        mesh_extension = ".xml"
+        mesh = dolfin.Mesh ( os.path.join (mesh_folder, mesh_base_name + mesh_extension))
+        a = 1.0;
+        b = 0.5;
+        d = 0.25;
+        # load the mesh function defining the boundaries
+        pec_mesh_function = dolfin.MeshFunction ( 'uint', mesh, os.path.join( mesh_folder, "%s_%s%s" % (mesh_base_name, "facet_region", mesh_extension)))
+        order = 4;
+        ep = EigenProblem()
+        ep.set_mesh(mesh)
+        ep.set_basis_order(order)
+        ep.set_boundary_conditions ( meshfunction=pec_mesh_function, bc_region=1 )
+        ep.init_problem()
+        
+        # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
+        sigma = 1.1
+        es = DefaultEigenSolver()
+        es.set_eigenproblem(ep)
+        es.set_sigma(sigma)
+        
+        # Solve the eigenproblem
+        eigs_w, eigs_v = es.solve_problem(10)
+        
+        # Output the results
+        res = np.array(sorted(eigs_w)[0:])
+        res = np.sqrt(res)/np.pi
+        
+        steps = 5
+        abd = (a, b, d)
+        ids = []
+        values = []
+        for m in range(steps):
+            for n in range(steps):
+                for l in range(steps):
+                    i = (m,n,l)
+                    if i.count(0) < 2:
+                        ids.append((m,n,l))
+                        values.append(k_mnl ( abd, m, n, l, True ))
+                    
+                    # mode is both a TE and TM mode            
+                    if i.count( 0 ) == 0:
+                        ids.append((m,n,l))
+                        values.append(k_mnl ( abd, m, n, l, True ))
+        
+        print res
+        
+        r = 0;
+        errors = np.zeros_like(res)
+        for i in np.argsort(values).tolist():
+            print ids[i], values[i]
+            
+            if r < len(res):
+                errors[r] = np.linalg.norm( res[r] - values[i])/np.linalg.norm( values[i] )
+                r += 1
+            else:
+                break;
+        
+        np.testing.assert_array_almost_equal( errors, np.zeros_like(res), 4 )
+    
     def test_cube_resonant_cavity(self):
         mesh = dolfin.UnitCube ( 4, 4, 4 )
         a = 1.0
