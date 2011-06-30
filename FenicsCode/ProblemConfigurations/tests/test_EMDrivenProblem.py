@@ -45,8 +45,8 @@ class test_DrivenProblemABC(unittest.TestCase):
         self.DUT.init_problem()
         # test data generated using a suspected-working version on 31 May 2011
         actual_LHSmat = self.DUT.get_LHS_matrix().todense()
-        desired_file = Paths.get_module_path_file('LHS_matrix.pickle', __file__)
-        desired_LHSmat = pickle.load(desired_file)
+        desired_file = Paths.get_module_path_filename('LHS_matrix.npy', __file__)
+        desired_LHSmat = N.load(desired_file)
         self.assertTrue(N.allclose(
             actual_LHSmat, desired_LHSmat, rtol=1e-12, atol=1e-16))
 
