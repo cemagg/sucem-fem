@@ -18,8 +18,12 @@ class TestSparseSolver ( unittest.TestCase ):
         N = 1000;
         A = scipy.sparse.eye ( N, N )
         b = np.random.rand ( N )
-        
-        x = solve_sparse_system ( A, b )
+
+        try:
+            x = solve_sparse_system ( A, b )
+        except AttributeError:
+            # Deal with older scipy versions that do not have spilu module
+            x = solve_sparse_system ( A, b, preconditioner_type='diagonal')
         
         np.testing.assert_array_equal( b, x )
    
