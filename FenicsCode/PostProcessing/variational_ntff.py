@@ -18,12 +18,16 @@ class TransformTestingExpression(object):
             '-cf_x*sin(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
             '-cf_y*sin(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
             '-cf_z*sin(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)'
-            ])
+            ],
+                                        cf_x=0, cf_y=0, cf_z=0, k0=0,
+                                        rhat_z=0, rhat_y=0, rhat_x=0)
         self.expr_i = dolfin.Expression([
             'cf_x*cos(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
             'cf_y*cos(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
             'cf_z*cos(x[2]*k0*rhat_z+x[1]*k0*rhat_y+x[0]*k0*rhat_x)',
-            ])
+            ],
+                                        cf_x=0, cf_y=0, cf_z=0, k0=0,
+                                        rhat_z=0, rhat_y=0, rhat_x=0)
         
     def set_parms(self, rhat, ahat, k0):
         crossy = np.cross(rhat, np.cross(ahat, rhat))
