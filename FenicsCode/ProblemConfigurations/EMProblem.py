@@ -47,11 +47,7 @@ class EMProblem(object):
         if bcs is None:
             if 'pec' in kwargs and kwargs['pec']:
                 bc = FenicsCode.BoundaryConditions.essential.EssentialBoundaryCondition()
-                class bcSubDomain(dolfin.SubDomain):
-                    def inside(self, x, on_boundary):
-                        return on_boundary
-                
-                walls = bcSubDomain()
+                walls = dolfin.DomainBoundary()
                 mesh_function = dolfin.MeshFunction(
                     'uint', self.mesh, self.mesh.topology().dim()-1)
                 mesh_function.set_all ( 0 )
