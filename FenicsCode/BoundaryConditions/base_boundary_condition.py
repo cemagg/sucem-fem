@@ -12,7 +12,32 @@ class BoundaryCondition(object):
     contributions of a basis function to those three aspects. It also
     provides nil-contribution default implementation.
     """
+    mesh_function = None
+    function_space = None
+    boundary_value_expression = None
+    
+    def set_boundary_value_expression (self, boundary_value_expression ):
+        """Set value expression for boundary condition
 
+        The EssentialBoundaryCondition class defaults to zero
+        (i.e. PEC) boundary condition if
+        set_boundary_value_expression() is not called
+
+        Parameters
+        ----------
+
+        boundary_value_expression -- dolfin expression object
+
+        """
+        self.boundary_value_expression = boundary_value_expression
+        
+    def set_mesh_function (self, mesh_function):
+        """Set the mesh function on which the essential boundary condition is to be applied
+        
+        @param mesh_function: The mesh_function that is used to construct the boundary condition
+        """
+        self.mesh_function = mesh_function
+        
     def set_function_space(self, function_space):
         """Set function space on which the essential boundary condition is to be applied.
 

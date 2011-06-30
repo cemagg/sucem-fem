@@ -169,10 +169,10 @@ def load_and_solve ( mesh_id, order ):
     print 'GMRES residual: %.3e' % calculate_residual ( A, x, b )
     gmres.print_timing_info ()
 
-#    gmres_ilu = GMRESSolver ( A, 'diagonal' )
-#    x = gmres_ilu.solve ( b )
-#    print 'GMRES ILU residual: %.3e' % calculate_residual ( A, x, b )
-#    gmres_ilu.print_timing_info ()
+    gmres_ilu = GMRESSolver ( A, 'ilu' )
+    x = gmres_ilu.solve ( b )
+    print 'GMRES ILU residual: %.3e' % calculate_residual ( A, x, b )
+    gmres_ilu.print_timing_info ()
     
 #    umfpack = UMFPACKSolver ( A )
 #    x = umfpack.solve ( b )
@@ -208,8 +208,8 @@ def generate_all ():
             generate_and_save(mesh_id, order)
 
 def main ( ):
-    mesh_id =  'sphere-r1m-10'
-    order = 1
+    mesh_id =  'sphere-r1m-7'
+    order = 2
     load_and_solve ( mesh_id, order )
     
 if __name__ == "__main__":
