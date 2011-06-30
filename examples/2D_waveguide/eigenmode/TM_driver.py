@@ -34,7 +34,8 @@ ep.set_mesh(mesh)
 ep.set_basis_order(order)
 ep.init_problem()
 
-# Set up eigen problem solver where sigma is the shift to use in the shift-invert process
+# Set up eigen problem solver where sigma is the shift to use in the
+# shift-invert process
 sigma = 1.5
 es = DefaultEigenSolver()
 es.set_eigenproblem(ep)
@@ -92,7 +93,8 @@ print "mnl, analytical, calculated, relative error"
 for i in N.argsort(values).tolist():
     if r < len(res):
         errors[r] = N.linalg.norm( res[r] - values[i])/N.linalg.norm( values[i] )
-        print "%d%d%d, " % (ids[i]), "%9.3f, %10.3f, %.2e" % ( values[i], res[r], errors[r] )
+        print "%d%d%d, " % (
+            ids[i]), "%9.3f, %10.3f, %.2e" % ( values[i], res[r], errors[r] )
         
         r += 1
     else:

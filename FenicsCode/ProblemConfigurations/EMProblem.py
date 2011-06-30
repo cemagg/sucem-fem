@@ -52,7 +52,8 @@ class EMProblem(object):
                         return on_boundary
                 
                 walls = bcSubDomain()
-                mesh_function = dolfin.MeshFunction('uint', self.mesh, self.mesh.topology().dim()-1)
+                mesh_function = dolfin.MeshFunction(
+                    'uint', self.mesh, self.mesh.topology().dim()-1)
                 mesh_function.set_all ( 0 )
                 walls.mark(mesh_function, 999)
                 
@@ -86,7 +87,8 @@ class EMProblem(object):
         
     def _init_function_space (self):
         if self.function_space is None:
-            self.function_space = dolfin.FunctionSpace(self.mesh, self.element_type, self.basis_order)
+            self.function_space = dolfin.FunctionSpace(
+                self.mesh, self.element_type, self.basis_order)
     
     def _init_interior_forms(self):
         self.interior_forms = Forms.EMGalerkinInteriorForms()
@@ -96,9 +98,9 @@ class EMProblem(object):
     def _init_material_properties (self):
         mat_props_fac = Materials.MaterialPropertiesFactory(self.material_regions)
         mat_func_fac = Materials.MaterialFunctionFactory(
-                                                         mat_props_fac.get_material_properties(), 
-                                                         self.region_meshfunction, 
-                                                         self.mesh )
+            mat_props_fac.get_material_properties(), 
+            self.region_meshfunction, 
+            self.mesh )
         self.material_functions = mat_func_fac.get_material_functions ( 'eps_r', 'mu_r' )
     
     def _init_system_matrices (self, matrix_class=None):

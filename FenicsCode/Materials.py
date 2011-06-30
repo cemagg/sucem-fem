@@ -94,7 +94,8 @@ class MaterialFunctionFactory(object):
         self.region_material_properties = region_material_properties
         # if the meshfunction is not defined then initialise to a zero mesh function
         if region_meshfunction is None:
-            region_meshfunction = dolfin.MeshFunction ( 'uint', mesh, mesh.topology().dim() )
+            region_meshfunction = dolfin.MeshFunction (
+                'uint', mesh, mesh.topology().dim() )
             region_meshfunction.set_all (0)
         self.region_meshfunction = region_meshfunction
         self.mesh = mesh

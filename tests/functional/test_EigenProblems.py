@@ -11,11 +11,10 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, '../../')
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
 from FenicsCode.Consts import c0
-del sys.path[0]
+from FenicsCode.Testing.Paths import get_module_path
 
 def k_mnl ( abd, m, n, l=0, normalize = False):
     """
@@ -43,7 +42,7 @@ def k_mnl ( abd, m, n, l=0, normalize = False):
 
 class Test3D(unittest.TestCase):
     def test_gmsh_resonant_cavity(self):
-        mesh_folder = "../data/meshes"
+        mesh_folder = os.path.join(get_module_path(__file__), "../data/meshes")
         mesh_base_name = "rectangular_prism"
         mesh_extension = ".xml"
         mesh = dolfin.Mesh ( os.path.join (mesh_folder, mesh_base_name + mesh_extension))
@@ -51,7 +50,9 @@ class Test3D(unittest.TestCase):
         b = 0.5;
         d = 0.25;
         # load the mesh function defining the boundaries
-        pec_mesh_function = dolfin.MeshFunction ( 'uint', mesh, os.path.join( mesh_folder, "%s_%s%s" % (mesh_base_name, "facet_region", mesh_extension)))
+        pec_filename = os.path.join(mesh_folder, "%s_%s%s" % (
+            mesh_base_name, "facet_region", mesh_extension))
+        pec_mesh_function = dolfin.MeshFunction ( 'uint', mesh, pec_filename)
         order = 4;
         ep = EigenProblem()
         ep.set_mesh(mesh)
@@ -59,7 +60,8 @@ class Test3D(unittest.TestCase):
         ep.set_boundary_conditions ( meshfunction=pec_mesh_function, bc_region=1 )
         ep.init_problem()
         
-        # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
+        # Set up eigen problem solver where sigma is the shift to use
+        # in the shift-invert process
         sigma = 1.1
         es = DefaultEigenSolver()
         es.set_eigenproblem(ep)
@@ -97,7 +99,8 @@ class Test3D(unittest.TestCase):
             print ids[i], values[i]
             
             if r < len(res):
-                errors[r] = np.linalg.norm( res[r] - values[i])/np.linalg.norm( values[i] )
+                errors[r] = np.linalg.norm(
+                    res[r] - values[i])/np.linalg.norm( values[i] )
                 r += 1
             else:
                 break;
@@ -156,7 +159,8 @@ class Test3D(unittest.TestCase):
         errors = np.zeros_like(res)
         for i in np.argsort(values).tolist():
             if r < len(res):
-                errors[r] = np.linalg.norm( res[r] - values[i])/np.linalg.norm( values[i] )
+                errors[r] = np.linalg.norm(
+                    res[r] - values[i])/np.linalg.norm( values[i] )
                 r += 1
             else:
                 break;
@@ -181,7 +185,8 @@ class Test2D(unittest.TestCase):
         ep.set_boundary_conditions(pec=True)
         ep.init_problem()
         
-        # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
+        # Set up eigen problem solver where sigma is the shift to use
+        # in the shift-invert process
         sigma = 1.5
         es = DefaultEigenSolver()
         es.set_eigenproblem(ep)
@@ -233,7 +238,8 @@ class Test2D(unittest.TestCase):
         ep.set_basis_order(order)
         ep.init_problem()
         
-        # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
+        # Set up eigen problem solver where sigma is the shift to use
+        # in the shift-invert process
         sigma = 1.5
         es = DefaultEigenSolver()
         es.set_eigenproblem(ep)

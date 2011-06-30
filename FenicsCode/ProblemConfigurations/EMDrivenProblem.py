@@ -61,7 +61,8 @@ class DrivenProblemABC(EMProblem):
         return RHS
 
     def _init_system_matrices (self):
-        EMProblem._init_system_matrices( self, matrix_class=dolfin.uBLASSparseMatrix )
+        EMProblem._init_system_matrices(
+            self, matrix_class=dolfin.uBLASSparseMatrix )
 
     def _get_RHS_contributions(self):
         self.sources.set_function_space(self.function_space)

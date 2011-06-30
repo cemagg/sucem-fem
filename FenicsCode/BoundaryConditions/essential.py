@@ -37,25 +37,6 @@ class EssentialBoundaryCondition(BoundaryCondition):
         self.region_number = region_number
         self.mesh_function = mesh_function
 
-#    def init_with_subdomain(self, subdomain, region_number):
-#        """Initialise using a mesh function to indicate boundary region
-#
-#        Parameters
-#        ----------
-#
-#        subdomain -- A SubDomain subclass defining the region of
-#            application for the boundary condition. The user must
-#            ensure that it does not overlap any other boundary
-#            condition region.
-#
-#        region_number -- A unique region number for this boundary
-#            condition. The user must ensure that no other boundary
-#            condition uses the same region number.
-#            
-#        """
-#        self.region_number = region_number
-#        self.subdomain = subdomain
-#        self.mesh_function = None
     def __init_boundary_value_expression ( self ):
         
         expr = ()
@@ -74,8 +55,7 @@ class EssentialBoundaryCondition(BoundaryCondition):
         if self.boundary_value_expression is None:
             self.__init_boundary_value_expression()
             
-        self._dirichletBC = dolfin.DirichletBC(
-                                               self.function_space, 
+        self._dirichletBC = dolfin.DirichletBC(self.function_space, 
                                                self.boundary_value_expression, 
                                                self.mesh_function, 
                                                self.region_number)
