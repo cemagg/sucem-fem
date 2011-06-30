@@ -56,6 +56,9 @@ class MaterialPropertiesFactory(object):
         Allowed material parameter names are defined by the class
         MaterialProperties. Default values for unspecified materials
         are also handled by that class
+
+        If material_regions is None, the whole domain defaults to
+        region 0, which is typicaly freespace
     
     """
     def __init__(self, material_regions):
@@ -83,7 +86,7 @@ class MaterialFunctionFactory(object):
         MaterialProperties object for that region number
 
     region_meshfunction -- a dolfin MeshFunction mapping elements to
-        region numbers
+        region numbers. If it is None, all elements are set to region 0
 
     mesh -- dolfin Mesh object relating to region_meshfunction. The
         material functions will be defined on this mesh
