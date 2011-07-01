@@ -1,3 +1,5 @@
+# Authors:
+# Neilen Marais <nmarais@gmail.com>
 import dolfin
 from FenicsCode import Forms 
 from FenicsCode import Materials 

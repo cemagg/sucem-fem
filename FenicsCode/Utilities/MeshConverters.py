@@ -1,3 +1,5 @@
+# Authors:
+# Neilen Marais <nmarais@gmail.com>
 import dolfin
 import numpy as N
 

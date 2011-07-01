@@ -1,3 +1,5 @@
+# Authors:
+# Neilen Marais <nmarais@gmail.com>
 import csv, os
 import numpy as N
 

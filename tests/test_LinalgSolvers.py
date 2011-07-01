@@ -1,3 +1,5 @@
+# Authors:
+# Neilen Marais <nmarais@gmail.com>
 __author__ = "Evan Lezar"
 __date__ = "11 May 2011"
 

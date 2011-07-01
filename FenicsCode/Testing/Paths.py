@@ -1,3 +1,5 @@
+# Authors:
+# Neilen Marais <nmarais@gmail.com>
 import os
 
 def get_module_path(modfile):

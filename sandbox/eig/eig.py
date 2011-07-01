@@ -1,3 +1,5 @@
+# Authors:
+# Neilen Marais <nmarais@gmail.com>
 import dolfin as dol
 from dolfin import dot, curl, inner, dx
 from scipy.sparse.linalg.eigen.arpack import speigs

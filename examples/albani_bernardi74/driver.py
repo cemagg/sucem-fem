@@ -1,3 +1,5 @@
+# Authors:
+# Neilen Marais <nmarais@gmail.com>
 from __future__ import division
 __author = "Neilen Marais, Evan Lezar"
 __date__ = "14 April 2011"

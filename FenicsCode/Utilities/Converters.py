@@ -1,4 +1,5 @@
-__author__ = "Evan Lezar"
+# Authors:
+# Evan Lezar <mail@evanlezar.com>
 __date__ = "11 May 2011"
 
 """This file contains a number of converters, including for DOLFIN matrices to scipy sparse matrices"""

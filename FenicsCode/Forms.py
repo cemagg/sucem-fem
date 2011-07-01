@@ -1,3 +1,5 @@
+# Authors:
+# Neilen Marais <nmarais@gmail.com>
 import dolfin
 
 from dolfin import inner, dot, dx, curl

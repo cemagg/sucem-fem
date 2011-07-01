@@ -1,3 +1,6 @@
+# Authors
+# Neilen Marais <nmarais@gmail.com>
+
 import os
 from scipy import *
 from femfeko import *

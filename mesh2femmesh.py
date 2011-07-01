@@ -5,7 +5,10 @@
 # and the Gmsh .msh format to the internal
 # femfeko .femmesh mesh file format
 # written and maintained by CEMAGG @US
-
+#
+# Authors
+# Neilen Marais <nmarais@gmail.com>
+# Julian P. Swartz <swartzjp@gmail.com>
 
 import sys
 from Scientific.IO.FortranFormat import *
