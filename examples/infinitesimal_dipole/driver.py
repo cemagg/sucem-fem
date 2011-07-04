@@ -3,11 +3,11 @@
 from __future__ import division
 
 import sys
-sys.path.append('../../')
 import numpy as N
 import os
 import dolfin
-import FenicsCode
+sys.path.insert(0, '../../')
+import FenicsCode.Sources.current_source
 import FenicsCode.BoundaryConditions.ABC
 from FenicsCode.Consts import eps0, mu0, c0
 from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
@@ -15,10 +15,11 @@ from FenicsCode.Sources import point_source
 from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from FenicsCode.PostProcessing import Reconstruct
-
-sys.path.insert(0, '../../')
 from test_data import problem_data
 del sys.path[0]
+
+from pylab import *
+from blog_example import analytical_pts, analytical_result
 
 ## Problem parameters
 I = problem_data['I']                   # Dipole current
@@ -49,7 +50,7 @@ dp.set_basis_order(order)
 dp.set_material_regions(materials)
 dp.set_region_meshfunction(material_mesh_func)
 dp.set_boundary_conditions(bcs)
-current_sources = point_source.CurrentSources()
+current_sources = FenicsCode.Sources.current_source.CurrentSources()
 dipole_source = point_source.PointCurrentSource()
 dipole_source.set_position(source_coord)
 dipole_source.set_value(source_value)
@@ -67,10 +68,8 @@ recon = Reconstruct(dp.function_space)
 recon.set_dof_values(x)
 E_field = recon.reconstruct_points(field_pts)
 
-from pylab import *
 r1 = field_pts[:]/lam
 x1 = r1[:,0]
-from blog_example import analytical_pts, analytical_result
 E_ana = N.abs(analytical_result)
 E_num = E_field
 figure()

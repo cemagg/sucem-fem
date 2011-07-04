@@ -3,11 +3,10 @@
 from __future__ import division
 
 import sys
-sys.path.append('../../../')
 import numpy as N
 import os
 import dolfin
-import FenicsCode
+import FenicsCode.Sources.current_source
 import FenicsCode.BoundaryConditions.ABC
 from FenicsCode.Consts import eps0, mu0, c0
 from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
@@ -15,6 +14,9 @@ from FenicsCode.Sources import point_source
 from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system, UMFPACKSolver
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from FenicsCode.PostProcessing import Reconstruct
+
+import pickle
+sys.path.append('../../../')
 
 
 ## Problem parameters
@@ -48,7 +50,7 @@ dp.set_basis_order(order)
 dp.set_material_regions(materials)
 dp.set_region_meshfunction(material_mesh_func)
 dp.set_boundary_conditions(bcs)
-current_sources = point_source.CurrentSources()
+current_sources = FenicsCode.Sources.current_source.CurrentSources()
 dipole_source = point_source.PointCurrentSource()
 dipole_source.set_position(source_coord)
 dipole_source.set_value(source_value)
@@ -68,7 +70,6 @@ recon = Reconstruct(dp.function_space)
 recon.set_dof_values(x)
 E_field = recon.reconstruct_points(field_pts)
 
-import pickle
 fname = 'dofs-%d-%s-%s.pickle' % (order, str(domain_size[0]), str(max_edge_len))
 pickle.dump(
     dict(x=x, order=order, domain_size=domain_size,
