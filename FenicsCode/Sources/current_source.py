@@ -44,3 +44,24 @@ class CurrentSources(object):
         dofnos = N.array(contribs.keys(), dtype=N.uint)
         rhs_contribs = N.array(contribs.values())
         return dofnos, rhs_contribs
+
+class CurrentSource(object):
+    """Abstract base class for current sources"""
+
+    def set_function_space(self, function_space):
+        """Set function space that the source is to be applied to"""
+        self.function_space = function_space
+
+    def get_contribution(self):
+        """Get the RHS contribution of the current source
+        Return Values
+        -------------
+        (dofnos, rhs_contribs) with
+
+        dofnos -- Array of degree of freedom indices of the source contribution
+
+        rhs_contribs -- Numerical values of RHS contribution, such that
+           RHS[dofnos] += rhs_contribs will add the current source to the system.
+        
+        """
+        raise NotImplementedError('User subclass should implement get_contribution()')

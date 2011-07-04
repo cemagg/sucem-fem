@@ -6,8 +6,9 @@ import collections
 import itertools
 import dolfin
 import numpy as N
+from FenicsCode.Sources.current_source import CurrentSource
 
-class PointCurrentSource(object):
+class PointCurrentSource(CurrentSource):
     def set_position(self, position):
         """Set point source position. Expects an array with x,y,z coordinates
         """
@@ -19,10 +20,6 @@ class PointCurrentSource(object):
         iscomplex = N.any(N.iscomplex(value))
         dtype = N.complex128 if iscomplex else N.float64
         self.value = N.array(value, dtype=dtype)
-
-    def set_function_space(self, function_space):
-        """Set function space that the source is to be applied to"""
-        self.function_space = function_space
 
     def get_contribution(self):
         """Get source contribution dofnos and value
