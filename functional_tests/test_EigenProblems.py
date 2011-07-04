@@ -42,7 +42,7 @@ def k_mnl ( abd, m, n, l=0, normalize = False):
 
 class Test3D(unittest.TestCase):
     def test_gmsh_resonant_cavity(self):
-        mesh_folder = os.path.join(get_module_path(__file__), "../data/meshes")
+        mesh_folder = os.path.join(get_module_path(__file__), "data/meshes")
         mesh_base_name = "rectangular_prism"
         mesh_extension = ".xml"
         mesh = dolfin.Mesh ( os.path.join (mesh_folder, mesh_base_name + mesh_extension))
