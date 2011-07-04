@@ -2,7 +2,6 @@
 # Neilen Marais <nmarais@gmail.com>
 from __future__ import division
 
-import collections
 import itertools
 import dolfin
 import numpy as N
