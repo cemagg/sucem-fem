@@ -1,5 +1,6 @@
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
+# Evan Lezar <mail@evanlezar.com>
 from FenicsCode import Forms
 
 class BoundaryCondition(object):

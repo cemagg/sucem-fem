@@ -1,7 +1,6 @@
-__author__ = "Evan Lezar"
+# Authors:
+# Evan Lezar <mail@evanlezar.com>
 __date__ = "10 Mar 2009"
-__copyright__ = "Copyright (C) 2009 Evan Lezar"
-__license__  = "GNU LGPL Version 2.1"
 
 """
     Work on implementing the Pelosi formulation of an h-plane waveguide

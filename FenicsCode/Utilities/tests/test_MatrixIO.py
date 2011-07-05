@@ -1,6 +1,6 @@
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
-__author__ = "Evan Lezar"
+# Evan Lezar <mail@evanlezar.com>
 __date__ = "20 May 2011"
 
 """this is a set of test cases for the testing of the matrix IO routines in FenicsCode/Utilities"""
