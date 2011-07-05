@@ -12,6 +12,8 @@ import FenicsCode.BoundaryConditions.ABC
 from FenicsCode.Consts import eps0, mu0, c0
 from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
 from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
+import FenicsCode.Utilities.LinalgSolvers
+
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from FenicsCode.PostProcessing import Reconstruct
 import FenicsCode.Utilities.Optimization
@@ -20,6 +22,12 @@ from FillamentSource import FillamentCurrentSource
 
 
 FenicsCode.Utilities.Optimization.set_dolfin_optimisation(True)
+## Postprocessing requests
+theta_deg = N.linspace(0, 180, 181)
+no_ff_pts = len(theta_deg)
+phi_deg = N.zeros(no_ff_pts)
+
+
 ## Problem parameters
 freq =  1.0e+9                          # Frequency
 lam = c0/freq
@@ -31,9 +39,9 @@ source_endpoints =  N.array(
     [-source_direction*l/2, source_direction*l/2]) + source_centre
 
 ## Discretisation settings
-order = 1
+order = 3
 domain_size = N.array([lam]*3)
-max_edge_len = lam/6
+max_edge_len = lam/12
 mesh = get_centred_cube(domain_size, max_edge_len)
 # Request information:
 field_pts = N.array([1,0,0])*(N.linspace(0, domain_size[0]/2.1))[:, N.newaxis]
@@ -54,6 +62,7 @@ dp.set_region_meshfunction(material_mesh_func)
 dp.set_boundary_conditions(bcs)
 current_sources = FenicsCode.Sources.current_source.CurrentSources()
 dipole_source = FillamentCurrentSource()
+dipole_source.no_integration_points = 1000
 dipole_source.set_source_endpoints(source_endpoints)
 dipole_source.set_value(I)
 current_sources.add_source(dipole_source)
@@ -64,25 +73,53 @@ dp.set_frequency(freq)
 A = dp.get_LHS_matrix()
 b = dp.get_RHS()
 print 'solve using scipy bicgstab'
-x = solve_sparse_system ( A, b)
+x = solve_sparse_system ( A, b, preconditioner_type='diagonal')
+# print 'solve using UMFPack'
+# umf_solver = FenicsCode.Utilities.LinalgSolvers.UMFPACKSolver(A)
+# x = umf_solver.solve(b)
+print 'calculating far field'
+from FenicsCode.PostProcessing import surface_ntff
+surf_ntff = surface_ntff.NTFF(dp.function_space)
+surf_ntff.set_dofs(x)
+surf_ntff.set_frequency(freq)
+surf_E_ff = N.array([surf_ntff.calc_pt(th_deg, ph_deg)
+                for th_deg, ph_deg in zip(theta_deg, phi_deg)])
+surf_E_theta = surf_E_ff[:,0]
+surf_E_phi = surf_E_ff[:,1]
 
-recon = Reconstruct(dp.function_space)
-recon.set_dof_values(x)
-E_field = recon.reconstruct_points(field_pts)
+print 'plotting'
+import pylab
+pylab.figure()
+pylab.plot(theta_deg, N.abs(surf_E_theta), label='|E_theta|')
+pylab.plot(theta_deg, N.abs(surf_E_phi), label='|E_phi|')
+import analytical
+an_E_theta = [analytical.eval_E_theta(freq, l, I, th) for th in N.deg2rad(theta_deg)]
+pylab.plot(theta_deg, N.abs(an_E_theta), label='analytical')
+pylab.legend()
+start=10 ; stop=-10
+from FenicsCode.Testing.ErrorMeasures import normalised_RMS
 
-from pylab import *
+err = normalised_RMS(
+    surf_E_theta[start:stop], an_E_theta[start:stop], surf_E_phi[start:stop])
+err_theta = normalised_RMS(surf_E_theta[start:stop], an_E_theta[start:stop])
 
-r1 = field_pts[:]/lam
-x1 = r1[:,0]
-#E_ana = N.abs(analytical_result)
-E_num = E_field
-figure()
-plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
-plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
-plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
-#plot(analytical_pts, E_ana, '--r', label='z_ana')
-ylabel('E-field Magnitude')
-xlabel('Distance (wavelengths)')
-legend(loc='best')
-grid(True)
-show()
+# recon = Reconstruct(dp.function_space)
+# recon.set_dof_values(x)
+# E_field = recon.reconstruct_points(field_pts)
+
+# from pylab import *
+
+# r1 = field_pts[:]/lam
+# x1 = r1[:,0]
+# #E_ana = N.abs(analytical_result)
+# E_num = E_field
+# figure()
+# plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
+# plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
+# plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
+# #plot(analytical_pts, E_ana, '--r', label='z_ana')
+# ylabel('E-field Magnitude')
+# xlabel('Distance (wavelengths)')
+# legend(loc='best')
+# grid(True)
+# show()

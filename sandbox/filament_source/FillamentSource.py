@@ -38,7 +38,7 @@ class FillamentCurrentSource(CurrentSource):
         source_len = vector_length(self.source_delta)
         no_pts = self.no_integration_points
         if no_pts == 1:
-            intg_pts = self.source_start + self.source_delta*0.5
+            intg_pts = [self.source_start + self.source_delta*0.5]
         else:
             intg_pts = self.source_start + self.source_delta*np.linspace(
                 0,1,no_pts)[:, np.newaxis]
