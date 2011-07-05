@@ -30,9 +30,3 @@ class ABCBoundaryCondition(BoundaryCondition):
         n = V.cell().n
         s_0 = inner(cross(n, v), cross(n, u))*ds
         return s_0
-
-    def set_region_number(self, region_number):
-        """ Set region number of BC. Currently ignored, but required
-        by the BC structure.
-        """
-        self.region_number = region_number
