@@ -40,8 +40,8 @@ source_endpoints =  N.array(
 
 ## Discretisation settings
 order = 3
-domain_size = N.array([lam]*3)
-max_edge_len = lam/12
+domain_size = N.array([lam]*3)*1
+max_edge_len = lam/6
 mesh = get_centred_cube(domain_size, max_edge_len)
 # Request information:
 field_pts = N.array([1,0,0])*(N.linspace(0, domain_size[0]/2.1))[:, N.newaxis]
@@ -77,6 +77,19 @@ x = solve_sparse_system ( A, b, preconditioner_type='diagonal')
 # print 'solve using UMFPack'
 # umf_solver = FenicsCode.Utilities.LinalgSolvers.UMFPACKSolver(A)
 # x = umf_solver.solve(b)
+
+import pickle
+fname = 'data/dofs-%d-%s-%s-%s-%s.pickle' % (
+    order, str(domain_size[0]), str(max_edge_len), str(l),
+    str(dipole_source.no_integration_points))
+pickle.dump(
+    dict(x=x, order=order, domain_size=domain_size,
+         max_edge_len=max_edge_len, freq=freq, l=l, I=I,
+         source_integration_points=dipole_source.no_integration_points),
+    open(fname, 'w'))
+
+
+
 print 'calculating far field'
 from FenicsCode.PostProcessing import surface_ntff
 surf_ntff = surface_ntff.NTFF(dp.function_space)
@@ -86,6 +99,8 @@ surf_E_ff = N.array([surf_ntff.calc_pt(th_deg, ph_deg)
                 for th_deg, ph_deg in zip(theta_deg, phi_deg)])
 surf_E_theta = surf_E_ff[:,0]
 surf_E_phi = surf_E_ff[:,1]
+
+
 
 print 'plotting'
 import pylab
@@ -102,6 +117,9 @@ from FenicsCode.Testing.ErrorMeasures import normalised_RMS
 err = normalised_RMS(
     surf_E_theta[start:stop], an_E_theta[start:stop], surf_E_phi[start:stop])
 err_theta = normalised_RMS(surf_E_theta[start:stop], an_E_theta[start:stop])
+err_abs_theta = normalised_RMS(N.abs(surf_E_theta[start:stop]),
+                               N.abs(an_E_theta[start:stop]))
+print fname, err, err_theta
 
 # recon = Reconstruct(dp.function_space)
 # recon.set_dof_values(x)
