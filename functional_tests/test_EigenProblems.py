@@ -1,7 +1,5 @@
 # Authors:
 # Evan Lezar <mail@evanlezar.com>
-__date__ = "29 June 2011"
-
 """
 This is a functional test for the solution of eigenproblems
 """

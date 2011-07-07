@@ -1,5 +1,4 @@
 __author__ = "Evan Lezar"
-__date__ = "20 May 2011"
 
 """
 A simple driver to test various LA solvers.

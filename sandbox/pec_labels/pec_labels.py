@@ -1,6 +1,5 @@
 # Authors:
 # Evan Lezar <mail@evanlezar.com>
-__date__ = "17 June 2011"
 
 from dolfin import *
 from dolfin_utils import meshconvert

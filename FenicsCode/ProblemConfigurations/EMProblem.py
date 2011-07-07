@@ -1,7 +1,6 @@
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
 # Evan Lezar <mail@evanlezar.com>
-__date__ = "28 July 2011"
 
 import dolfin
 

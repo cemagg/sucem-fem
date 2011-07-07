@@ -1,7 +1,5 @@
 # Authors:
 # Evan Lezar <mail@evanlezar.com>
-__date__ = "10 Mar 2009"
-
 """
     Work on implementing the Pelosi formulation of an h-plane waveguide
 """

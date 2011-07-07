@@ -1,6 +1,5 @@
 # Authors:
 # Evan Lezar <mail@evanlezar.com>
-__date__ = "20 May 2011"
 
 """
 This is a collection of routines to save and load finite element matrices to disk

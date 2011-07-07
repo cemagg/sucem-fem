@@ -2,7 +2,6 @@
 # Evan Lezar <mail@evanlezar.com>
 # Neilen Marais <nmarais@gmail.com>
 from checkbox.job import PASS
-__date__ = "11 May 2011"
 
 
 import numpy as np

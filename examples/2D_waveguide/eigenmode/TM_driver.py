@@ -1,7 +1,5 @@
 # Authors:
 # Evan Lezar <mail@evanlezar.com>
-__date__ = "28 June 2011"
-
 """A simple 2D eigenproblem which calculates the TM modes of a square guide.
 
 Note that this is done by modelling the Magnetic field and as such no dirichlet BCs are used.

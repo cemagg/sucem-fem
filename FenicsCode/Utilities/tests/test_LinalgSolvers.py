@@ -1,7 +1,6 @@
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
 # Evan Lezar <mail@evanlezar.com>
-__date__ = "11 May 2011"
 
 """this is a set of test cases for the testing of the linear algebra solvers in FenicsCode/Utilities"""
 
