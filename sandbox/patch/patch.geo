@@ -5,7 +5,7 @@ Sx = Lx*2;
 Sy = Ly*2;
 Dp = 1.3e-3;
 IIf = 8.9e-3;
-Hs = 2.87e-3*5;
+Hs = 2.87e-3;
 eps_r = 2.2;
 freq = 3e9;
 lam = 299792458/freq;
@@ -163,3 +163,10 @@ Volume(108) = {107};
 // Volume in -ve y direction from patch
 Surface Loop(109) = {58, 80, 66, 86, 68, 82};
 Volume(110) = {109};
+// Patch physical metal surfaces
+Physical Surface(10) = {42, 96};
+// Substrate physical volume
+Physical Volume(20) = {98};
+// Air physical volumes
+Physical Volume(0) = {110, 106, 104, 108, 102, 100};
+Characteristic Length {28, 1, 2, 3, 4, 5,6, 7, 8, 9, 10, 11, 12, 21, 22, 23, 24, 25, 26, 27} = Lc/2.5/Sqrt(eps_r);
