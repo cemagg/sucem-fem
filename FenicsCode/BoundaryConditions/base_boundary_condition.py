@@ -1,5 +1,6 @@
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
+# Evan Lezar <mail@evanlezar.com>
 from FenicsCode import Forms
 
 class BoundaryCondition(object):
@@ -39,7 +40,13 @@ class BoundaryCondition(object):
         @param mesh_function: The mesh_function that is used to construct the boundary condition
         """
         self.mesh_function = mesh_function
-        
+    
+    def set_region_number(self, region_number):
+        """ Set region number of BC. Currently ignored, but required
+        by the BC structure.
+        """
+        self.region_number = region_number 
+    
     def set_function_space(self, function_space):
         """Set function space on which the essential boundary condition is to be applied.
 

@@ -1,4 +1,5 @@
-__author__ = "Evan Lezar"
+# Authors:
+# Evan Lezar <mail@evanlezar.com>
 __date__ = "20 May 2011"
 
 """

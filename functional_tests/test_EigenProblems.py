@@ -1,4 +1,5 @@
-__author__ = "Evan Lezar"
+# Authors:
+# Evan Lezar <mail@evanlezar.com>
 __date__ = "29 June 2011"
 
 """
@@ -11,10 +12,18 @@ import os
 import sys
 import unittest
 
+if __name__ == "__main__":
+    sys.path.insert(0, "../")
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
 from FenicsCode.Consts import c0
 from FenicsCode.Testing.Paths import get_module_path
+
+from FenicsCode.BoundaryConditions.container import BoundaryConditions 
+from FenicsCode.BoundaryConditions.essential import PECWallsBoundaryCondition
+
+if __name__ == "__main__":
+    del sys.path[0]
 
 def k_mnl ( abd, m, n, l=0, normalize = False):
     """
@@ -46,6 +55,7 @@ class Test3D(unittest.TestCase):
         mesh_base_name = "rectangular_prism"
         mesh_extension = ".xml"
         mesh = dolfin.Mesh ( os.path.join (mesh_folder, mesh_base_name + mesh_extension))
+        
         a = 1.0;
         b = 0.5;
         d = 0.25;
@@ -53,11 +63,17 @@ class Test3D(unittest.TestCase):
         pec_filename = os.path.join(mesh_folder, "%s_%s%s" % (
             mesh_base_name, "facet_region", mesh_extension))
         pec_mesh_function = dolfin.MeshFunction ( 'uint', mesh, pec_filename)
+        
+        pec_walls = PECWallsBoundaryCondition ()
+        pec_walls.init_with_meshfunction ( pec_mesh_function, 1 )
+        bc_set = BoundaryConditions()
+        bc_set.add_boundary_condition ( pec_walls )
+        
         order = 4;
         ep = EigenProblem()
         ep.set_mesh(mesh)
         ep.set_basis_order(order)
-        ep.set_boundary_conditions ( meshfunction=pec_mesh_function, bc_region=1 )
+        ep.set_boundary_conditions ( bc_set )
         ep.init_problem()
         
         # Set up eigen problem solver where sigma is the shift to use
@@ -91,13 +107,9 @@ class Test3D(unittest.TestCase):
                         ids.append((m,n,l))
                         values.append(k_mnl ( abd, m, n, l, True ))
         
-        print res
-        
         r = 0;
         errors = np.zeros_like(res)
         for i in np.argsort(values).tolist():
-            print ids[i], values[i]
-            
             if r < len(res):
                 errors[r] = np.linalg.norm(
                     res[r] - values[i])/np.linalg.norm( values[i] )
@@ -115,14 +127,20 @@ class Test3D(unittest.TestCase):
         mesh.coordinates()[:,0] = a*mesh.coordinates()[:,0]
         mesh.coordinates()[:,1] = b*mesh.coordinates()[:,1]
         mesh.coordinates()[:,2] = d*mesh.coordinates()[:,2]
-         
+        
+        
+        pec_walls = PECWallsBoundaryCondition ()
+        pec_walls.init_with_mesh ( mesh )
+        bc_set = BoundaryConditions()
+        bc_set.add_boundary_condition ( pec_walls )
+        
         # Use 3rd order basis functions 
         order = 3
         # Set up the eigen problem
         ep = EigenProblem()
         ep.set_mesh(mesh)
         ep.set_basis_order(order)
-        ep.set_boundary_conditions(pec=True)
+        ep.set_boundary_conditions( bc_set )
         ep.init_problem()
         
         # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
@@ -175,14 +193,19 @@ class Test2D(unittest.TestCase):
         b = 1.0
         mesh.coordinates()[:,0] = a*mesh.coordinates()[:,0]
         mesh.coordinates()[:,1] = b*mesh.coordinates()[:,1]
- 
+        
+        pec_walls = PECWallsBoundaryCondition ()
+        pec_walls.init_with_mesh ( mesh )
+        bc_set = BoundaryConditions()
+        bc_set.add_boundary_condition ( pec_walls )
+        
         # Use 3rd order basis functions 
         order = 3
         # Set up the eigen problem
         ep = EigenProblem()
         ep.set_mesh(mesh)
         ep.set_basis_order(order)
-        ep.set_boundary_conditions(pec=True)
+        ep.set_boundary_conditions(bc_set)
         ep.init_problem()
         
         # Set up eigen problem solver where sigma is the shift to use

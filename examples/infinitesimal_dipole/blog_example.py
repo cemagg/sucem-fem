@@ -1,5 +1,6 @@
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
+# Evan Lezar <mail@evanlezar.com>
 from __future__ import division
 
 import numpy as N
@@ -216,21 +217,21 @@ def main():
         try: E_field[i,:] = u_re(fp) + 1j*u_im(fp)
         except (RuntimeError, StandardError): E_field[i,:] = N.nan + 1j*N.nan
 
-    from pylab import *
+    import pylab as P
     r1 = field_pts[:]/lam
     x1 = r1[:,0]
     E_ana = N.abs(analytical_result)
     E_num = E_field
-    figure()
-    plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
-    plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
-    plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
-    plot(analytical_pts, E_ana, '--r', label='z_ana')
-    ylabel('E-field Magnitude')
-    xlabel('Distance (wavelengths)')
-    legend(loc='best')
-    grid(True)
-    show()
+    P.figure()
+    P.plot(x1, N.abs(E_num[:,0]), '-g', label='x_num')
+    P.plot(x1, N.abs(E_num[:,1]), '-b', label='y_num')
+    P.plot(x1, N.abs(E_num[:,2]), '-r', label='z_num')
+    P.plot(analytical_pts, E_ana, '--r', label='z_ana')
+    P.ylabel('E-field Magnitude')
+    P.xlabel('Distance (wavelengths)')
+    P.legend(loc='best')
+    P.grid(True)
+    P.show()
 
 
 

@@ -1,4 +1,5 @@
-__author__ = "Evan Lezar"
+# Authors:
+# Evan Lezar <mail@evanlezar.com>
 __date__ = "28 June 2011"
 
 """A simple 2D eigenproblem"""
@@ -12,6 +13,9 @@ sys.path.insert(0, '../../../')
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
 from FenicsCode.Consts import c0
+
+from FenicsCode.BoundaryConditions.container import BoundaryConditions
+from FenicsCode.BoundaryConditions.essential import PECWallsBoundaryCondition
 del sys.path[0]
 
 script_path = os.path.dirname(__file__)
@@ -21,6 +25,12 @@ a = 1.0
 b = 1.0
 mesh.coordinates()[:,0] = a*mesh.coordinates()[:,0]
 mesh.coordinates()[:,1] = b*mesh.coordinates()[:,1]
+
+
+pec_walls = PECWallsBoundaryCondition()
+pec_walls.init_with_mesh( mesh )
+bc_set = BoundaryConditions ()
+bc_set.add_boundary_condition ( pec_walls )
  
 # Use 3rd order basis functions 
 order = 3
@@ -28,7 +38,7 @@ order = 3
 ep = EigenProblem()
 ep.set_mesh(mesh)
 ep.set_basis_order(order)
-ep.set_boundary_conditions(pec=True)
+ep.set_boundary_conditions( bc_set )
 ep.init_problem()
 
 # Set up eigen problem solver where sigma is the shift to use in the shift-invert process

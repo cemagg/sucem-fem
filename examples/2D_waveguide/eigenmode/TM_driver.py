@@ -1,4 +1,5 @@
-__author__ = "Evan Lezar"
+# Authors:
+# Evan Lezar <mail@evanlezar.com>
 __date__ = "28 June 2011"
 
 """A simple 2D eigenproblem which calculates the TM modes of a square guide.

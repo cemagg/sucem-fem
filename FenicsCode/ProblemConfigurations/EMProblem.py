@@ -1,6 +1,6 @@
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
-__author__ = "Evan Lezar"
+# Evan Lezar <mail@evanlezar.com>
 __date__ = "28 July 2011"
 
 import dolfin
@@ -37,33 +37,15 @@ class EMProblem(object):
         if self.mesh is not None:
             self._init_function_space()
     
-    def set_boundary_conditions(self, bcs=None, **kwargs):
+    def set_boundary_conditions(self, bcs):
         """
         Set the boundary conditions for the problem based on the keyword arguments passed
         or with the boundary condition object provided
         
-        @keyword pec: A value of true indicates that the boundary condition is a pure PEC dirichlet
-        @keyword meshfunction: The dolfin MeshFunction object that must be used to intitialise the bc
-        @keyword bc_region: The region (meshfunction value) that must be used to apply the bc 
+        @param bcs: A BoundaryConditions object that stores the boundary conditions to be
+            applied to the problem
         """
-        if bcs is None:
-            if 'pec' in kwargs and kwargs['pec']:
-                bc = FenicsCode.BoundaryConditions.essential.EssentialBoundaryCondition()
-                walls = dolfin.DomainBoundary()
-                mesh_function = dolfin.MeshFunction(
-                    'uint', self.mesh, self.mesh.topology().dim()-1)
-                mesh_function.set_all ( 0 )
-                walls.mark(mesh_function, 999)
-                
-                bc.init_with_meshfunction(mesh_function, 999)
-                self.boundary_conditions.add_boundary_condition(bc)
-            elif 'meshfunction' in kwargs and 'bc_region' in kwargs:
-                bc = FenicsCode.BoundaryConditions.essential.EssentialBoundaryCondition()
-                bc.init_with_meshfunction(kwargs['meshfunction'], kwargs['bc_region'])
-                self.boundary_conditions.add_boundary_condition(bc)
-            
-        else:
-            self.boundary_conditions = bcs
+        self.boundary_conditions = bcs
     
     def set_material_regions(self, material_regions):
         """Set material region properties
