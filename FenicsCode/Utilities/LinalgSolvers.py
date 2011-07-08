@@ -1,7 +1,8 @@
 # Authors:
 # Evan Lezar <mail@evanlezar.com>
 # Neilen Marais <nmarais@gmail.com>
-__author__ = "Evan Lezar <mail@evanlezar.com>, Neilen Marais <nmarais@gmail.com>"
+
+""" A collection of linear system solvers """
 
 import numpy as np
 import scipy.sparse
@@ -200,63 +201,60 @@ class SystemSolverBase ( object ):
 
 class BiCGStabSolver ( SystemSolverBase ):
     """
-    This solver implements an iterative Stabilised BICG solver using scipy
+    An iterative Stabilised BICG solver using scipy.
     """
     def _call_solver (self):
-        """
-        Solves the linear system (self._A)x = self._b
+        """Solves the linear system (self._A)x = self._b and returns the solution vector.
         
-        @see: The SystemSolverBase class
+        @return: The solution to the linear system.
         """
         return scipy.sparse.linalg.bicgstab(self._A, self._b, M=self._M, callback=self._callback )
 
 class GMRESSolver ( SystemSolverBase ):
     """
-    This solver implements an iterative GMRES solver using scipy
+    An iterative GMRES solver using scipy.
     """
     def _call_solver (self):
-        """
-        Solves the linear system (self._A)x = self._b
+        """Solves the linear system (self._A)x = self._b and returns the solution vector.
         
-        @see: The SystemSolverBase class
+        @return: The solution to the linear system.
         """
         return scipy.sparse.linalg.gmres(self._A, self._b, M=self._M, callback=self._callback )
 
 class UMFPACKSolver ( SystemSolverBase ):
     """
-    This solver uses the UMFPACK fuctionality provided by scipy
+    A direct UMFPACK-based solver provided by scipy
     """
     def _call_solver (self):
-        """
-        Solves the linear system (self._A)x = self._b
+        """Solves the linear system (self._A)x = self._b and returns the solution vector.
         
-        @see: The SystemSolverBase class
+        @return: The solution to the linear system.
         """
         scipy.sparse.linalg.use_solver(useUmfpack=True)
         return scipy.sparse.linalg.spsolve ( self._A, self._b ), 0
     
     def plot_convergence (self, x_is_time=False, show_plot=False, label=None, style='-'):
+        """Output a string indicating that no convergence history is available.
+        """
         print "Direct solver has no convergence history"
 
 class PyAMGSolver ( SystemSolverBase ):
     """
-    This solver uses PyAMG to solve the linear system iteratively
+    A PyAMG-based iterative solver.
     """
     def _call_solver (self):
-        """
-        Solves the linear system (self._A)x = self._b
+        """Solves the linear system (self._A)x = self._b and returns the solution vector.
         
-        @see: The SystemSolverBase class
+        @return: The solution to the linear system.
         """
         import pyamg
         x = pyamg.solve ( self._A, self._b, verb=True, tol=1e-8, maxiter=800 )
         return x, 0
     
     def plot_convergence (self, x_is_time=False, show_plot=False, label=None, style='-'):
+        """Output a string indicating that no convergence history is available.
+        """
         print "PAMG solver convergence display is not yet implemented"
-
-
-
 
 def calculate_residual ( A, x, b ):
     """
