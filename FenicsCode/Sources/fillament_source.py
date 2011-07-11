@@ -3,9 +3,7 @@ from __future__ import division
 import dolfin
 import numpy as np
 import collections
-import sys
 
-sys.path.append('../../')
 from FenicsCode.Sources.current_source import CurrentSource
 from FenicsCode.Sources.point_source import calc_pointsource_contrib
 from FenicsCode.Utilities.Geometry import unit_vector, vector_length
