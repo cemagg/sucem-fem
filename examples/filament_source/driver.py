@@ -6,6 +6,7 @@ import sys
 import numpy as N
 import os
 import dolfin
+sys.path.insert(0, '../../')
 import FenicsCode.Sources.current_source
 import FenicsCode.BoundaryConditions.ABC
 import FenicsCode.Utilities.LinalgSolvers
@@ -18,8 +19,7 @@ from FenicsCode.Sources.fillament_source import FillamentCurrentSource
 from FenicsCode.PostProcessing import surface_ntff
 from FenicsCode.Testing.ErrorMeasures import normalised_RMS
 import pylab
-import FenicsCode.Testing.Analytical.current_fillament_farfield
-sys.path.insert(0, '../../')
+from FenicsCode.Testing.Analytical import current_fillament_farfield
 del sys.path[0]
 
 
@@ -97,6 +97,8 @@ surf_E_theta = surf_E_ff[:,0]
 surf_E_phi = surf_E_ff[:,1]
 
 ## Calculate some errors relative to the analytical solution
+an_E_theta = [current_fillament_farfield.eval_E_theta(freq, l, I, th)
+              for th in N.deg2rad(theta_deg)]
 start=10 ; stop=-10                     # Don't include the very ends
 err = normalised_RMS(
     surf_E_theta[start:stop], an_E_theta[start:stop], surf_E_phi[start:stop])
