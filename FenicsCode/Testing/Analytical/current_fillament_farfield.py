@@ -2,10 +2,8 @@ from __future__ import division
 
 import sympy as sp
 from sympy import sin, cos, exp, pi
-#from sympy.abc import 
 
 import sys
-sys.path.append('../../')
 from FenicsCode.Consts import mu0, c0
 
 omega, mu, L, beta, r, theta = sp.symbols(

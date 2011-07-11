@@ -6,7 +6,6 @@ import sys
 import numpy as N
 import os
 import dolfin
-sys.path.insert(0, '../../')
 import FenicsCode.Sources.current_source
 import FenicsCode.BoundaryConditions.ABC
 import FenicsCode.Utilities.LinalgSolvers
@@ -16,6 +15,11 @@ from FenicsCode.Consts import eps0, mu0, c0
 from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
 from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
 from FenicsCode.Sources.fillament_source import FillamentCurrentSource
+from FenicsCode.PostProcessing import surface_ntff
+from FenicsCode.Testing.ErrorMeasures import normalised_RMS
+import pylab
+import FenicsCode.Testing.Analytical.current_fillament_farfield
+sys.path.insert(0, '../../')
 del sys.path[0]
 
 
@@ -84,7 +88,6 @@ x = umf_solver.solve(b)
 
 ## Post-process solution to obtain far-field
 print 'calculating far field'
-from FenicsCode.PostProcessing import surface_ntff
 surf_ntff = surface_ntff.NTFF(dp.function_space)
 surf_ntff.set_dofs(x)
 surf_ntff.set_frequency(freq)
@@ -95,7 +98,6 @@ surf_E_phi = surf_E_ff[:,1]
 
 ## Calculate some errors relative to the analytical solution
 start=10 ; stop=-10                     # Don't include the very ends
-from FenicsCode.Testing.ErrorMeasures import normalised_RMS
 err = normalised_RMS(
     surf_E_theta[start:stop], an_E_theta[start:stop], surf_E_phi[start:stop])
 err_theta = normalised_RMS(surf_E_theta[start:stop], an_E_theta[start:stop])
@@ -104,12 +106,10 @@ err_abs_theta = normalised_RMS(N.abs(surf_E_theta[start:stop]),
 print 'Far-field RMS error: ', err
 
 print 'plotting'
-import pylab
 pylab.figure()
 pylab.plot(theta_deg, N.abs(surf_E_theta), label='|E_theta|')
 pylab.plot(theta_deg, N.abs(surf_E_phi), label='|E_phi|')
-import analytical
-an_E_theta = [analytical.eval_E_theta(freq, l, I, th) for th in N.deg2rad(theta_deg)]
+an_E_theta = [FenicsCode.Testing.Analytical.current_fillament_farfield.eval_E_theta(freq, l, I, th) for th in N.deg2rad(theta_deg)]
 pylab.plot(theta_deg, N.abs(an_E_theta), label='analytical')
 pylab.legend()
 

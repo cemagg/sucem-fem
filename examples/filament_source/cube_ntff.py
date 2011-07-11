@@ -7,11 +7,14 @@ import numpy as N
 import dolfin
 
 import sys
-sys.path.append('../../')
 from FenicsCode.Consts import Z0, c0
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 import FenicsCode.Utilities.Optimization
 from FenicsCode.PostProcessing import surface_ntff, variational_ntff
+import FenicsCode.Testing.Analytical.current_fillament_farfield
+from FenicsCode.Testing.ErrorMeasures import normalised_RMS, max_normalised_RMS
+import pylab 
+sys.path.append('../../')
 
 # Enable dolfin's form optimizations
 FenicsCode.Utilities.Optimization.set_dolfin_optimisation()
@@ -49,12 +52,10 @@ surf_E_phi = surf_E_ff[:,1]
 # var_E_phi = var_E_ff[:,1]
 #------------------------------
 # Analytical solution of the far-field of a constant-current dipole
-import analytical
-an_E_theta = [analytical.eval_E_theta(
+an_E_theta = [FenicsCode.Testing.Analytical.current_fillament_farfield.eval_E_theta(
     data['freq'], data['l'], data['I'], th) for th in N.deg2rad(theta_deg)]
 
 start=10 ; stop=-10
-from FenicsCode.Testing.ErrorMeasures import normalised_RMS, max_normalised_RMS
 
 err = normalised_RMS(
     surf_E_theta[start:stop], an_E_theta[start:stop], surf_E_phi[start:stop])
@@ -68,7 +69,6 @@ err_abs_theta_maxnorm = max_normalised_RMS(N.abs(surf_E_theta[start:stop]),
                                            N.abs(an_E_theta[start:stop]))
 
 # Plot results
-import pylab 
 pylab.figure()
 pylab.plot(theta_deg, N.abs(surf_E_theta), label='surf_ntff |E_theta|')
 pylab.plot(theta_deg, N.abs(surf_E_phi), label='surf_ntff |E_phi|')
