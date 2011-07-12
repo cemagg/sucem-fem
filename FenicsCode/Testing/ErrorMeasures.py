@@ -5,16 +5,11 @@ import numpy as np
 def normalised_RMS(actual, desired, extra_error=None):
     """Calculate normalised RMS error %
 
-    Parameters
-    ----------
+    @param actual: actual values
+    @param desired: desired values, the series used for normalisation
+    @param extra_error: An optional extra orthogonal error component
 
-    actual -- actual values
-    desired -- desired values, the series used for normalisation
-    extra_error -- An optional extra orthogonal error component
-
-    Return value
-
-    The normalised RMS error of actual vs desired in percentage
+    @return: The normalised RMS error of actual vs desired in percentage
     """
     err = np.abs(actual-desired)
     if extra_error is None:
@@ -31,16 +26,10 @@ def max_normalised_RMS(actual, desired, extra_error=None):
     This is to prevent values close to zero resulting in a large error
     norm while the absolute error remains small
 
-    Parameters
-    ----------
-
-    actual -- actual values
-    desired -- desired values, the series used for normalisation
-    extra_error -- An optional extra orthogonal error component
-
-    Return value
-
-    The normalised RMS error of actual vs desired in percentage
+    @param actual: actual values
+    @param desired: desired values, the series used for normalisation
+    @param extra_error: An optional extra orthogonal error component
+    @return: The normalised (wrt. the maximum) RMS error of actual vs desired in percentage
     """
     err = np.abs(actual-desired)
     if extra_error is None:
