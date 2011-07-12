@@ -11,28 +11,38 @@ from FenicsCode.Utilities.Geometry import unit_vector, vector_length
 class FillamentCurrentSource(CurrentSource):
     no_integration_points = 100
 
+    def __init__(self, *names, **kwargs):
+        self._dirty = True
+        
     def set_no_integration_points(self, no_integration_points):
         """Set number of integration points to use along the length of
         the fillament"""
         self.no_integration_points = no_integration_points
     
     def set_source_endpoints(self, source_endpoints):
-        """Set the curren filament endpoints
+        """Set the current filament endpoints
 
         @param endpoints: 2x3 array with the coordinates of the start
         and end point of the current fillament. The conventional
         current flows from the start point towards the endpoint.
         """
         self.source_endpoints = source_endpoints
-        self.source_start, self.source_end = self.source_endpoints
-        self.source_delta = self.source_end - self.source_start
+        self._dirty = True
 
     def set_value(self, value):
         """Set line current value in Amperes"""
         self.value = value
-        self.vector_value = unit_vector(self.source_delta)*value
-
+        self._dirty = True
+        
+    def _update(self):
+        if self._dirty:
+            self.source_start, self.source_end = self.source_endpoints
+            self.source_delta = self.source_end - self.source_start
+            self.vector_value = unit_vector(self.source_delta)*self.value
+        self._dirty == False
+            
     def get_contribution(self):
+        self._update()
         source_len = vector_length(self.source_delta)
         no_pts = self.no_integration_points
         if no_pts == 1:

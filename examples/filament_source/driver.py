@@ -67,7 +67,6 @@ dp.set_boundary_conditions(bcs)
 ## Set up current fillament source
 current_sources = FenicsCode.Sources.current_source.CurrentSources()
 fillament_source = FillamentCurrentSource()
-fillament_source.no_integration_points = 1000
 fillament_source.set_source_endpoints(source_endpoints)
 fillament_source.set_value(I)
 current_sources.add_source(fillament_source)
