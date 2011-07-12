@@ -11,7 +11,7 @@ sys.path.insert(0, '../../../')
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 import FenicsCode.Utilities.Optimization
 from FenicsCode.Consts import c0
-from FenicsCode.Sources.fillament_source import FillamentCurrentSource
+from FenicsCode.Sources.fillament_current_source import FillamentCurrentSource
 
 
 

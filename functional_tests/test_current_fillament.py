@@ -15,7 +15,7 @@ import FenicsCode.Utilities.Optimization
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 from FenicsCode.Consts import eps0, mu0, c0
 from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
-from FenicsCode.Sources.fillament_source import FillamentCurrentSource
+from FenicsCode.Sources.fillament_current_source import FillamentCurrentSource
 from FenicsCode.PostProcessing import surface_ntff
 from FenicsCode.Testing.ErrorMeasures import normalised_RMS
 from FenicsCode.Testing.Analytical import current_fillament_farfield

@@ -10,7 +10,7 @@ from FenicsCode.Testing import Paths
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
 
 # Module under test:
-from FenicsCode.Sources.fillament_source import FillamentCurrentSource
+from FenicsCode.Sources.fillament_current_source import FillamentCurrentSource
 
         
 class FillamentEnvironment(object):
