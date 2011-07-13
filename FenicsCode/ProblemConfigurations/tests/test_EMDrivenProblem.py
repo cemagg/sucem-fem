@@ -51,7 +51,7 @@ class test_DrivenProblemABC(unittest.TestCase):
         desired_file = Paths.get_module_path_filename('LHS_matrix.npy', __file__)
         desired_LHSmat = N.load(desired_file)
         self.assertTrue(N.allclose(
-            actual_LHSmat, desired_LHSmat, rtol=1e-12, atol=1e-16))
+            actual_LHSmat, desired_LHSmat, rtol=1e-10, atol=3e-15))
 
     def test_get_RHS(self):
         self.DUT.set_frequency(self.frequency)
