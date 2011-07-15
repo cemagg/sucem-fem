@@ -8,7 +8,7 @@ from FenicsCode import Forms
 from FenicsCode import Materials 
 from FenicsCode import SystemMatrices
 
-import FenicsCode.BoundaryConditions.container
+from FenicsCode.BoundaryConditions import BoundaryConditions
 
 class EMProblem(object):
     """
@@ -21,7 +21,7 @@ class EMProblem(object):
         self.function_space = None
         self.material_regions = None
         self.region_meshfunction = None
-        self.boundary_conditions = FenicsCode.BoundaryConditions.container.BoundaryConditions()
+        self.boundary_conditions = BoundaryConditions()
     
     def get_global_dimension(self):
         """Return total number of system dofs, including Dirichlet constrained dofs
@@ -41,10 +41,13 @@ class EMProblem(object):
         Set the boundary conditions for the problem based on the keyword arguments passed
         or with the boundary condition object provided
         
-        @param bcs: A BoundaryConditions object that stores the boundary conditions to be
-            applied to the problem
+        @param bcs: A BoundaryConditions object containing a collection of boundary conditions, 
+            or a single BoundaryCondition.
         """
-        self.boundary_conditions = bcs
+        if type(bcs) == BoundaryConditions: 
+            self.boundary_conditions = bcs
+        else:
+            self.boundary_conditions.add_boundary_condition ( bcs )
     
     def set_material_regions(self, material_regions):
         """Set material region properties

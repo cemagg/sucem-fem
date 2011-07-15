@@ -8,7 +8,7 @@ import os
 import dolfin
 sys.path.insert(0, '../../')
 import FenicsCode.Sources.current_source
-import FenicsCode.BoundaryConditions.ABC
+from FenicsCode.BoundaryConditions import ABCBoundaryCondition, BoundaryConditions
 from FenicsCode.Consts import eps0, mu0, c0
 from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
 from FenicsCode.Sources import point_source
@@ -40,9 +40,9 @@ field_pts = N.array([lam,0,0])*(N.arange(88)/100+1/10)[:, N.newaxis]
 material_mesh_func = dolfin.MeshFunction('uint', mesh, 3)
 material_mesh_func.set_all(0)
 materials = {0:dict(eps_r=1, mu_r=1),}
-abc = FenicsCode.BoundaryConditions.ABC.ABCBoundaryCondition()
+abc = ABCBoundaryCondition()
 abc.set_region_number(1)
-bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
+bcs = BoundaryConditions()
 bcs.add_boundary_condition(abc)
 dp = DrivenProblemABC()
 dp.set_mesh(mesh)

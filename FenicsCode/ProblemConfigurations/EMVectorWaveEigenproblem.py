@@ -7,8 +7,6 @@ from FenicsCode import BoundaryConditions
 from FenicsCode import SystemMatrices
 
 from scipy.sparse.linalg.eigen.arpack import speigs
-import FenicsCode.BoundaryConditions.essential
-import FenicsCode.BoundaryConditions.container
 from EMProblem import EMProblem
 
 class CombineForms(Forms.CombineGalerkinForms):

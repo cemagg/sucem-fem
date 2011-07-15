@@ -12,13 +12,11 @@ import unittest
 
 if __name__ == "__main__":
     sys.path.insert(0, "../")
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
+from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem, DefaultEigenSolver 
 from FenicsCode.Consts import c0
 from FenicsCode.Testing.Paths import get_module_path
 
-from FenicsCode.BoundaryConditions.container import BoundaryConditions 
-from FenicsCode.BoundaryConditions.essential import PECWallsBoundaryCondition
+from FenicsCode.BoundaryConditions import PECWallsBoundaryCondition 
 
 if __name__ == "__main__":
     del sys.path[0]
@@ -64,14 +62,12 @@ class Test3D(unittest.TestCase):
         
         pec_walls = PECWallsBoundaryCondition ()
         pec_walls.init_with_meshfunction ( pec_mesh_function, 1 )
-        bc_set = BoundaryConditions()
-        bc_set.add_boundary_condition ( pec_walls )
         
         order = 4;
         ep = EigenProblem()
         ep.set_mesh(mesh)
         ep.set_basis_order(order)
-        ep.set_boundary_conditions ( bc_set )
+        ep.set_boundary_conditions ( pec_walls )
         ep.init_problem()
         
         # Set up eigen problem solver where sigma is the shift to use
@@ -129,8 +125,6 @@ class Test3D(unittest.TestCase):
         
         pec_walls = PECWallsBoundaryCondition ()
         pec_walls.init_with_mesh ( mesh )
-        bc_set = BoundaryConditions()
-        bc_set.add_boundary_condition ( pec_walls )
         
         # Use 3rd order basis functions 
         order = 3
@@ -138,7 +132,7 @@ class Test3D(unittest.TestCase):
         ep = EigenProblem()
         ep.set_mesh(mesh)
         ep.set_basis_order(order)
-        ep.set_boundary_conditions( bc_set )
+        ep.set_boundary_conditions( pec_walls )
         ep.init_problem()
         
         # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
@@ -194,8 +188,6 @@ class Test2D(unittest.TestCase):
         
         pec_walls = PECWallsBoundaryCondition ()
         pec_walls.init_with_mesh ( mesh )
-        bc_set = BoundaryConditions()
-        bc_set.add_boundary_condition ( pec_walls )
         
         # Use 3rd order basis functions 
         order = 3
@@ -203,7 +195,7 @@ class Test2D(unittest.TestCase):
         ep = EigenProblem()
         ep.set_mesh(mesh)
         ep.set_basis_order(order)
-        ep.set_boundary_conditions(bc_set)
+        ep.set_boundary_conditions(pec_walls)
         ep.init_problem()
         
         # Set up eigen problem solver where sigma is the shift to use

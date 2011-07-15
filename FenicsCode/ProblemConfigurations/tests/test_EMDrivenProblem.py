@@ -10,7 +10,7 @@ import dolfin
 from FenicsCode.Testing import Meshes
 from FenicsCode.Testing import Paths
 from FenicsCode.Sources import point_source, current_source
-import FenicsCode.BoundaryConditions
+from FenicsCode.BoundaryConditions import ABCBoundaryCondition, BoundaryConditions
 from FenicsCode.ProblemConfigurations import EMDrivenProblem
 
 # Module under test:
@@ -26,9 +26,9 @@ class test_DrivenProblemABC(unittest.TestCase):
         self.material_mesh_func = dolfin.MeshFunction('uint', self.mesh, 3)
         self.material_mesh_func.set_all(0)
         self.materials = {0:dict(eps_r=1, mu_r=1),}
-        self.abc = FenicsCode.BoundaryConditions.ABC.ABCBoundaryCondition()
+        self.abc = ABCBoundaryCondition()
         self.abc.set_region_number(1)
-        self.bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
+        self.bcs = BoundaryConditions()
         self.bcs.add_boundary_condition(self.abc)
         self.current_sources = current_source.CurrentSources()
         self.dipole_source = point_source.PointCurrentSource()

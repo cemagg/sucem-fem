@@ -12,8 +12,7 @@ from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProbl
 from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
 from FenicsCode.Consts import c0
 
-from FenicsCode.BoundaryConditions.container import BoundaryConditions
-from FenicsCode.BoundaryConditions.essential import PECWallsBoundaryCondition
+from FenicsCode.BoundaryConditions import PECWallsBoundaryCondition
 del sys.path[0]
 
 script_path = os.path.dirname(__file__)
@@ -27,8 +26,6 @@ mesh.coordinates()[:,1] = b*mesh.coordinates()[:,1]
 
 pec_walls = PECWallsBoundaryCondition()
 pec_walls.init_with_mesh( mesh )
-bc_set = BoundaryConditions ()
-bc_set.add_boundary_condition ( pec_walls )
  
 # Use 3rd order basis functions 
 order = 3
@@ -36,7 +33,7 @@ order = 3
 ep = EigenProblem()
 ep.set_mesh(mesh)
 ep.set_basis_order(order)
-ep.set_boundary_conditions( bc_set )
+ep.set_boundary_conditions( pec_walls )
 ep.init_problem()
 
 # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
