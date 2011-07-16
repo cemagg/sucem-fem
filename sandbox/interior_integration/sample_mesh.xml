@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dolfin xmlns:dolfin="http://www.fenicsproject.org">
+  <mesh celltype="triangle" dim="2">
+    <vertices size="43">
+      <vertex index="0" x="0" y="0"/>
+      <vertex index="1" x="1" y="0"/>
+      <vertex index="2" x="1" y="1"/>
+      <vertex index="3" x="0" y="1"/>
+      <vertex index="4" x="0.25" y="0.25"/>
+      <vertex index="5" x="0.75" y="0.25"/>
+      <vertex index="6" x="0.75" y="0.75"/>
+      <vertex index="7" x="0.25" y="0.75"/>
+      <vertex index="8" x="0.333333" y="1"/>
+      <vertex index="9" x="0.666667" y="1"/>
+      <vertex index="10" x="1" y="0.666667"/>
+      <vertex index="11" x="1" y="0.333333"/>
+      <vertex index="12" x="0.666667" y="0"/>
+      <vertex index="13" x="0.333333" y="0"/>
+      <vertex index="14" x="0" y="0.333333"/>
+      <vertex index="15" x="0" y="0.666667"/>
+      <vertex index="16" x="0.25" y="0.375"/>
+      <vertex index="17" x="0.25" y="0.5"/>
+      <vertex index="18" x="0.25" y="0.625"/>
+      <vertex index="19" x="0.375" y="0.75"/>
+      <vertex index="20" x="0.5" y="0.75"/>
+      <vertex index="21" x="0.625" y="0.75"/>
+      <vertex index="22" x="0.75" y="0.625"/>
+      <vertex index="23" x="0.75" y="0.5"/>
+      <vertex index="24" x="0.75" y="0.375"/>
+      <vertex index="25" x="0.625" y="0.25"/>
+      <vertex index="26" x="0.5" y="0.25"/>
+      <vertex index="27" x="0.375" y="0.25"/>
+      <vertex index="28" x="0.561748" y="0.48421"/>
+      <vertex index="29" x="0.443801" y="0.420855"/>
+      <vertex index="30" x="0.434661" y="0.642586"/>
+      <vertex index="31" x="0.562768" y="0.625088"/>
+      <vertex index="32" x="0.356993" y="0.543446"/>
+      <vertex index="33" x="0.471644" y="0.528709"/>
+      <vertex index="34" x="0.558811" y="0.36064"/>
+      <vertex index="35" x="0.447371" y="0.318221"/>
+      <vertex index="36" x="0.322659" y="0.43036"/>
+      <vertex index="37" x="0.333331" y="0.662206"/>
+      <vertex index="38" x="0.348139" y="0.340739"/>
+      <vertex index="39" x="0.659448" y="0.435141"/>
+      <vertex index="40" x="0.668679" y="0.340452"/>
+      <vertex index="41" x="0.661911" y="0.55949"/>
+      <vertex index="42" x="0.669936" y="0.661916"/>
+    </vertices>
+    <cells size="72">
+      <triangle index="0" v0="19" v1="20" v2="30"/>
+      <triangle index="1" v0="20" v1="21" v2="31"/>
+      <triangle index="2" v0="20" v1="30" v2="31"/>
+      <triangle index="3" v0="28" v1="31" v2="33"/>
+      <triangle index="4" v0="30" v1="31" v2="33"/>
+      <triangle index="5" v0="17" v1="18" v2="32"/>
+      <triangle index="6" v0="28" v1="29" v2="33"/>
+      <triangle index="7" v0="29" v1="32" v2="33"/>
+      <triangle index="8" v0="30" v1="32" v2="33"/>
+      <triangle index="9" v0="7" v1="19" v2="37"/>
+      <triangle index="10" v0="7" v1="18" v2="37"/>
+      <triangle index="11" v0="19" v1="30" v2="37"/>
+      <triangle index="12" v0="4" v1="16" v2="38"/>
+      <triangle index="13" v0="4" v1="27" v2="38"/>
+      <triangle index="14" v0="18" v1="32" v2="37"/>
+      <triangle index="15" v0="30" v1="32" v2="37"/>
+      <triangle index="16" v0="26" v1="27" v2="35"/>
+      <triangle index="17" v0="16" v1="36" v2="38"/>
+      <triangle index="18" v0="27" v1="35" v2="38"/>
+      <triangle index="19" v0="29" v1="36" v2="38"/>
+      <triangle index="20" v0="29" v1="35" v2="38"/>
+      <triangle index="21" v0="25" v1="26" v2="34"/>
+      <triangle index="22" v0="26" v1="34" v2="35"/>
+      <triangle index="23" v0="28" v1="29" v2="34"/>
+      <triangle index="24" v0="29" v1="34" v2="35"/>
+      <triangle index="25" v0="17" v1="32" v2="36"/>
+      <triangle index="26" v0="16" v1="17" v2="36"/>
+      <triangle index="27" v0="29" v1="32" v2="36"/>
+      <triangle index="28" v0="5" v1="25" v2="40"/>
+      <triangle index="29" v0="5" v1="24" v2="40"/>
+      <triangle index="30" v0="25" v1="34" v2="40"/>
+      <triangle index="31" v0="23" v1="24" v2="39"/>
+      <triangle index="32" v0="28" v1="34" v2="39"/>
+      <triangle index="33" v0="34" v1="39" v2="40"/>
+      <triangle index="34" v0="24" v1="39" v2="40"/>
+      <triangle index="35" v0="23" v1="39" v2="41"/>
+      <triangle index="36" v0="28" v1="31" v2="41"/>
+      <triangle index="37" v0="28" v1="39" v2="41"/>
+      <triangle index="38" v0="22" v1="23" v2="41"/>
+      <triangle index="39" v0="6" v1="22" v2="42"/>
+      <triangle index="40" v0="6" v1="21" v2="42"/>
+      <triangle index="41" v0="22" v1="41" v2="42"/>
+      <triangle index="42" v0="31" v1="41" v2="42"/>
+      <triangle index="43" v0="21" v1="31" v2="42"/>
+      <triangle index="44" v0="5" v1="12" v2="25"/>
+      <triangle index="45" v0="12" v1="25" v2="26"/>
+      <triangle index="46" v0="12" v1="13" v2="26"/>
+      <triangle index="47" v0="13" v1="26" v2="27"/>
+      <triangle index="48" v0="4" v1="13" v2="27"/>
+      <triangle index="49" v0="4" v1="14" v2="16"/>
+      <triangle index="50" v0="5" v1="11" v2="24"/>
+      <triangle index="51" v0="14" v1="15" v2="17"/>
+      <triangle index="52" v0="14" v1="16" v2="17"/>
+      <triangle index="53" v0="10" v1="11" v2="23"/>
+      <triangle index="54" v0="11" v1="23" v2="24"/>
+      <triangle index="55" v0="15" v1="17" v2="18"/>
+      <triangle index="56" v0="10" v1="22" v2="23"/>
+      <triangle index="57" v0="7" v1="15" v2="18"/>
+      <triangle index="58" v0="6" v1="10" v2="22"/>
+      <triangle index="59" v0="8" v1="19" v2="20"/>
+      <triangle index="60" v0="7" v1="8" v2="19"/>
+      <triangle index="61" v0="6" v1="9" v2="21"/>
+      <triangle index="62" v0="9" v1="20" v2="21"/>
+      <triangle index="63" v0="8" v1="9" v2="20"/>
+      <triangle index="64" v0="0" v1="4" v2="13"/>
+      <triangle index="65" v0="0" v1="4" v2="14"/>
+      <triangle index="66" v0="1" v1="5" v2="12"/>
+      <triangle index="67" v0="1" v1="5" v2="11"/>
+      <triangle index="68" v0="3" v1="7" v2="15"/>
+      <triangle index="69" v0="3" v1="7" v2="8"/>
+      <triangle index="70" v0="2" v1="6" v2="10"/>
+      <triangle index="71" v0="2" v1="6" v2="9"/>
+    </cells>
+  </mesh>
+</dolfin>
