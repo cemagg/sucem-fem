@@ -28,8 +28,10 @@ def k_mnl ( abd, m, n, l=0, normalize = False):
     @param abd: a 3-tuple of the dimensions in meters of the cavitys
     @param m: the index of the mode in the x direction
     @param n: the index of the mode in the y direction
-    @param l: the index of the mode in the z direction
-    @param normalize: divide by the factor \pi
+    @keyword l: the index of the mode in the z direction
+        (default: 0)
+    @keyword normalize: divide by the factor M{\pi}
+        (default: False)
     """
     if len(abd) == 3:
         a, b, d = abd

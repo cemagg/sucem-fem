@@ -33,22 +33,17 @@ class DefaultEigenSolver(object):
         self.sigma = sigma
 
     def solve_problem(self, nev, ncv=None):
-        """Solve problem for eigenvalues and eigenvectors
-        Input Values
-        -------------
-        @param nev: Number of eigenpairs to compute
-        @param ncv: Number of Arnoldi basisvectors to use. If None, default to 2*nev+1
-        Return Values
-        -------------
-        (eigs_w, eigs_v) with
-
-        eigs_w -- array of n_eig eigen values corresponding to k^2 for the
-            mode's resonant wavenumber
-
-        eigs_v -- 2D array ofshape n_eig x problem_dim eigen vectors
-            corresponding to the modal distributions of the eigenvalues.
-            eigs_v[i] is the eigenvector corresponding to eigs_w[i]
+        """Solve problem and return the eigenvalues and eigenvectors
         
+        @param nev: Number of eigenpairs to compute
+        @keyword ncv: Number of Arnoldi basisvectors to use. 
+            (default: 2*nev+1).
+        
+        @rtype: (C{numpy.array}, C{numpy.array})
+        @return: (eigs_w, eigs_v) -- A tupple consisting of the eigenvalues and eigenvectors of the eigensystem.
+            The eigenvalues are returned as an array of n_eig values corresponding to k^2 for the mode's resonant wavenumber.
+            The eigenvectors are returned as a 2D array of shape (n_eig, problem_dim), with row i corresponding to the 
+            modal distributions associated with the i-th eigenvalue. 
         """
         M = self.eigenproblem.system_matrices['M']
         S = self.eigenproblem.system_matrices['S']

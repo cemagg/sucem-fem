@@ -20,11 +20,11 @@ class FillamentCurrentSource(CurrentSource):
         self.no_integration_points = no_integration_points
     
     def set_source_endpoints(self, source_endpoints):
-        """Set the current filament endpoints
+        """Set the current filament endpoints.
 
-        @param endpoints: 2x3 array with the coordinates of the start
-        and end point of the current fillament. The conventional
-        current flows from the start point towards the endpoint.
+        @param source_endpoints: 2x3 array with the coordinates of the start
+            and end point of the current fillament. The conventional
+            current flows from the start point towards the endpoint.
         """
         self.source_endpoints = source_endpoints
         self._dirty = True

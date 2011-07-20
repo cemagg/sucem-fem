@@ -20,13 +20,13 @@ class CombineForms(Forms.CombineGalerkinForms):
         return dict(M=m, S=s, S_0=ABC_form)
 
 class DrivenProblemABC(EMProblem):
-    """Set up driven problem, potentially terminated by an ABC
-
+    """Set up driven problem, potentially terminated by an ABC.
+    
     Assumes lossless, frequency independent materials, and that the
     boundary bilinear form is:
-
-        dot(cross(n, u), cross(n, v))
-
+        
+    dot(cross(n, u), cross(n, v))
+    
     where n is a face normal and u,v are the trial and testing
     functions. All forms are assumed to be real valued. They real
     forms will be combined into a complex system matrix of the form
@@ -35,7 +35,6 @@ class DrivenProblemABC(EMProblem):
 
     where S, M are stiffness and mass matrices and k0 is the
     freespace wave-number
-    
     """
 
     FormCombiner = CombineForms
@@ -63,6 +62,9 @@ class DrivenProblemABC(EMProblem):
         return RHS
 
     def _init_system_matrices (self):
+        """Initialise the system matrices associated with the problem. 
+        Matrices are stored in dolfin.uBLASSparseMatrix format.
+        """ 
         EMProblem._init_system_matrices(
             self, matrix_class=dolfin.uBLASSparseMatrix )
 
