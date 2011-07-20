@@ -61,8 +61,23 @@ def use_generated_mesh():
                 return True
             return False
     
+    class A (SubDomain):
+        def inside (self, x, on_boundary):
+            if ( x[0] >= 0.25 and x[0] <= 0.75 ) and ( x[1] >= 0.25 and x[1] <= 0.75 ):
+                return True
+            else:
+                return False
+            
     class Interior ( Expression ):
-    
+        def __init__ (self, domain, **kwargs):
+            self._domain = domain;
+        def eval (self, value, x):
+            if self._domain.inside ( x, False ):
+                value[0] = 1;
+            else:
+                value[0] = 0;
+        def value_shape (self):
+            return (1,)
     
     sides = ['left', 'top', 'right', 'bottom']
     
@@ -85,9 +100,12 @@ def use_generated_mesh():
     bottom_side = Bottom ( )
     bottom_side.mark( interior_edges, 103 )
     
+    DG = FunctionSpace(mesh, "DG", 0)
+    AB = Interior (domain=A(), element=DG.ufl_element())
+    
     for interior_edge in [100, 101, 102, 103]:
         n = V.cell().n
-        l_p = dot( n('+'), E('+'))*dS(interior_edge)
+        l_p = dot( (AB('+')-AB('-'))*n('+'), E('+'))*dS(interior_edge)
         print sides[interior_edge-100], assemble ( l_p, interior_facet_domains=interior_edges, mesh=mesh )
     
     print '----'
