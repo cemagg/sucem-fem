@@ -4,6 +4,7 @@
 """This file contains a number of converters, including for DOLFIN matrices to scipy sparse matrices"""
 
 import numpy as np
+import dolfin
 
 def dolfin_ublassparse_to_scipy_csr ( A, dtype=None, imagify=False ):
     """
@@ -23,4 +24,11 @@ def dolfin_ublassparse_to_scipy_csr ( A, dtype=None, imagify=False ):
     A_sp = scipy.sparse.csr_matrix( (data,col,row), shape=(n,n), dtype=dtype)
     
     return A_sp
+
+def as_dolfin_vector(a):
+    """Convert array to a dolfin Vector() instance"""
+    assert len(a.shape) == 1            # 1D vectors please
+    v = dolfin.Vector(len(a))
+    v.set_local(np.require(a, requirements=['C',]))
+    return v
 
