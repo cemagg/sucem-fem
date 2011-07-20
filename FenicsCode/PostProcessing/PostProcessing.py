@@ -60,6 +60,8 @@ class CalcEMFunctional(object):
         self.g_i = dolfin.Function(Vt)
         self.dx = dx
         self.cell_domains = None
+        self.epsr_function = None
+        self.mur_function = None
         
     def set_k0(self, k0):
         self.k0 = k0
@@ -74,13 +76,37 @@ class CalcEMFunctional(object):
         self.cell_mark_value = cell_mark_value
         self.dx = dx(self.cell_mark_value)
         
+    def set_epsr_function(self, permittivity_function):
+        self.epsr_function = epsr_function
+        
+    def set_mur_function(self, mur_function):
+        self.mur_function = mur_function
+
+    def _get_epsr_function(self):
+        if self.epsr_function is not None:
+            epsr_func = self.epsr_function
+        else:
+            epsr_func = dolfin.Constant(1)
+
+        return epsr_func
+   
+    def _get_mur_function(self):
+        if self.epsr_function is not None:
+            mur_func = self.mur_function
+        else:
+            mur_func = dolfin.Constant(1)
+
+        return mur_func
+
     def _get_forms(self):
         E_r, E_i, g_r, g_i = self.E_r, self.E_i, self.g_r, self.g_i
         k0 = self.k0
-        form_r = (dot(curl(E_r), curl(g_r)) - dot(curl(E_i), curl(g_i)) \
-                  + k0**2*dot(E_r, g_r) - dot(E_i, g_i))*self.dx
-        form_i = (dot(curl(E_r), curl(g_i)) + dot(curl(E_i), curl(g_r)) \
-                  + k0**2*dot(E_r, g_i) - dot(E_i, g_r))*self.dx
+        eps_r = self._get_epsr_function()
+        mu_r = self._get_mur_function()
+        form_r = (dot(curl(E_r)/mu_r, curl(g_r)) - dot(curl(E_i)/mu_r, curl(g_i)) \
+                  + k0**2*dot(eps_r*E_r, g_r) - dot(eps_r*E_i, g_i))*self.dx
+        form_i = (dot(curl(E_r)/mu_r, curl(g_i)) + dot(curl(E_i)/mu_r, curl(g_r)) \
+                  + k0**2*dot(eps_r*E_r, g_i) - dot(eps_r*E_i, g_r))*self.dx
         return form_r, form_i
 
     def set_E_dofs(self, E_dofs):

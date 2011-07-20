@@ -61,6 +61,9 @@ def use_generated_mesh():
                 return True
             return False
     
+    class Interior ( Expression ):
+    
+    
     sides = ['left', 'top', 'right', 'bottom']
     
     mesh = UnitSquare ( 8, 8 )
