@@ -27,18 +27,16 @@ class EnsureInitialised(object):
 
 
 class BoundaryEdges(object):
-    """Find and mark the edges that occur on a set of boundary faces
-    Parameters
-    ==========
-
-    mesh -- dolfin mesh object
-
-    boundary_facefun -- optional face mesh function that describes the
-        faces to be considered
-
-    boundary_value -- mesh function value marking the boundary faces
-    """
     def __init__(self, mesh, boundary_facefun=None, boundary_value=1):
+        """Find and mark the edges that occur on a set of boundary faces
+    
+        @param mesh: A dolfin mesh object
+        @keyword boundary_facefun: a face mesh function that describes the
+            faces to be considered 
+            (default: None).
+        @keyword boundary_value: the mesh function value marking the boundary faces
+            (default: 1)
+        """
         self.mesh = mesh
         if boundary_facefun is None:
             boundary_facefun = dolfin.FaceFunction('uint', mesh)

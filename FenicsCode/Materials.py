@@ -44,26 +44,24 @@ class MaterialProperties(object):
         return mu0*self.mu_r
 
 class MaterialPropertiesFactory(object):
-    """Set up a material region number to MaterialProperties lookup
-
-    Input Parameters
-    ----------------
-
-    material_regions -- Dictionary of with keys equal to material
-        region number, and sub-dictionaries of parameter name and numeric
-        values. E.g.
-
-        {100:{'eps_r':1, 'mu_r':1}, 101:{'eps_r':2, 'mu_r':1}}
-
-        Allowed material parameter names are defined by the class
-        MaterialProperties. Default values for unspecified materials
-        are also handled by that class
-
-        If material_regions is None, the whole domain defaults to
-        region 0, which is typicaly freespace
-    
-    """
     def __init__(self, material_regions):
+        """Set up a material region number to MaterialProperties lookup
+
+        @param material_regions: A dictionary of with keys equal to material
+            region number, and sub-dictionaries of parameter name and numeric
+            values. E.g.
+    
+            {100:{'eps_r':1, 'mu_r':1}, 101:{'eps_r':2, 'mu_r':1}}
+    
+            Allowed material parameter names are defined by the class
+            MaterialProperties. Default values for unspecified materials
+            are also handled by that class
+    
+            If material_regions is None, the whole domain defaults to
+            region 0, which is typicaly freespace
+        
+        """
+
         self.material_properties = {}
         if material_regions is None:
             # default to default material properties in region 0
@@ -79,23 +77,17 @@ class MaterialPropertiesFactory(object):
         return self.material_properties
 
 class MaterialFunctionFactory(object):
-    """Set up material property functions
-
-    Input Parameters
-    ----------------
-
-    region_material_properties -- dict with key region_no, value
-        MaterialProperties object for that region number
-
-    region_meshfunction -- a dolfin MeshFunction mapping elements to
-        region numbers. If it is None, all elements are set to region 0
-
-    mesh -- dolfin Mesh object relating to region_meshfunction. The
-        material functions will be defined on this mesh
-
-    """
 
     def __init__(self, region_material_properties, region_meshfunction, mesh):
+        """Set up material property functions
+    
+        @param region_material_properties: A dict with key region_no, value
+            MaterialProperties object for that region number
+        @param region_meshfunction: A dolfin MeshFunction mapping elements to
+            region numbers. If it is None, all elements are set to region 0
+        @param mesh: A dolfin Mesh object relating to region_meshfunction. The
+            material functions will be defined on this mesh
+        """
         self.region_material_properties = region_material_properties
         # if the meshfunction is not defined then initialise to a zero mesh function
         if region_meshfunction is None:
@@ -108,20 +100,14 @@ class MaterialFunctionFactory(object):
     def get_material_functions(self, *property_names):
         """Return material functions for the requested properties
 
-        Input Parameters
-        ----------------
-
-        property_names -- Sequence of property names for which to
+        @param property_names: A sequence of property names for which to
             calculate material functions
-            
-        Note, the property names have to be defined by the
-        region_material_properties objects passed to the class
-        constructor
+        
+            Note, the property names have to be defined by the
+            region_material_properties objects passed to the class
+            constructor
 
-        Return Value
-
-        dict with {property_name:property_value_function}
-
+        @return: a dict with elements {property_name:property_value_function}
         """
         
         mat_fns = {}

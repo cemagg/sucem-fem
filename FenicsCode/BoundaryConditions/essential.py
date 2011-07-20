@@ -23,15 +23,12 @@ class EssentialBoundaryCondition(BoundaryCondition):
 
     def init_with_meshfunction(self, mesh_function, region_number):
         """Initialise using a mesh function to indicate boundary region
-
-        Parameters
-        ----------
-
-        mesh_function -- A 'uint' mesh function defined on the facets
+        
+        @param mesh_function: A 'uint' mesh function defined on the facets
             (i.e. of dimension one lower than mesh geometry) of the
             computational mesh
 
-        region_number -- Region number (as defined in mesh_function)
+        @param region_number: The region number (as defined in mesh_function)
             that this boundary condition should be applied to
         """
         self.set_region_number ( region_number )
@@ -51,6 +48,8 @@ class EssentialBoundaryCondition(BoundaryCondition):
         """Return an essential boundary condition application function.
 
         See parent class documentation for more details
+        
+        @return: The application function for the Dirichlet boundary condition
         """
         if function_space is not None: self.set_function_space ( function_space )
                 

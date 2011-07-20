@@ -6,9 +6,11 @@ import dolfin
 
 def set_dolfin_optimisation(enable=True):
     """Set dolfin optimization options
-
-    enable = True -> optimization enabled
-    enable = False -> disabled
+    
+    @keyword enable:  
+        True -> optimization enabled
+        False -> disabled
+        (default: True).
     """
     dolfin.parameters['optimize_form'] = enable
     dolfin.parameters['optimize'] = enable

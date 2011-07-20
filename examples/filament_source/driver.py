@@ -8,7 +8,7 @@ import os
 import dolfin
 sys.path.insert(0, '../../')
 import FenicsCode.Sources.current_source
-import FenicsCode.BoundaryConditions.ABC
+from FenicsCode.BoundaryConditions import ABCBoundaryCondition, BoundaryConditions
 import FenicsCode.Utilities.LinalgSolvers
 import FenicsCode.Utilities.Optimization
 from FenicsCode.Utilities.MeshGenerators import get_centred_cube
@@ -53,9 +53,9 @@ material_mesh_func = dolfin.MeshFunction('uint', mesh, 3)
 material_mesh_func.set_all(0)
 materials = {0:dict(eps_r=1, mu_r=1),}
 ## Set up 1st-order analytical ABC
-abc = FenicsCode.BoundaryConditions.ABC.ABCBoundaryCondition()
+abc = ABCBoundaryCondition()
 abc.set_region_number(1)
-bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
+bcs = BoundaryConditions()
 bcs.add_boundary_condition(abc)
 ## Set up high level problem class
 dp = DrivenProblemABC()

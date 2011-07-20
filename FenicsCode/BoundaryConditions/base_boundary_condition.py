@@ -26,11 +26,7 @@ class BoundaryCondition(object):
         (i.e. PEC) boundary condition if
         set_boundary_value_expression() is not called
 
-        Parameters
-        ----------
-
-        boundary_value_expression -- dolfin expression object
-
+        @param boundary_value_expression: a dolfin expression object
         """
         self.boundary_value_expression = boundary_value_expression
         
@@ -44,34 +40,25 @@ class BoundaryCondition(object):
     def set_region_number(self, region_number):
         """ Set region number of BC. Currently ignored, but required
         by the BC structure.
+        
+        @param region_number: the region number to which the boundary condition must be applied.
         """
         self.region_number = region_number 
     
     def set_function_space(self, function_space):
         """Set function space on which the essential boundary condition is to be applied.
 
-        Parameters
-        ----------
-
-        function_space -- dolfin function space object 
-
+        @param function_space: a dolfin function space object 
         """
         self.function_space = function_space
 
     def get_essential_application_func(self, function_space=None):
         """Return an essential boundary condition application function.
 
-        Parameters
-        ----------
-
-        function_space -- Optional dolfin function space to use for
+        @keyword function_space: An optional dolfin function space to use for
             constructing the essential boundary condition. If None is
             specified, the function space stored in self is used.
-
-        Return value
-        ------------
-
-        apply(A, [b]) -- A function that applies the essential
+        @return: A function that applies the essential
             component of the boundary condition to the system matrix
             equation with the matrix A on LHS and the optional vector
             b on the RHS.
@@ -81,17 +68,10 @@ class BoundaryCondition(object):
     def get_linear_form(self, test_function=None):
         """Return boundary condition's  linear form contribution as a dolfin form
 
-        Parameters
-        ----------
-
-        test_function -- Optional dolfin testing function to use in
+        @param test_function: An optional dolfin testing function to use in
             the form construction. If None is specified, the testing
             function stored in self is used
-
-        Return value
-        ------------
-        
-        linear_form -- A dolfin linear form. The contribution of the
+        @return: a dolfin linear form. The contribution of the
             linear form should be added to the form used to calculate
             the RHS of the system matrix equation that is eventually
             solved.
@@ -101,21 +81,13 @@ class BoundaryCondition(object):
     def get_bilinear_form(self, test_function=None, trial_function=None):
         """Return boundary condition's  bilinear form contribution as a dolfin form
 
-        Parameters
-        ----------
-
-        test_function -- Optional dolfin testing function to use in
+        @param test_function: An optional dolfin testing function to use in
             the form construction. If None is specified, the testing
             function stored in self is used
-
-        trial_function -- Optional dolfin trial function to use in
+        @param trial_function: An optional dolfin trial function to use in
             the form construction. If None is specified, the trial
             function stored in self is used
-
-        Return value
-        ------------
-        
-        bilinear_form -- A dolfin linear form. This linear form should
+        @return: A dolfin linear form. This linear form should
             be added to the form used to calculate the RHS of the
             system matrix equation that is eventually solved.
         """

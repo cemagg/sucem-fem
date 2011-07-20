@@ -21,19 +21,7 @@ class CurrentSources(object):
             src.set_function_space(self.function_space)
         
     def get_source_contributions(self):
-        """Calculate the RHS contribution of all current contained sources 
-
-        Return Values
-        -------------
-        (dofnos, rhs_contribs) with
-
-        dofnos -- Array of degree of freedom indices of the source contribution
-
-        rhs_contribs -- Numerical values of RHS contribution
-
-        Calculated such that RHS[dofnos] += rhs_contribs will add the
-        current sources' contribution to the system.
-
+        """Get and return the RHS contribution of the current source
         """
         contribs = collections.defaultdict(lambda : 0.)
         for src in self.sources:
@@ -53,15 +41,13 @@ class CurrentSource(object):
         self.function_space = function_space
 
     def get_contribution(self):
-        """Get the RHS contribution of the current source
-        Return Values
-        -------------
-        (dofnos, rhs_contribs) with
-
-        dofnos -- Array of degree of freedom indices of the source contribution
-
-        rhs_contribs -- Numerical values of RHS contribution, such that
-           RHS[dofnos] += rhs_contribs will add the current source to the system.
+        """Get and return the RHS contribution of the current source
         
+        @raise NotImplementedError: This method should be implemented in a sub-class.
+        @rtype: (C{numpy.array}, C{numpy.array})
+        @return: (dofnos, rhs_contribs) -- An array containing the indices of the degrees of freedom associated with
+            the source, and the numerical values of the contributions of the current source.
+            
+            C{RHS[dofnos] += rhs_contribs} will add the current source to the system's RHS.
         """
         raise NotImplementedError('User subclass should implement get_contribution()')

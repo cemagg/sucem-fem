@@ -81,9 +81,6 @@ class CombineGalerkinForms(object):
     def get_combined_forms(self):
         """Get combined forms
 
-        Return value
-        ------------
-
         combined_forms[matrix_name] -- a dict with forms as required
         to calculate system matrix 'matrix_name'. E.g.
 
@@ -92,11 +89,11 @@ class CombineGalerkinForms(object):
         where 'M' is the name of the matrix and 'mass_form' is the
         form required to calculate the matrix. 
 
-        This function will raise a NotImplementedError. Concrete
-        classes should sub-class CombineForms to provide an
-        implementation. The concrete class should use a combination of
-        self.interior_forms and self.boundary_conditions to calculate
-        the final forms.
+        @raise NotImplementedError: If the sub-class does not itself implement this method.
+            The sub-class should use C{self.interior_forms} and C{self.boundary_conditions}
+            to calculate the final forms.
+        @return: The forms for the various matrices or boundary conditions.
+            eg: {'M': mass_form; 'ABC': abc_form}
         """
         raise NotImplementedError("Use a concrete class")
 

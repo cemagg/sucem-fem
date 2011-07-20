@@ -8,14 +8,22 @@ from FenicsCode.BoundaryConditions import BoundaryCondition
 class ABCBoundaryCondition(BoundaryCondition):
     """
     Implements a first-order ABC, i.e. assuming 
-    n x curl(E) + j*k_0*(n x (n x E)) = 0.
-
-    Currently the ABC is applied to the whole exterior. Should be made
+    
+    M{n S{times} curl(E) + j*k_0*(n S{times} (n S{times} E)) = 0.}
+    
+    @todo: Currently the ABC is applied to the whole exterior. Should be made
     to work with mesh function region numbers in the future.
-
     """
     def get_bilinear_form(self, test_function=None, trial_function=None):
-        """Get bilinear form for implementing the ABC
+        """Calculate and return the bilinear form associated with the boundary condition.
+        
+        The form is calculated as: M{<n S{times} v, n S{times} u>}, where M{v} and M{u} are the 
+        test and trial functions, respectively.
+        
+        @keyword test_function: override the stored test function space. 
+            (default: None.)
+        @keyword trial_function: override the stored trial function space.
+            (default: None.)
         """
         V = self.function_space 
         if test_function is None:

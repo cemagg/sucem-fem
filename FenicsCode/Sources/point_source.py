@@ -30,20 +30,16 @@ class PointCurrentSource(CurrentSource):
 
 def calc_pointsource_contrib(V, source_coords, source_value):
     """Calculate the RHS contribution of a current point source (i.e. electric dipole)
-    Input Values
-    -------------
+    
     @param V: dolfin FunctionSpace object
     @param source_coords: length 3 array with x,y,z coordinates of point source
     @param source_value: length 3 array with x,y,z componets of source current 
-    Return Values
-    -------------
-    (dofnos, rhs_contribs) with
-
-    dofnos -- Array of degree of freedom indices of the source contribution
-
-    rhs_contribs -- Numerical values of RHS contribution, such that
-        RHS[dofnos] += rhs_contribs will add the current source to the system.
-
+    
+    @rtype: (C{numpy.array}, C{numpy.array})
+    @return: (dofnos, rhs_contribs) -- An array containing the indices of the degrees of freedom associated with
+        the source, and the numerical values of the contributions of the current source.
+        
+        C{RHS[dofnos] += rhs_contribs} will add the current source to the system's RHS.
     """
     source_coords = N.asarray(source_coords, dtype=N.float64)
     source_value = N.asarray(source_value)
