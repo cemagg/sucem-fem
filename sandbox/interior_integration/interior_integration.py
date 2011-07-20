@@ -32,7 +32,9 @@ def use_generated_mesh():
     """construct a 1x1 mesh that has inside it a 0.5x0.5 square mesh.
     
     Integrate the dot product of the facet normal with a unit field in the x direction along each one of the 
-    sides of the interior square (0.5x0.5). The integral of the two vertical sides should equal the length of each side.
+    sides of the interior square (0.5x0.5). The integral of the two vertical sides should equal the length of each side,
+    with the sign indicating the direction of the normal. For the normal pointing out of the inner square, 
+    the left (100) integral should be -0.5 and the right (102) integral should be +0.5.
     """
     print 'Generated Mesh:'
     class Left ( SubDomain ):
