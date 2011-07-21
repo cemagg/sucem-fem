@@ -56,11 +56,11 @@ emfunc.set_g_dofs(1j*x_dirich.conjugate()/k0/Z0)
 emfunc.set_k0(k0)
 cell_domains = dolfin.CellFunction('uint', mesh)
 cell_domains.set_all(1)
-# cell_region = 0
-cell_region = 1                         # Temporarily mark everything
+cell_region = 0
 boundary_cells = Geometry.BoundaryEdgeCells(mesh)
 boundary_cells.mark(cell_domains, cell_region)
 emfunc.set_cell_domains(cell_domains, cell_region)
+
 var_energy_flux = emfunc.calc_functional().conjugate()
 
 
