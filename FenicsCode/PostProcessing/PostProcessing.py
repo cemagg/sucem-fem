@@ -62,6 +62,7 @@ class CalcEMFunctional(object):
         self.cell_domains = None
         self.epsr_function = None
         self.mur_function = None
+        self._form_compiler_parameters = None
         self.dirty = True
         
     def set_k0(self, k0):
@@ -86,6 +87,14 @@ class CalcEMFunctional(object):
     def set_mur_function(self, mur_function):
         self.mur_function = mur_function
         self.dirty = True
+
+    def set_quadrature_degree(self, quadrature_degree):
+        """Optionally set quadrature degre, otherwise dolfin auto is used"""
+        self.quadrature_degree = quadrature_degree
+        if self._form_compiler_parameters is None:
+            self._form_compiler_parameters = {}
+        self._form_compiler_parameters.update(dict(
+            quadrature_degree=quadrature_degree))
 
     def _get_epsr_function(self):
         if self.epsr_function is not None:
@@ -134,7 +143,11 @@ class CalcEMFunctional(object):
     def calc_functional(self):
         """Calculate functional using given E, g and k0 values"""
         form_r, form_i = self._get_forms()
-        I_r = dolfin.assemble(self.form_r, cell_domains=self.cell_domains)
-        I_i = dolfin.assemble(self.form_i, cell_domains=self.cell_domains)
+        I_r = dolfin.assemble(
+            self.form_r, cell_domains=self.cell_domains,
+            form_compiler_parameters=self._form_compiler_parameters)
+        I_i = dolfin.assemble(
+            self.form_i, cell_domains=self.cell_domains,
+            form_compiler_parameters=self._form_compiler_parameters)
 
         return I_r + 1j*I_i
