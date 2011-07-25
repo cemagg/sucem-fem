@@ -12,13 +12,16 @@ from FenicsCode.Consts import eps0, mu0, c0, Z0
 from FenicsCode.Utilities.Converters import as_dolfin_vector
 import FenicsCode.Utilities.Optimization
 
+from FenicsCode import Geometry 
 from FenicsCode.Sources.PostProcess import ComplexVoltageAlongLine
+from FenicsCode.PostProcessing import CalcEMFunctional
 
 # Enable dolfin's form optimizations
 FenicsCode.Utilities.Optimization.set_dolfin_optimisation()
 
 
-fname = 'data/f-1000000000.000000_o-2_s-0.299792_l-0.001000_h-0.166667'
+fname = 'data/f-1000000000.000000_o-2_s-0.299792_l-0.100000_h-0.166667'
+#fname = 'data/f-1000000000.000000_o-2_s-0.299792_l-0.100000_h-0.083333'
 data = pickle.load(open(fname+'.pickle'))
 mesh = dolfin.Mesh(data['meshfile'])
 material_meshfn = dolfin.MeshFunction('uint', mesh, data['materialsfile'])
@@ -37,8 +40,37 @@ ReS = (1/k0/Z0)*dolfin.dot(n, (dolfin.cross(E_r, -dolfin.curl(E_i)) +
 
 energy_flux = dolfin.assemble(ReS)
 
+def boundary(x, on_boundary):
+    return on_boundary
+E_r_dirich = dolfin.DirichletBC(V, E_r, boundary)
+x_r_dirich = as_dolfin_vector(np.zeros(len(x)))
+E_r_dirich.apply(x_r_dirich)
+E_i_dirich = dolfin.DirichletBC(V, E_i, boundary)
+x_i_dirich = as_dolfin_vector(np.zeros(len(x)))
+E_i_dirich.apply(x_i_dirich)
+x_dirich = x_r_dirich.array() + 1j*x_i_dirich.array()
+
+emfunc = CalcEMFunctional(V)
+emfunc.set_E_dofs(x)
+emfunc.set_g_dofs(1j*x_dirich.conjugate()/k0/Z0)
+emfunc.set_k0(k0)
+cell_domains = dolfin.CellFunction('uint', mesh)
+cell_domains.set_all(1)
+cell_region = 0
+boundary_cells = Geometry.BoundaryEdgeCells(mesh)
+boundary_cells.mark(cell_domains, cell_region)
+emfunc.set_cell_domains(cell_domains, cell_region)
+
+var_energy_flux = emfunc.calc_functional().conjugate()
+
+
 complex_voltage = ComplexVoltageAlongLine(V)
 complex_voltage.set_dofs(x)
+
 volts = complex_voltage.calculate_voltage(*data['source_endpoints'])
 
-print 'source power: ', volts*data['I'], ' energy flux: ', energy_flux
+
+
+print 'source power: ', volts*data['I']
+print 'energy flux:      ', energy_flux
+print 'var energy flux: ', var_energy_flux

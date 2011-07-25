@@ -62,10 +62,13 @@ class CalcEMFunctional(object):
         self.cell_domains = None
         self.epsr_function = None
         self.mur_function = None
+        self._form_compiler_parameters = None
+        self.dirty = True
         
     def set_k0(self, k0):
         self.k0 = k0
-        self.form_r, self.form_i = self._get_forms()
+        self.dirty = True
+
 
     def set_cell_domains(self, cell_domains, cell_mark_value):
         """Set cell domain mesh function
@@ -75,12 +78,23 @@ class CalcEMFunctional(object):
         self.cell_domains = cell_domains
         self.cell_mark_value = cell_mark_value
         self.dx = dx(self.cell_mark_value)
+        self.dirty = True
         
     def set_epsr_function(self, permittivity_function):
         self.epsr_function = epsr_function
+        self.dirty = True
         
     def set_mur_function(self, mur_function):
         self.mur_function = mur_function
+        self.dirty = True
+
+    def set_quadrature_degree(self, quadrature_degree):
+        """Optionally set quadrature degre, otherwise dolfin auto is used"""
+        self.quadrature_degree = quadrature_degree
+        if self._form_compiler_parameters is None:
+            self._form_compiler_parameters = {}
+        self._form_compiler_parameters.update(dict(
+            quadrature_degree=quadrature_degree))
 
     def _get_epsr_function(self):
         if self.epsr_function is not None:
@@ -99,15 +113,20 @@ class CalcEMFunctional(object):
         return mur_func
 
     def _get_forms(self):
-        E_r, E_i, g_r, g_i = self.E_r, self.E_i, self.g_r, self.g_i
-        k0 = self.k0
-        eps_r = self._get_epsr_function()
-        mu_r = self._get_mur_function()
-        form_r = (dot(curl(E_r)/mu_r, curl(g_r)) - dot(curl(E_i)/mu_r, curl(g_i)) \
-                  + k0**2*dot(eps_r*E_r, g_r) - dot(eps_r*E_i, g_i))*self.dx
-        form_i = (dot(curl(E_r)/mu_r, curl(g_i)) + dot(curl(E_i)/mu_r, curl(g_r)) \
-                  + k0**2*dot(eps_r*E_r, g_i) - dot(eps_r*E_i, g_r))*self.dx
-        return form_r, form_i
+        if self.dirty:
+            E_r, E_i, g_r, g_i = self.E_r, self.E_i, self.g_r, self.g_i
+            k0 = self.k0
+            eps_r = self._get_epsr_function()
+            mu_r = self._get_mur_function()
+            form_r = (dot(curl(E_r)/mu_r, curl(g_r)) - dot(curl(E_i)/mu_r, curl(g_i)) \
+                      + k0**2*dot(eps_r*E_r, g_r) - dot(eps_r*E_i, g_i))*self.dx
+            form_i = (dot(curl(E_r)/mu_r, curl(g_i)) + dot(curl(E_i)/mu_r, curl(g_r)) \
+                  + k0**2*dot(eps_r*E_r, g_i) - dot(eps_r*E_i,
+                    g_r))*self.dx
+            self.form_r, self.form_i = form_r, form_i
+            self.dirty = False
+
+        return self.form_r, self.form_i
 
     def set_E_dofs(self, E_dofs):
         x_r = N.real(E_dofs).copy()
@@ -123,7 +142,12 @@ class CalcEMFunctional(object):
 
     def calc_functional(self):
         """Calculate functional using given E, g and k0 values"""
-        I_r = dolfin.assemble(self.form_r, cell_domains=self.cell_domains)
-        I_i = dolfin.assemble(self.form_i, cell_domains=self.cell_domains)
+        form_r, form_i = self._get_forms()
+        I_r = dolfin.assemble(
+            self.form_r, cell_domains=self.cell_domains,
+            form_compiler_parameters=self._form_compiler_parameters)
+        I_i = dolfin.assemble(
+            self.form_i, cell_domains=self.cell_domains,
+            form_compiler_parameters=self._form_compiler_parameters)
 
         return I_r + 1j*I_i

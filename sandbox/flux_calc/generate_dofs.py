@@ -33,7 +33,7 @@ phi_deg = N.zeros(no_ff_pts)
 ### Problem parameters
 freq =  1.0e+9                          # Frequency
 lam = c0/freq
-l = lam/1000                            # Dipole length
+l = lam/10                            # Dipole length
 I = 1.0                                 # Dipole current
 source_direction = N.array([0,0,1.])    # Source orientation
 source_centre = N.array([0,0,0.])        # Position of the source
@@ -42,8 +42,8 @@ source_endpoints =  N.array(
 
 ### Discretisation settings
 order = 2
-domain_size = N.array([lam]*3)*1
-max_edge_len = lam/6
+domain_size = N.array([lam]*3)*0.25
+max_edge_len = lam/36
 mesh = get_centred_cube(domain_size, max_edge_len)
 
 fname = 'data/f-%f_o-%d_s-%f_l-%f_h-%f' % (freq, order,
