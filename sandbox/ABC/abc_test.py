@@ -28,7 +28,7 @@ import dolfin as dol
 from dolfin import dot, cross, curl, inner, dx, ds
 import scipy.sparse
 
-from FenicsCode.Consts import eps0, mu0, c0
+from sucemfem.Consts import eps0, mu0, c0
 import point_source
 reload(point_source)
 

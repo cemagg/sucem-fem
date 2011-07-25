@@ -30,12 +30,12 @@ import os
 import sys
 
 sys.path.insert(0, '../../')
-from FenicsCode.Consts import eps0, mu0, c0, Z0
-from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
-from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
-from FenicsCode.Sources import point_source
-from FenicsCode.Utilities.LinalgSolvers import BiCGStabSolver, GMRESSolver, calculate_residual, UMFPACKSolver, PyAMGSolver
-from FenicsCode.Utilities.MatrixIO import ( load_scipy_matrix_from_mat, save_scipy_matrix_as_mat)
+from sucemfem.Consts import eps0, mu0, c0, Z0
+from sucemfem.Utilities.MeshIO import femmesh_2_dolfin_mesh
+from sucemfem.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
+from sucemfem.Sources import point_source
+from sucemfem.Utilities.LinalgSolvers import BiCGStabSolver, GMRESSolver, calculate_residual, UMFPACKSolver, PyAMGSolver
+from sucemfem.Utilities.MatrixIO import ( load_scipy_matrix_from_mat, save_scipy_matrix_as_mat)
 del sys.path[0]
 
 def generate_matrices ( mesh_file, order ):

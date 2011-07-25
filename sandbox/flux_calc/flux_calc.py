@@ -26,16 +26,16 @@ import numpy as np
 import sys
 import dolfin
 sys.path.append('../../')
-from FenicsCode.Consts import eps0, mu0, c0, Z0
-from FenicsCode.Utilities.Converters import as_dolfin_vector
-import FenicsCode.Utilities.Optimization
+from sucemfem.Consts import eps0, mu0, c0, Z0
+from sucemfem.Utilities.Converters import as_dolfin_vector
+import sucemfem.Utilities.Optimization
 
-from FenicsCode import Geometry 
-from FenicsCode.Sources.PostProcess import ComplexVoltageAlongLine
-from FenicsCode.PostProcessing import CalcEMFunctional
+from sucemfem import Geometry 
+from sucemfem.Sources.PostProcess import ComplexVoltageAlongLine
+from sucemfem.PostProcessing import CalcEMFunctional
 
 # Enable dolfin's form optimizations
-FenicsCode.Utilities.Optimization.set_dolfin_optimisation()
+sucemfem.Utilities.Optimization.set_dolfin_optimisation()
 
 
 fname = 'data/f-1000000000.000000_o-2_s-0.299792_l-0.100000_h-0.166667'

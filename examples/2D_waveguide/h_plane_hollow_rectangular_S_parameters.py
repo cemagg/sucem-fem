@@ -29,8 +29,8 @@ import csv
 
 import sys
 sys.path.insert(0, '../../')
-from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
-from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
+from sucemfem.Utilities.LinalgSolvers import solve_sparse_system
+from sucemfem.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
 del sys.path[0]
 #from solvers import CutoffSquared
 #parameters["linear algebra backend"] = "uBLAS"

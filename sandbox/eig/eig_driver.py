@@ -26,10 +26,10 @@ import numpy as N
 import os
 import dolfin as dol
 
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
+from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
+from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
 
-from FenicsCode.Consts import c0
+from sucemfem.Consts import c0
 
 
 # Define mesh

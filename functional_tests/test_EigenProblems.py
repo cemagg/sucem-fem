@@ -30,11 +30,11 @@ import unittest
 
 if __name__ == "__main__":
     sys.path.insert(0, "../")
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem, DefaultEigenSolver 
-from FenicsCode.Consts import c0
-from FenicsCode.Testing.Paths import get_module_path
+from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem, DefaultEigenSolver 
+from sucemfem.Consts import c0
+from sucemfem.Testing.Paths import get_module_path
 
-from FenicsCode.BoundaryConditions import PECWallsBoundaryCondition 
+from sucemfem.BoundaryConditions import PECWallsBoundaryCondition 
 
 if __name__ == "__main__":
     del sys.path[0]

@@ -26,13 +26,13 @@ import dolfin
 
 import sys
 sys.path.append('../../')
-from FenicsCode.Consts import Z0, c0
-from FenicsCode.Utilities.MeshGenerators import get_centred_cube
-import FenicsCode.Utilities.Optimization
-from FenicsCode.PostProcessing import surface_ntff, variational_ntff
+from sucemfem.Consts import Z0, c0
+from sucemfem.Utilities.MeshGenerators import get_centred_cube
+import sucemfem.Utilities.Optimization
+from sucemfem.PostProcessing import surface_ntff, variational_ntff
 
 # Enable dolfin's form optimizations
-FenicsCode.Utilities.Optimization.set_dolfin_optimisation()
+sucemfem.Utilities.Optimization.set_dolfin_optimisation()
 
 # Near-field of an infintesimal dipole
 fname = 'reference_dofs-2-0.149896229-0.0499654096667.pickle'
