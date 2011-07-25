@@ -1,8 +1,0 @@
-load("HexaBasisFunction")$
-load("BrickCoords")$
-onef_refval(BF, lam):=ev(to_var_list(BF), grd_lam:[[1,0,0], [0,1,0], [0,0,1]])$
-make_refval_list(BFs, reffun, lams):=map(
-  lambda([BF], map(lambda([lam], reffun(BF, lam)), lams)),
-               BFs)$
-
-calc_refvals():=onef_efs_CTLN_refvals:make_refval_list(efs, onef_refval, test_lams)$

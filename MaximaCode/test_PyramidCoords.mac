@@ -1,6 +1,0 @@
-load("PyramidCoords")$
-load("SixPyrams")$
-
-cov_basevecs:makelist(subs_verts([g1, g2, g3], verts), verts, el_verts)$
-
-con_basevecs:makelist(subs_verts([l1, l2, l3]/J, verts), verts, el_verts)$
