@@ -4,6 +4,8 @@ import dolfin
 import numpy as N
 from dolfin import dx, dot, curl
 
+__all__ = ['Reconstruct', 'CalcEMFunctional']
+
 class Reconstruct(object):
     """Reconstruct field values, dealing with complex numbers as required"""
 
@@ -121,8 +123,7 @@ class CalcEMFunctional(object):
             form_r = (dot(curl(E_r)/mu_r, curl(g_r)) - dot(curl(E_i)/mu_r, curl(g_i)) \
                       + k0**2*dot(eps_r*E_r, g_r) - dot(eps_r*E_i, g_i))*self.dx
             form_i = (dot(curl(E_r)/mu_r, curl(g_i)) + dot(curl(E_i)/mu_r, curl(g_r)) \
-                  + k0**2*dot(eps_r*E_r, g_i) - dot(eps_r*E_i,
-                    g_r))*self.dx
+                  + k0**2*dot(eps_r*E_r, g_i) - dot(eps_r*E_i, g_r))*self.dx
             self.form_r, self.form_i = form_r, form_i
             self.dirty = False
 
@@ -151,3 +152,4 @@ class CalcEMFunctional(object):
             form_compiler_parameters=self._form_compiler_parameters)
 
         return I_r + 1j*I_i
+
