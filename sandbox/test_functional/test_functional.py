@@ -38,7 +38,8 @@ from sucemfem.Utilities.MeshGenerators import get_centred_cube
 from sucemfem.Consts import eps0, mu0, c0
 from sucemfem.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
 from sucemfem.Sources.fillament_current_source import FillamentCurrentSource
-from sucemfem.PostProcessing import surface_ntff
+#from sucemfem.PostProcessing import surface_ntff
+from sucemfem.PostProcessing import variational_ntff
 from sucemfem.Testing.ErrorMeasures import normalised_RMS
 from sucemfem.Testing.Analytical import current_fillament_farfield
 
@@ -111,10 +112,10 @@ x_z = umf_solver.solve(b_z)
 
 ## Post-process solution to obtain far-field
 print 'calculating far field'
-surf_ntff = surface_ntff.NTFF(dp.function_space)
-surf_ntff.set_dofs(x_z)
-surf_ntff.set_frequency(freq)
-surf_E_ff_z = N.array([surf_ntff.calc_pt(th_deg, ph_deg)
+var_ntff = variational_ntff.NTFF(dp.function_space)
+var_ntff.set_dofs(x_z)
+var_ntff.set_frequency(freq)
+surf_E_ff_z = N.array([var_ntff.calc_pt(th_deg, ph_deg)
                 for th_deg, ph_deg in zip(theta_deg, phi_deg)])
 surf_E_theta_z = surf_E_ff_z[:,0]
 surf_E_phi_z = surf_E_ff_z[:,1]
