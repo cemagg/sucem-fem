@@ -1,5 +1,0 @@
-** Revised 6 June 99 DBD, MP -> MA 25 Nov 99 DBD
-** Cube 1 by 0.5 by 0.75 (x;y;z) centered on (0,0,0.375)
-** Originally labelled test.fek
-BEGIN_FEM
-END_FEM

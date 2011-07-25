@@ -1,8 +1,0 @@
-/* This pyramid is set up such that u1 = x, u2 = y, u3 = z*/
-
-el_verts:[[[ 0  ,  0  ,  0  ],
-           [ 0  ,  1  ,  0  ],
-           [ 1  ,  0  ,  0  ],
-           [ 1  ,  1  ,  0  ],
-           [ 0  ,  0  ,  1/2]]]$
-
