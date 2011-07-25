@@ -1,3 +1,21 @@
+## Copyright (C) 2011 Stellenbosch University
+##
+## This file is part of SUCEM.
+##
+## SUCEM is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## SUCEM is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with SUCEM. If not, see <http:##www.gnu.org/licenses/>. 
+##
+## Contact: cemagga@gmail.com 
 # Authors:
 # Evan Lezar <mail@evanlezar.com>
 
@@ -33,10 +51,11 @@ def use_generated_mesh():
     
     Integrate the dot product of the facet normal with a unit field in
     the x direction along each one of the sides of the interior square
-    (0.5x0.5).
-
-    The integral of the two vertical sides should equal the
-    length of each side.
+    (0.5x0.5). The integral of the two vertical sides should equal the
+    length of each side, with the sign indicating the direction of the
+    normal. For the normal pointing out of the inner square, the left
+    (100) integral should be -0.5 and the right (102) integral should
+    be +0.5.
     """
     print 'Generated Mesh:'
     class Left ( SubDomain ):
@@ -63,6 +82,24 @@ def use_generated_mesh():
                 return True
             return False
     
+    class A (SubDomain):
+        def inside (self, x, on_boundary):
+            if ( x[0] >= 0.25 and x[0] <= 0.75 ) and ( x[1] >= 0.25 and x[1] <= 0.75 ):
+                return True
+            else:
+                return False
+            
+    class Interior ( Expression ):
+        def __init__ (self, domain, **kwargs):
+            self._domain = domain;
+        def eval (self, value, x):
+            if self._domain.inside ( x, False ):
+                value[0] = 1;
+            else:
+                value[0] = 0;
+        def value_shape (self):
+            return (1,)
+    
     sides = ['left', 'top', 'right', 'bottom']
     
     mesh = UnitSquare ( 8, 8 )
@@ -84,9 +121,12 @@ def use_generated_mesh():
     bottom_side = Bottom ( )
     bottom_side.mark( interior_edges, 103 )
     
+    DG = FunctionSpace(mesh, "DG", 0)
+    AB = Interior (domain=A(), element=DG.ufl_element())
+    
     for interior_edge in [100, 101, 102, 103]:
         n = V.cell().n
-        l_p = dot( n('+'), E('+'))*dS(interior_edge)
+        l_p = dot( (AB('+')-AB('-'))*n('+'), E('+'))*dS(interior_edge)
         print sides[interior_edge-100], assemble ( l_p, interior_facet_domains=interior_edges, mesh=mesh )
     
     print '----'

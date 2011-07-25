@@ -1,3 +1,21 @@
+## Copyright (C) 2011 Stellenbosch University
+##
+## This file is part of SUCEM.
+##
+## SUCEM is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## SUCEM is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with SUCEM. If not, see <http:##www.gnu.org/licenses/>. 
+##
+## Contact: cemagga@gmail.com 
 __author__ = "Evan Lezar"
 
 """
@@ -12,12 +30,12 @@ import os
 import sys
 
 sys.path.insert(0, '../../')
-from FenicsCode.Consts import eps0, mu0, c0, Z0
-from FenicsCode.Utilities.MeshIO import femmesh_2_dolfin_mesh
-from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
-from FenicsCode.Sources import point_source
-from FenicsCode.Utilities.LinalgSolvers import BiCGStabSolver, GMRESSolver, calculate_residual, UMFPACKSolver, PyAMGSolver
-from FenicsCode.Utilities.MatrixIO import ( load_scipy_matrix_from_mat, save_scipy_matrix_as_mat)
+from sucemfem.Consts import eps0, mu0, c0, Z0
+from sucemfem.Utilities.MeshIO import femmesh_2_dolfin_mesh
+from sucemfem.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
+from sucemfem.Sources import point_source
+from sucemfem.Utilities.LinalgSolvers import BiCGStabSolver, GMRESSolver, calculate_residual, UMFPACKSolver, PyAMGSolver
+from sucemfem.Utilities.MatrixIO import ( load_scipy_matrix_from_mat, save_scipy_matrix_as_mat)
 del sys.path[0]
 
 def generate_matrices ( mesh_file, order ):

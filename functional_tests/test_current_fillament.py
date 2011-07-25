@@ -1,3 +1,21 @@
+## Copyright (C) 2011 Stellenbosch University
+##
+## This file is part of SUCEM.
+##
+## SUCEM is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## SUCEM is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with SUCEM. If not, see <http:##www.gnu.org/licenses/>. 
+##
+## Contact: cemagga@gmail.com 
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
 from __future__ import division
@@ -8,21 +26,21 @@ This is a functional test for the far-field solution of a constant-current filla
 import numpy as N
 import dolfin
 import unittest
-import FenicsCode.Sources.current_source
-import FenicsCode.Utilities.LinalgSolvers
-import FenicsCode.Utilities.Optimization
-from FenicsCode.BoundaryConditions import ABCBoundaryCondition, BoundaryConditions
-from FenicsCode.Utilities.MeshGenerators import get_centred_cube
-from FenicsCode.Consts import eps0, mu0, c0
-from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
-from FenicsCode.Sources.fillament_current_source import FillamentCurrentSource
-from FenicsCode.PostProcessing import surface_ntff
-from FenicsCode.Testing.ErrorMeasures import normalised_RMS
-from FenicsCode.Testing.Analytical import current_fillament_farfield
+import sucemfem.Sources.current_source
+import sucemfem.Utilities.LinalgSolvers
+import sucemfem.Utilities.Optimization
+from sucemfem.BoundaryConditions import ABCBoundaryCondition, BoundaryConditions
+from sucemfem.Utilities.MeshGenerators import get_centred_cube
+from sucemfem.Consts import eps0, mu0, c0
+from sucemfem.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
+from sucemfem.Sources.fillament_current_source import FillamentCurrentSource
+from sucemfem.PostProcessing import surface_ntff
+from sucemfem.Testing.ErrorMeasures import normalised_RMS
+from sucemfem.Testing.Analytical import current_fillament_farfield
 
 class test_current_fillament(unittest.TestCase):
     def test_ff_error(self):
-        FenicsCode.Utilities.Optimization.set_dolfin_optimisation(True)
+        sucemfem.Utilities.Optimization.set_dolfin_optimisation(True)
         ### Postprocessing requests
         theta_deg = N.linspace(10, 170, 161)
         no_ff_pts = len(theta_deg)
@@ -68,7 +86,7 @@ class test_current_fillament(unittest.TestCase):
         dp.set_region_meshfunction(material_mesh_func)
         dp.set_boundary_conditions(bcs)
         ## Set up current fillament source
-        current_sources = FenicsCode.Sources.current_source.CurrentSources()
+        current_sources = sucemfem.Sources.current_source.CurrentSources()
         fillament_source = FillamentCurrentSource()
         fillament_source.no_integration_points = 1000
         fillament_source.set_source_endpoints(source_endpoints_z)
@@ -90,7 +108,7 @@ class test_current_fillament(unittest.TestCase):
         #import pdb ; pdb.set_trace()
         A
         print 'solve using UMFPack'
-        umf_solver = FenicsCode.Utilities.LinalgSolvers.UMFPACKSolver(A)
+        umf_solver = sucemfem.Utilities.LinalgSolvers.UMFPACKSolver(A)
         x_z = umf_solver.solve(b_z)
         x_x = umf_solver.solve(b_x)
         x_y = umf_solver.solve(b_y)

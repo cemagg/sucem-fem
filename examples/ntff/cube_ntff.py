@@ -1,3 +1,21 @@
+## Copyright (C) 2011 Stellenbosch University
+##
+## This file is part of SUCEM.
+##
+## SUCEM is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## SUCEM is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with SUCEM. If not, see <http:##www.gnu.org/licenses/>. 
+##
+## Contact: cemagga@gmail.com 
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
 from __future__ import division
@@ -8,13 +26,13 @@ import dolfin
 
 import sys
 sys.path.append('../../')
-from FenicsCode.Consts import Z0, c0
-from FenicsCode.Utilities.MeshGenerators import get_centred_cube
-import FenicsCode.Utilities.Optimization
-from FenicsCode.PostProcessing import surface_ntff, variational_ntff
+from sucemfem.Consts import Z0, c0
+from sucemfem.Utilities.MeshGenerators import get_centred_cube
+import sucemfem.Utilities.Optimization
+from sucemfem.PostProcessing import surface_ntff, variational_ntff
 
 # Enable dolfin's form optimizations
-FenicsCode.Utilities.Optimization.set_dolfin_optimisation()
+sucemfem.Utilities.Optimization.set_dolfin_optimisation()
 
 # Near-field of an infintesimal dipole
 fname = 'reference_dofs-2-0.149896229-0.0499654096667.pickle'

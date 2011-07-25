@@ -1,3 +1,21 @@
+## Copyright (C) 2011 Stellenbosch University
+##
+## This file is part of SUCEM.
+##
+## SUCEM is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## SUCEM is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with SUCEM. If not, see <http:##www.gnu.org/licenses/>. 
+##
+## Contact: cemagga@gmail.com 
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
 from __future__ import division
@@ -7,14 +25,14 @@ import numpy as N
 import os
 import dolfin
 sys.path.insert(0, '../../')
-import FenicsCode.Sources.current_source
-from FenicsCode.BoundaryConditions import ABCBoundaryCondition, BoundaryConditions
-from FenicsCode.Consts import eps0, mu0, c0
-from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
-from FenicsCode.Sources import point_source
-from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
-from FenicsCode.Utilities.MeshGenerators import get_centred_cube
-from FenicsCode.PostProcessing import Reconstruct
+import sucemfem.Sources.current_source
+from sucemfem.BoundaryConditions import ABCBoundaryCondition, BoundaryConditions
+from sucemfem.Consts import eps0, mu0, c0
+from sucemfem.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
+from sucemfem.Sources import point_source
+from sucemfem.Utilities.LinalgSolvers import solve_sparse_system
+from sucemfem.Utilities.MeshGenerators import get_centred_cube
+from sucemfem.PostProcessing import Reconstruct
 from test_data import problem_data
 del sys.path[0]
 
@@ -50,7 +68,7 @@ dp.set_basis_order(order)
 dp.set_material_regions(materials)
 dp.set_region_meshfunction(material_mesh_func)
 dp.set_boundary_conditions(bcs)
-current_sources = FenicsCode.Sources.current_source.CurrentSources()
+current_sources = sucemfem.Sources.current_source.CurrentSources()
 dipole_source = point_source.PointCurrentSource()
 dipole_source.set_position(source_coord)
 dipole_source.set_value(source_value)

@@ -1,3 +1,21 @@
+## Copyright (C) 2011 Stellenbosch University
+##
+## This file is part of SUCEM.
+##
+## SUCEM is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## SUCEM is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with SUCEM. If not, see <http:##www.gnu.org/licenses/>. 
+##
+## Contact: cemagga@gmail.com 
 # Authors:
 # Evan Lezar <mail@evanlezar.com>
 """
@@ -11,8 +29,8 @@ import csv
 
 import sys
 sys.path.insert(0, '../../')
-from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
-from FenicsCode.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
+from sucemfem.Utilities.LinalgSolvers import solve_sparse_system
+from sucemfem.Utilities.Converters import dolfin_ublassparse_to_scipy_csr
 del sys.path[0]
 #from solvers import CutoffSquared
 #parameters["linear algebra backend"] = "uBLAS"

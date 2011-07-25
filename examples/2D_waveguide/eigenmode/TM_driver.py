@@ -1,3 +1,21 @@
+## Copyright (C) 2011 Stellenbosch University
+##
+## This file is part of SUCEM.
+##
+## SUCEM is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## SUCEM is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with SUCEM. If not, see <http:##www.gnu.org/licenses/>. 
+##
+## Contact: cemagga@gmail.com 
 # Authors:
 # Evan Lezar <mail@evanlezar.com>
 """A simple 2D eigenproblem which calculates the TM modes of a square guide.
@@ -12,9 +30,9 @@ import os
 import dolfin as dol
 
 sys.path.insert(0, '../../../')
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
-from FenicsCode.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
-from FenicsCode.Consts import c0
+from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
+from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
+from sucemfem.Consts import c0
 del sys.path[0]
 
 script_path = os.path.dirname(__file__)
