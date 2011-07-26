@@ -2,9 +2,6 @@ from __future__ import division
 
 import numpy as np
 
-6, 12, 24, 36, 48
-
-
 vflux = {'2':(1/np.array([6, 12, 24, 36, 48]),
             np.array([(25.1077957032-2.47363376041j ),
                       (25.5014203462-1.32217653023j ),  
