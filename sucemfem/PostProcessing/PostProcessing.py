@@ -139,9 +139,9 @@ class CalcEMFunctional(object):
             eps_r = self._get_epsr_function()
             mu_r = self._get_mur_function()
             form_r = (dot(curl(E_r)/mu_r, curl(g_r)) - dot(curl(E_i)/mu_r, curl(g_i)) \
-                      + k0**2*dot(eps_r*E_r, g_r) - dot(eps_r*E_i, g_i))*self.dx
+                      - k0**2*dot(eps_r*E_r, g_r) - dot(eps_r*E_i, g_i))*self.dx
             form_i = (dot(curl(E_r)/mu_r, curl(g_i)) + dot(curl(E_i)/mu_r, curl(g_r)) \
-                  + k0**2*dot(eps_r*E_r, g_i) - dot(eps_r*E_i, g_r))*self.dx
+                  - k0**2*dot(eps_r*E_r, g_i) + dot(eps_r*E_i, g_r))*self.dx
             self.form_r, self.form_i = form_r, form_i
             self.dirty = False
 
