@@ -1,21 +1,3 @@
-## Copyright (C) 2011 Stellenbosch University
-##
-## This file is part of SUCEM.
-##
-## SUCEM is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## SUCEM is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with SUCEM. If not, see <http://www.gnu.org/licenses/>. 
-##
-## Contact: cemagga@gmail.com 
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
 from __future__ import division
@@ -25,23 +7,23 @@ import numpy as N
 import os
 import dolfin
 sys.path.insert(0, '../../')
-import sucemfem.Sources.current_source
-import sucemfem.BoundaryConditions.ABC
-import sucemfem.Utilities.LinalgSolvers
-import sucemfem.Utilities.Optimization
-from sucemfem.Utilities.MeshGenerators import get_centred_cube
-from sucemfem.Consts import eps0, mu0, c0
-from sucemfem.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
-from sucemfem.Utilities.LinalgSolvers import solve_sparse_system
-from sucemfem.Sources.fillament_current_source import FillamentCurrentSource
-from sucemfem.PostProcessing import surface_ntff
-from sucemfem.Testing.ErrorMeasures import normalised_RMS
+import FenicsCode.Sources.current_source
+import FenicsCode.BoundaryConditions.ABC
+import FenicsCode.Utilities.LinalgSolvers
+import FenicsCode.Utilities.Optimization
+from FenicsCode.Utilities.MeshGenerators import get_centred_cube
+from FenicsCode.Consts import eps0, mu0, c0
+from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
+from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
+from FenicsCode.Sources.fillament_current_source import FillamentCurrentSource
+from FenicsCode.PostProcessing import surface_ntff
+from FenicsCode.Testing.ErrorMeasures import normalised_RMS
 import pylab
-from sucemfem.Testing.Analytical import current_fillament_farfield
+from FenicsCode.Testing.Analytical import current_fillament_farfield
 del sys.path[0]
 
 
-sucemfem.Utilities.Optimization.set_dolfin_optimisation(True)
+FenicsCode.Utilities.Optimization.set_dolfin_optimisation(True)
 ### Postprocessing requests
 theta_deg = N.linspace(0, 180, 181)
 no_ff_pts = len(theta_deg)
@@ -59,9 +41,9 @@ source_endpoints =  N.array(
     [-source_direction*l/2, source_direction*l/2]) + source_centre
 
 ### Discretisation settings
-order = 2
+order = 1
 domain_size = N.array([lam]*3)*0.25
-max_edge_len = lam/36
+max_edge_len = lam/144
 mesh = get_centred_cube(domain_size, max_edge_len)
 
 fname = 'data/f-%f_o-%d_s-%f_l-%f_h-%f' % (freq, order,
@@ -77,9 +59,9 @@ material_mesh_func = dolfin.MeshFunction('uint', mesh, 3)
 material_mesh_func.set_all(0)
 materials = {0:dict(eps_r=1, mu_r=1),}
 ## Set up 1st-order analytical ABC
-abc = sucemfem.BoundaryConditions.ABC.ABCBoundaryCondition()
+abc = FenicsCode.BoundaryConditions.ABC.ABCBoundaryCondition()
 abc.set_region_number(1)
-bcs = sucemfem.BoundaryConditions.container.BoundaryConditions()
+bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
 bcs.add_boundary_condition(abc)
 ## Set up high level problem class
 dp = DrivenProblemABC()
@@ -89,7 +71,7 @@ dp.set_material_regions(materials)
 dp.set_region_meshfunction(material_mesh_func)
 dp.set_boundary_conditions(bcs)
 ## Set up current fillament source
-current_sources = sucemfem.Sources.current_source.CurrentSources()
+current_sources = FenicsCode.Sources.current_source.CurrentSources()
 fillament_source = FillamentCurrentSource()
 fillament_source.set_source_endpoints(source_endpoints)
 fillament_source.set_value(I)
@@ -103,11 +85,12 @@ dp.set_frequency(freq)
 A = dp.get_LHS_matrix()
 b = dp.get_RHS()
 ## Solve. Choose spare solver if UMFPack runsout of memory
-# print 'solve using scipy bicgstab'
+print 'solve using scipy bicgstab'
 # x = solve_sparse_system ( A, b, preconditioner_type='diagonal')
-print 'solve using UMFPack'
-umf_solver = sucemfem.Utilities.LinalgSolvers.UMFPACKSolver(A)
-x = umf_solver.solve(b)
+x = solve_sparse_system ( A, b )
+# print 'solve using UMFPack'
+# umf_solver = FenicsCode.Utilities.LinalgSolvers.UMFPACKSolver(A)
+# x = umf_solver.solve(b)
 
 import pickle
 with open(fname+'.pickle', 'w') as f:
@@ -146,7 +129,7 @@ dolfin.File(materialsfilename)  << material_mesh_func
 # pylab.figure()
 # pylab.plot(theta_deg, N.abs(surf_E_theta), label='|E_theta|')
 # pylab.plot(theta_deg, N.abs(surf_E_phi), label='|E_phi|')
-# an_E_theta = [sucemfem.Testing.Analytical.current_fillament_farfield.eval_E_theta(freq, l, I, th) for th in N.deg2rad(theta_deg)]
+# an_E_theta = [FenicsCode.Testing.Analytical.current_fillament_farfield.eval_E_theta(freq, l, I, th) for th in N.deg2rad(theta_deg)]
 # pylab.plot(theta_deg, N.abs(an_E_theta), label='analytical')
 # pylab.legend()
 
