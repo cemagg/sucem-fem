@@ -6,24 +6,24 @@ import sys
 import numpy as N
 import os
 import dolfin
-sys.path.insert(0, '../../')
-import FenicsCode.Sources.current_source
-import FenicsCode.BoundaryConditions.ABC
-import FenicsCode.Utilities.LinalgSolvers
-import FenicsCode.Utilities.Optimization
-from FenicsCode.Utilities.MeshGenerators import get_centred_cube
-from FenicsCode.Consts import eps0, mu0, c0
-from FenicsCode.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
-from FenicsCode.Utilities.LinalgSolvers import solve_sparse_system
-from FenicsCode.Sources.fillament_current_source import FillamentCurrentSource
-from FenicsCode.PostProcessing import surface_ntff
-from FenicsCode.Testing.ErrorMeasures import normalised_RMS
+sys.path.insert(0, '../../../../')
+import sucemfem.Sources.current_source
+import sucemfem.BoundaryConditions.ABC
+import sucemfem.Utilities.LinalgSolvers
+import sucemfem.Utilities.Optimization
+from sucemfem.Utilities.MeshGenerators import get_centred_cube
+from sucemfem.Consts import eps0, mu0, c0
+from sucemfem.ProblemConfigurations.EMDrivenProblem import DrivenProblemABC
+from sucemfem.Utilities.LinalgSolvers import solve_sparse_system
+from sucemfem.Sources.fillament_current_source import FillamentCurrentSource
+from sucemfem.PostProcessing import surface_ntff
+from sucemfem.Testing.ErrorMeasures import normalised_RMS
 import pylab
-from FenicsCode.Testing.Analytical import current_fillament_farfield
+from sucemfem.Testing.Analytical import current_fillament_farfield
 del sys.path[0]
 
 
-FenicsCode.Utilities.Optimization.set_dolfin_optimisation(True)
+sucemfem.Utilities.Optimization.set_dolfin_optimisation(True)
 ### Postprocessing requests
 theta_deg = N.linspace(0, 180, 181)
 no_ff_pts = len(theta_deg)
@@ -41,14 +41,13 @@ source_endpoints =  N.array(
     [-source_direction*l/2, source_direction*l/2]) + source_centre
 
 ### Discretisation settings
-order = 1
+order = 2
 domain_size = N.array([lam]*3)*0.25
-max_edge_len = lam/144
+max_edge_len = lam/6
 mesh = get_centred_cube(domain_size, max_edge_len)
 
-fname = 'data/f-%f_o-%d_s-%f_l-%f_h-%f' % (freq, order,
-                                           domain_size[0], l/lam,
-                                           max_edge_len/lam)
+fname = 'power_flux_reference_dofs_f-%f_o-%d_s-%f_l-%f_h-%f' % (
+    freq, order, domain_size[0], l/lam, max_edge_len/lam)
 meshfilename = fname+'_mesh.xml'
 materialsfilename = fname+'_materials.xml'
 print fname
@@ -59,9 +58,9 @@ material_mesh_func = dolfin.MeshFunction('uint', mesh, 3)
 material_mesh_func.set_all(0)
 materials = {0:dict(eps_r=1, mu_r=1),}
 ## Set up 1st-order analytical ABC
-abc = FenicsCode.BoundaryConditions.ABC.ABCBoundaryCondition()
+abc = sucemfem.BoundaryConditions.ABC.ABCBoundaryCondition()
 abc.set_region_number(1)
-bcs = FenicsCode.BoundaryConditions.container.BoundaryConditions()
+bcs = sucemfem.BoundaryConditions.container.BoundaryConditions()
 bcs.add_boundary_condition(abc)
 ## Set up high level problem class
 dp = DrivenProblemABC()
@@ -71,7 +70,7 @@ dp.set_material_regions(materials)
 dp.set_region_meshfunction(material_mesh_func)
 dp.set_boundary_conditions(bcs)
 ## Set up current fillament source
-current_sources = FenicsCode.Sources.current_source.CurrentSources()
+current_sources = sucemfem.Sources.current_source.CurrentSources()
 fillament_source = FillamentCurrentSource()
 fillament_source.set_source_endpoints(source_endpoints)
 fillament_source.set_value(I)
@@ -85,18 +84,17 @@ dp.set_frequency(freq)
 A = dp.get_LHS_matrix()
 b = dp.get_RHS()
 ## Solve. Choose spare solver if UMFPack runsout of memory
-print 'solve using scipy bicgstab'
+# print 'solve using scipy bicgstab'
 # x = solve_sparse_system ( A, b, preconditioner_type='diagonal')
-x = solve_sparse_system ( A, b )
-# print 'solve using UMFPack'
-# umf_solver = FenicsCode.Utilities.LinalgSolvers.UMFPACKSolver(A)
-# x = umf_solver.solve(b)
+# x = solve_sparse_system ( A, b )
+print 'solve using UMFPack'
+umf_solver = sucemfem.Utilities.LinalgSolvers.UMFPACKSolver(A)
+x = umf_solver.solve(b)
 
 import pickle
 with open(fname+'.pickle', 'w') as f:
     pickle.dump(dict(x=x, meshfile=meshfilename,
                      materialsfile=materialsfilename,
-                     material_properties=materials,
                      freq=freq, order=order, 
                      source_endpoints=source_endpoints,
                      I=I),f)
@@ -129,7 +127,7 @@ dolfin.File(materialsfilename)  << material_mesh_func
 # pylab.figure()
 # pylab.plot(theta_deg, N.abs(surf_E_theta), label='|E_theta|')
 # pylab.plot(theta_deg, N.abs(surf_E_phi), label='|E_phi|')
-# an_E_theta = [FenicsCode.Testing.Analytical.current_fillament_farfield.eval_E_theta(freq, l, I, th) for th in N.deg2rad(theta_deg)]
+# an_E_theta = [sucemfem.Testing.Analytical.current_fillament_farfield.eval_E_theta(freq, l, I, th) for th in N.deg2rad(theta_deg)]
 # pylab.plot(theta_deg, N.abs(an_E_theta), label='analytical')
 # pylab.legend()
 

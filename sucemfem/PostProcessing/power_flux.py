@@ -75,6 +75,7 @@ class VariationalSurfaceFlux(object):
         boundary_cells.mark(cell_domains, cell_region)
         self.functional = CalcEMFunctional(V)
         self.functional.set_cell_domains(cell_domains, cell_region)
+        self.k0_dirty = True
 
     def set_dofs(self, dofs):
         x_r = np.real(dofs).copy()
@@ -98,7 +99,7 @@ class VariationalSurfaceFlux(object):
     def set_k0(self,k0):
         self.k0 = k0
         self.functional.set_k0(k0)
-        self.functional.set_g_dofs(1j*self.dirich_dofs.conjugate()/k0/Z0)
+        self.k0_dirty = True
         
     def set_epsr_function(self, epsr_function):
         self.epsr_function = epsr_function
@@ -110,6 +111,9 @@ class VariationalSurfaceFlux(object):
         self.functional.set_mur_function(mur_function)
 
     def calc_flux(self):
+        if self.k0_dirty:
+            self.functional.set_g_dofs(1j*self.dirich_dofs.conjugate()/self.k0/Z0)
+            self.k0_dirty = False
         return self.functional.calc_functional().conjugate()
 
     def _get_mur_function(self):

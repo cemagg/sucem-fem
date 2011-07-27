@@ -124,9 +124,9 @@ def calcs(fname):
                   sflux=energy_flux, vflux=var_energy_flux)
 
 
-    # print 'source power: ', volts*data['I']
-    # print 'energy flux:      ', energy_flux
-    # print 'var energy flux: ', var_energy_flux
+    print 'source power: ', volts*data['I']
+    print 'energy flux:      ', energy_flux
+    print 'var energy flux: ', var_energy_flux
 
     # print '|'.join(str(s) for s in ('', volts*data['I'], energy_flux,
     #                                 var_energy_flux, ''))
