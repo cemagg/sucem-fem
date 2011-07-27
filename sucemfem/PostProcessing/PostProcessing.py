@@ -100,7 +100,7 @@ class CalcEMFunctional(object):
         self.dx = dx(self.cell_mark_value)
         self.dirty = True
         
-    def set_epsr_function(self, permittivity_function):
+    def set_epsr_function(self, epsr_function):
         self.epsr_function = epsr_function
         self.dirty = True
         
