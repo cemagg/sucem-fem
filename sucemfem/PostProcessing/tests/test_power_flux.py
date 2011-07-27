@@ -50,7 +50,7 @@ class test_SurfaceFlux(unittest.TestCase):
     def test_calc_flux(self):
         self.DUT.set_k0(self.k0)
         self.DUT.set_dofs(self.data['x'])
-        # Desired result as calculated with gitrev 
+        # Desired result as calculated with gitrev 953c7063b02547f5233a29ced884ba5af0fd0fe3
         self.assertAlmostEqual(self.DUT.calc_flux(), 26.3586862457)
 
 
@@ -73,6 +73,6 @@ class test_SurfaceFlux(unittest.TestCase):
     def test_calc_flux(self):
         self.DUT.set_k0(self.k0)
         self.DUT.set_dofs(self.data['x'])
-        # Desired result as calculated with gitrev 
+        # Desired result as calculated with gitrev 953c7063b02547f5233a29ced884ba5af0fd0fe3
         self.assertAlmostEqual(self.DUT.calc_flux(), (26.9015957282-7.85747240242e-08j))
         
