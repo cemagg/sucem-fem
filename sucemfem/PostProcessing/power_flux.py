@@ -1,8 +1,10 @@
 from __future__ import division
 
 import dolfin
+import numpy as np
 
 from sucemfem.Consts import eps0, mu0, c0, Z0
+from sucemfem.Utilities.Converters import as_dolfin_vector
 from sucemfem.PostProcessing import CalcEMFunctional
 from sucemfem import Geometry 
 
@@ -22,6 +24,7 @@ class SurfaceFlux(object):
         self.function_space = V = function_space
         self.E_r = dolfin.Function(V)
         self.E_i = dolfin.Function(V)
+        self.mur_function = None
 
     def set_dofs(self, dofs):
         x_r = np.real(dofs).copy()
@@ -33,7 +36,7 @@ class SurfaceFlux(object):
         self.k0 = k0
 
     def _get_mur_function(self):
-        if self.epsr_function is not None:
+        if self.mur_function is not None:
             mur_func = self.mur_function
         else:
             mur_func = dolfin.Constant(1)
@@ -44,7 +47,7 @@ class SurfaceFlux(object):
         self.mur_function = mur_function
 
     def _get_form(self):
-        n = self.function_space.cell().x
+        n = self.function_space.cell().n
         k0 = self.k0
         E_i = self.E_i
         E_r = self.E_r
@@ -54,7 +57,7 @@ class SurfaceFlux(object):
 
     def calc_flux(self):
         """Calculate the power flux"""
-        return dolfin.assemble(self._get_form)
+        return dolfin.assemble(self._get_form())
 
 class VariationalSurfaceFlux(object):
     def __init__(self, function_space):
@@ -62,6 +65,7 @@ class VariationalSurfaceFlux(object):
         self.E_r = dolfin.Function(V)
         self.E_i = dolfin.Function(V)
         self.mur_function = None
+        self.epsr_function = None
         ## Set CalcEMCalcEMFunctional to only integrate along a skin
         ## of elements connected to the boundary
         boundary_cells = Geometry.BoundaryEdgeCells(V.mesh())
@@ -84,8 +88,8 @@ class VariationalSurfaceFlux(object):
             self.function_space, self.E_r, boundary)
         E_i_dirich = dolfin.DirichletBC(
             self.function_space, self.E_i, boundary)
-        x_r_dirich = np.zeros(len(x_r))
-        x_i_dirich = np.zeros(len(x_r))
+        x_r_dirich = as_dolfin_vector(np.zeros(len(x_r)))
+        x_i_dirich = as_dolfin_vector(np.zeros(len(x_r)))
         E_r_dirich.apply(x_r_dirich)
         E_i_dirich.apply(x_i_dirich)
         self.dirich_dofs = x_r_dirich.array() + 1j*x_i_dirich.array()
@@ -96,6 +100,18 @@ class VariationalSurfaceFlux(object):
         self.functional.set_k0(k0)
         self.functional.set_g_dofs(1j*self.dirich_dofs.conjugate()/k0/Z0)
         
+    def set_epsr_function(self, epsr_function):
+        self.epsr_function = epsr_function
+        self.functional.set_epsr_function(epsr_function)
+
+
+    def set_mur_function(self, mur_function):
+        self.mur_function = mur_function
+        self.functional.set_mur_function(mur_function)
+
+    def calc_flux(self):
+        return self.functional.calc_functional().conjugate()
+
     def _get_mur_function(self):
         if self.epsr_function is not None:
             mur_func = self.mur_function
@@ -104,6 +120,10 @@ class VariationalSurfaceFlux(object):
 
         return mur_func
 
-    def set_mur_function(self, mur_function):
-        self.mur_function = mur_function
-        self.functional.set_mur_function(mur_function)
+    def _get_epsr_function(self):
+        if self.epsr_function is not None:
+            epsr_func = self.epsr_function
+        else:
+            epsr_func = dolfin.Constant(1)
+
+        return epsr_func

@@ -33,6 +33,7 @@ import sucemfem.Utilities.Optimization
 from sucemfem import Geometry 
 from sucemfem.Sources.PostProcess import ComplexVoltageAlongLine
 from sucemfem.PostProcessing import CalcEMFunctional
+from sucemfem.PostProcessing.power_flux import SurfaceFlux, VariationalSurfaceFlux
 
 # Enable dolfin's form optimizations
 sucemfem.Utilities.Optimization.set_dolfin_optimisation()
@@ -41,7 +42,7 @@ sucemfem.Utilities.Optimization.set_dolfin_optimisation()
 # fname = 'data/f-1000000000.000000_o-2_s-0.299792_l-0.100000_h-0.166667'
 # fname = 'data/f-1000000000.000000_o-2_s-0.299792_l-0.100000_h-0.083333'
 
-order = 1
+order = 2
 fnames = {2:['data/f-1000000000.000000_o-2_s-0.074948_l-0.100000_h-0.016667', # h60 
              'data/f-1000000000.000000_o-2_s-0.074948_l-0.100000_h-0.020833', # h48 
              'data/f-1000000000.000000_o-2_s-0.074948_l-0.100000_h-0.027778', # h36 
@@ -80,8 +81,11 @@ def calcs(fname):
     ReS = (1/k0/Z0)*dolfin.dot(n, (dolfin.cross(E_r, -dolfin.curl(E_i)) +
                                    dolfin.cross(E_i, dolfin.curl(E_r))))*dolfin.ds
     energy_flux = dolfin.assemble(ReS)
-
-    var_method = 'original'
+    surface_flux = SurfaceFlux(V)
+    surface_flux.set_dofs(x)
+    surface_flux.set_k0(k0)
+    energy_flux2 = surface_flux.calc_flux()
+    assert(np.allclose(energy_flux, energy_flux2, rtol=1e-8, atol=1e-8))    
 
     def boundary(x, on_boundary):
         return on_boundary
@@ -105,6 +109,11 @@ def calcs(fname):
     emfunc.set_E_dofs(x)
     emfunc.set_g_dofs(1j*x_dirich.conjugate()/k0/Z0)
     var_energy_flux = emfunc.calc_functional().conjugate()
+    var_surf_flux = VariationalSurfaceFlux(V)
+    var_surf_flux.set_dofs(x)
+    var_surf_flux.set_k0(k0)
+    var_energy_flux2 = var_surf_flux.calc_flux()
+    assert(np.allclose(var_energy_flux, var_energy_flux2, rtol=1e-8, atol=1e-8))
 
     complex_voltage = ComplexVoltageAlongLine(V)
     complex_voltage.set_dofs(x)
@@ -124,7 +133,7 @@ def calcs(fname):
 
     return result
 
-for fname in fnames[order]:
+for fname in fnames[order][::-1]:
     print fname
     res = calcs(fname)
     hs.append(res['h'])
@@ -149,20 +158,20 @@ volts_log = np.log(np.abs(volts_gradients))
 
 vflux_log_h = np.log(hs)
 
-import pylab
-pylab.figure(3)
-pylab.hold(0)
-pylab.plot(-vflux_log_h, vflux_log, label='vflux')
-pylab.hold(1)
-pylab.plot(-vflux_log_h, sflux_log, label='sflux')
-pylab.plot(-vflux_log_h, volts_log, label='volts')
-pylab.grid(1)
-pylab.legend(loc=0)
-pylab.figure(4)
-pylab.hold(0)
-pylab.plot(hs, vfluxes, label='vflux')
-pylab.hold(1)
-pylab.plot(hs, sfluxes, label='sflux')
-pylab.plot(hs, -volts, label='volts')
-pylab.grid(1)
-pylab.legend(loc=0)
+# import pylab
+# pylab.figure(3)
+# pylab.hold(0)
+# pylab.plot(-vflux_log_h, vflux_log, label='vflux')
+# pylab.hold(1)
+# pylab.plot(-vflux_log_h, sflux_log, label='sflux')
+# pylab.plot(-vflux_log_h, volts_log, label='volts')
+# pylab.grid(1)
+# pylab.legend(loc=0)
+# pylab.figure(4)
+# pylab.hold(0)
+# pylab.plot(hs, vfluxes, label='vflux')
+# pylab.hold(1)
+# pylab.plot(hs, sfluxes, label='sflux')
+# pylab.plot(hs, -volts, label='volts')
+# pylab.grid(1)
+# pylab.legend(loc=0)
