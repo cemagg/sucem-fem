@@ -18,7 +18,34 @@
 ## Contact: cemagga@gmail.com 
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
+from __future__ import division
 
+import unittest
+import os
+import pickle
+import numpy as np
+import dolfin
 
-### Add a test here that checks that CalcEMFuctional actually behaves
-### as a symmetrical functional, as it should
+# Module under test
+from sucemfem.PostProcessing import CalcEMFunctional
+
+class test_CalcEMFunctional(unittest.TestCase):
+    def setUp(self):
+        self.mesh = dolfin.UnitCube(2,2,2)
+        self.function_space = dolfin.FunctionSpace(
+            self.mesh, "Nedelec 1st kind H(curl)", 1)
+        nodofs = self.function_space.dofmap().global_dimension()
+        self.E_dofs = np.random.random(nodofs) + 1j*np.random.random(nodofs)
+        self.g_dofs = np.random.random(nodofs) + 1j*np.random.random(nodofs)
+        self.k0 = np.random.rand()*10
+        self.DUT = CalcEMFunctional(self.function_space)
+
+    def test_symmetry(self):
+        self.DUT.set_k0(self.k0)
+        self.DUT.set_g_dofs(self.g_dofs)
+        self.DUT.set_E_dofs(self.E_dofs)
+        val1 = self.DUT.calc_functional()
+        self.DUT.set_g_dofs(self.E_dofs)
+        self.DUT.set_E_dofs(self.g_dofs)
+        val2 = self.DUT.calc_functional()        
+        self.assertEqual(val1, val2)
