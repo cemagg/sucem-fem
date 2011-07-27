@@ -32,7 +32,7 @@ from sucemfem.PostProcessing import surface_ntff
 from sucemfem.PostProcessing import variational_ntff
 
 class test_interpolant(unittest.TestCase):
-    test_data_file = 'interpolant_test_data.pickle'
+    test_data_file = 'data/interpolant_test_data.pickle'
     rtol=1e-10
     atol=1e-7
 
@@ -78,7 +78,7 @@ class NTFFEnvironment(object):
         self.frequency = nf_input_data['freq']
         
 class test_surface_ntff(unittest.TestCase):
-    test_data_file = 'reference_surface_ntff-2-0.149896229-0.0499654096667.pickle'
+    test_data_file = 'data/reference_surface_ntff-2-0.149896229-0.0499654096667.pickle'
     rtol=1e-12
     atol=1e-7
     
@@ -98,7 +98,7 @@ class test_surface_ntff(unittest.TestCase):
         
 
 class test_variational_ntff(test_surface_ntff):
-    test_data_file = 'reference_variational_ntff-2-0.149896229-0.0499654096667.pickle'
+    test_data_file = 'data/reference_variational_ntff-2-0.149896229-0.0499654096667.pickle'
     def setUp(self):
         desired_file = Paths.get_module_path_file(self.test_data_file, __file__)
         self.environment = NTFFEnvironment(desired_file)
