@@ -41,17 +41,27 @@ class SystemSolverBase ( object ):
             (default: None)
         """
         self._logging_data = { 'time': [], 'id': [], 'res': [] }
+        self._user_callbacks = []
         self._timestamp( 'init' )
         self._A = A
         self.set_preconditioner ( preconditioner_type )
         self._callback_count = 0
-    
     def _call_solver (self):
         """
         A stub routine that is to be implemented by an inherited class depending on the solver being used.
         """
         raise Exception ( "Solver driver not implemented.")
-    
+
+    def add_user_callback(self, cb):
+        """
+        Add a user callback function cb(self, residual)
+
+        @param cb: User callback function cb(self, residual) where
+            self is the current SystemSolver instance and residual is
+            the most recently calculated residual.
+        """
+        self._user_callbacks.append(cb)
+
     def _callback ( self, xk ):
         """
         Calculate the residual if required, and update the progress of the iterative solver.
@@ -60,9 +70,10 @@ class SystemSolverBase ( object ):
         """
         self._callback_count += 1;
         if type(xk) is float:
-            self._timestamp( self._callback_count, res=xk )
+            res = xk
         else:
-            self._timestamp( self._callback_count, res=calculate_residual ( self._A, xk, self._b ) )
+            res = calculate_residual( self._A, xk, self._b )
+        self._timestamp( self._callback_count, res=res )
         
     def _timestamp (self, id, res=np.nan ):
         """
@@ -75,6 +86,8 @@ class SystemSolverBase ( object ):
         self._logging_data['time'].append ( time() )
         self._logging_data['id'].append ( id )
         self._logging_data['res'].append ( res )
+        for cb in self._user_callbacks:
+            cb(self, res)
     
     def set_b ( self, b ):
         """
