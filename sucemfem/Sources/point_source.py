@@ -62,7 +62,7 @@ def calc_pointsource_contrib(V, source_coords, source_value):
     source_coords = N.asarray(source_coords, dtype=N.float64)
     source_value = N.asarray(source_value)
     dm = V.dofmap()
-    dofnos = N.zeros(dm.max_cell_dimension(), dtype=N.uint32)
+    dofnos = N.zeros(dm.max_cell_dimension(), dtype=N.uintc)
     source_pt = dolfin.Point(*source_coords)
     try:
         cell_index = V.mesh().any_intersected_entity(source_pt)
