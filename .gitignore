@@ -6,3 +6,4 @@
 tests/data
 *.pyc
 *~
+doc/html
