@@ -24,8 +24,8 @@ import os
 import dolfin as dol
 
 sys.path.insert(0, '../../')
-from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
-from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
+from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem, DefaultEigenSolver
+from sucemfem.BoundaryConditions import PECWallsBoundaryCondition
 from sucemfem.Consts import c0
 del sys.path[0]
 
@@ -38,14 +38,18 @@ d = 1.0
 mesh.coordinates()[:,0] = a*mesh.coordinates()[:,0]
 mesh.coordinates()[:,1] = b*mesh.coordinates()[:,1]
 mesh.coordinates()[:,2] = d*mesh.coordinates()[:,2]
- 
+
+# init the PEC walls boundary condition
+pec_walls = PECWallsBoundaryCondition ()
+pec_walls.init_with_mesh ( mesh ) 
+
 # Use 3rd order basis functions 
 order = 3
 # Set up the eigen problem
 ep = EigenProblem()
 ep.set_mesh(mesh)
 ep.set_basis_order(order)
-ep.set_boundary_conditions(pec=True)
+ep.set_boundary_conditions ( pec_walls )
 ep.init_problem()
 
 # Set up eigen problem solver where sigma is the shift to use in the shift-invert process
