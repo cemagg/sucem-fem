@@ -18,12 +18,10 @@
 ## Contact: cemagga@gmail.com 
 # Authors:
 # Neilen Marais <nmarais@gmail.com>
+# Evan Lezar <mail@evanlezar.com>
 from __future__ import division
-__author = "Neilen Marais, Evan Lezar"
 
 """
-This file has been adapted from a file eig_driver.py developed by N Marais
-
 Problem considered:
 
 Eigenvalue solution of a dielectricaly loaded PEC cavity.
@@ -45,8 +43,8 @@ import os
 import dolfin as dol
 
 sys.path.insert(0, '../../')
-from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem
-from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import DefaultEigenSolver
+from sucemfem.ProblemConfigurations.EMVectorWaveEigenproblem import EigenProblem, DefaultEigenSolver
+from sucemfem.BoundaryConditions import PECWallsBoundaryCondition
 from sucemfem.Consts import c0
 del sys.path[0]
 
@@ -60,13 +58,17 @@ material_mesh_func = dol.MeshFunction('uint', mesh, materials_mesh_file)
 materials = {1000:dict(eps_r=16),
              1001:dict(eps_r=1)}
 
+# init the PEC walls boundary condition
+pec_walls = PECWallsBoundaryCondition ()
+pec_walls.init_with_mesh ( mesh ) 
+
 # Use 3rd order basis functions 
 order = 3
 # Set up the eigen problem
 ep = EigenProblem()
 ep.set_mesh(mesh)
 ep.set_basis_order(order)
-ep.set_boundary_conditions(pec=True)
+ep.set_boundary_conditions( pec_walls )
 ep.set_material_regions(materials)
 ep.set_region_meshfunction(material_mesh_func)
 ep.init_problem()
