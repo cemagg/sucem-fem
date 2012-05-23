@@ -128,9 +128,12 @@ print 'plotting'
 pylab.figure()
 pylab.plot(theta_deg, N.abs(surf_E_theta), label='|E_theta|')
 pylab.plot(theta_deg, N.abs(surf_E_phi), label='|E_phi|')
-an_E_theta = [sucemfem.Testing.Analytical.current_fillament_farfield.eval_E_theta(freq, l, I, th) for th in N.deg2rad(theta_deg)]
-pylab.plot(theta_deg, N.abs(an_E_theta), label='analytical')
+
+#Analytical Solution
+#an_E_theta = [sucemfem.Testing.Analytical.current_fillament_farfield.eval_E_theta(freq, l, I, th) for th in N.deg2rad(theta_deg)]
+#pylab.plot(theta_deg, N.abs(an_E_theta), label='analytical')
 pylab.legend()
+pylab.show()
 
 
 

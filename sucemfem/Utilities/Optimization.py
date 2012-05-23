@@ -30,10 +30,10 @@ def set_dolfin_optimisation(enable=True):
         False -> disabled
         (default: True).
     """
-    dolfin.parameters['optimize_form'] = enable
-    dolfin.parameters['optimize'] = enable
-    dolfin.parameters['optimize_use_dofmap_cache'] = enable
-    dolfin.parameters['optimize_use_tensor_cache'] = enable
+#    dolfin.parameters['optimize_form'] = enable
+#    dolfin.parameters['optimize'] = enable
+#    dolfin.parameters['optimize_use_dofmap_cache'] = enable
+#    dolfin.parameters['optimize_use_tensor_cache'] = enable    
     dolfin.parameters['form_compiler']['optimize'] = enable
     dolfin.parameters['form_compiler']['cpp_optimize'] = enable
 

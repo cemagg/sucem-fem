@@ -22,7 +22,8 @@ from __future__ import division
 
 import pickle
 import numpy as N
-import dolfin
+#import dolfin
+from dolfin import *
 
 import sys
 sys.path.append('../../')
@@ -40,9 +41,12 @@ theta_deg = N.linspace(0, 180, 181)
 no_ff_pts = len(theta_deg)
 phi_deg = N.zeros(no_ff_pts)
 data = pickle.load(open(fname))
+print data
+
 lam = c0/data['freq']
 k0 = data['freq']*2*N.pi/c0
 mesh = get_centred_cube(data['domain_size'], data['max_edge_len'])
+#plot(mesh,interactive=True)
 V = dolfin.FunctionSpace(mesh, "Nedelec 1st kind H(curl)", data['order'])
 
 #------------------------------
@@ -69,14 +73,35 @@ var_E_phi = var_E_ff[:,1]
 E_theta_an = Z0*N.exp(-1j*k0)*(1j*k0*1*lam/1000)/(4*N.pi)*N.sin(N.deg2rad(theta_deg))
 #------------------------------
 # Plot results
-import pylab 
-pylab.figure()
-pylab.plot(theta_deg, N.abs(surf_E_theta), label='surf_ntff |E_theta|')
-pylab.plot(theta_deg, N.abs(surf_E_phi), label='surf_ntff |E_phi|')
-pylab.plot(theta_deg, N.abs(var_E_theta), label='var_ntff |E_theta|')
-pylab.plot(theta_deg, N.abs(var_E_phi), label='var_ntff |E_phi|')
-pylab.plot(theta_deg, N.abs(E_theta_an), label='analytical')
-pylab.legend(loc='lower center')
-pylab.grid(1)
-pylab.show()
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+font = {'size'   : 18}
 
+mpl.rc('font', **font)
+
+plt.figure()
+plt.plot(theta_deg, N.abs(surf_E_theta), 'ko',markersize=10,markerfacecolor='None')
+#plt.plot(theta_deg, N.abs(surf_E_phi), label='surf_ntff |E_phi|')
+plt.plot(theta_deg, N.abs(var_E_theta), 'kx', linewidth=1.5, markersize=10)
+#plt.plot(theta_deg, N.abs(var_E_phi), label='var_ntff |E_phi|')
+plt.plot(theta_deg, N.abs(E_theta_an), '-k',linewidth=1.5)
+plt.xlabel('Degrees [$^o$]')
+plt.title('Surface Integral versus Variational NTFF')
+plt.ylabel('$E_{\Theta}$ [V/m]')
+plt.legend(['Surface NTFF','Variational NTFF','Analytical'],loc='lower center')
+plt.grid(True)
+plt.show()
+
+#import pylab 
+#pylab.figure()
+#pylab.plot(theta_deg, N.abs(surf_E_theta), '-ko', mfc="None", markersize=8, label='Surface NTFF')
+##pylab.plot(theta_deg, N.abs(surf_E_phi), label='surf_ntff |E_phi|')
+##pylab.plot(theta_deg, N.abs(var_E_theta), '-rx', markersize=8 , label='Variational NTFF')
+##pylab.plot(theta_deg, N.abs(var_E_phi), label='var_ntff |E_phi|')
+#pylab.plot(theta_deg, N.abs(E_theta_an), '--b', label='Analytical')
+#pylab.xlabel('Degrees [$^o$]')
+#pylab.title('Surface Integral vs. Variational NTFF')
+#pylab.ylabel('$E_{\Theta}$ [V/m]')
+#pylab.legend(loc='lower center')
+#pylab.grid(1)
+#pylab.show()

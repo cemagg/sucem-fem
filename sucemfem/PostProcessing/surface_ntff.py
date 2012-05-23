@@ -78,7 +78,7 @@ class SurfaceNTFFForms(object):
             return self.L_form
         except AttributeError:
             pass
-        # Set up eqivalent magnetic current forms
+        # Set up equivalent magnetic current forms
         M_r = -cross(self.n, self.E_r)
         M_i = -cross(self.n, self.E_i)
         #------------------------------

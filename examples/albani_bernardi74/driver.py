@@ -83,7 +83,8 @@ es.set_sigma(sigma)
 eigs_w, eigs_v = es.solve_problem(10)
 
 # Output the results
-res = N.array(sorted(eigs_w)[0:10])
+#res = N.array(sorted(eigs_w)[0:10])
+res = N.array(sorted(1/eigs_w+sigma)[0:10]) #HAVE TO CORRECT FOR THE SPECTRUM SHIFT
 print N.sqrt(res)
 print c0*N.sqrt(res)/2/N.pi/1e6
 
