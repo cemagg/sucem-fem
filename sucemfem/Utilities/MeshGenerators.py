@@ -38,7 +38,8 @@ def get_centred_cube(domain_size, max_edge_len, centred_element_coordinate=None)
         ## Translate mesh slightly so that source coordinate lies at
         ## centroid of an element
         centred_element_point = dolfin.Point(*centred_element_coordinate)
-        source_elnos = mesh.all_intersected_entities(centred_element_point)
+#        source_elnos = mesh.all_intersected_entities(centred_element_point)
+        source_elnos = mesh.intersected_cells(centred_element_point)
         closest_elno = source_elnos[(N.argmin(
             [centred_element_point.distance(dolfin.Cell(mesh, i).midpoint())
              for i in source_elnos]))]

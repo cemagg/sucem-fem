@@ -100,7 +100,7 @@ def calc_pointsource_contrib(V, source_coords, source_value):
     -------------
     @param V: dolfin FunctionSpace object
     @param source_coords: length 3 array with x,y,z coordinates of point source
-    @param source_value: length 3 array with x,y,z componets of source current 
+    @param source_value: length 3 array with x,y,z components of source current 
     Return Values
     -------------
     (dofnos, rhs_contribs) with
@@ -116,8 +116,10 @@ def calc_pointsource_contrib(V, source_coords, source_value):
     dm = V.dofmap()
     dofnos = N.zeros(dm.max_cell_dimension(), dtype=N.uint32)
     source_pt = dolfin.Point(*source_coords)
+
+    io = V.mesh().intersection_operator()
     try:
-        cell_index = V.mesh().any_intersected_entity(source_pt)
+        cell_index = io.any_intersected_entity(source_pt)
     except StandardError:
         # CGAL as used by dolfin to implement intersection searches
         # seems to break with 1-element meshes
@@ -157,7 +159,9 @@ def main():
     mesh.coordinates()[:] -= domain_size/2
     ## Translate mesh slightly so that source coordinate lies at
     ## centroid of an element
-    source_elnos = mesh.all_intersected_entities(source_point)
+         
+    io = mesh.intersection_operator()
+    source_elnos = io.all_intersected_entities(source_point)
     closest_elno = source_elnos[(N.argmin([source_point.distance(dolfin.Cell(mesh, i).midpoint())
                                   for i in source_elnos]))]
     centre_pt = dolfin.Cell(mesh, closest_elno).midpoint()
@@ -197,9 +201,9 @@ def main():
     dolfin.assemble(s_0, tensor=S_0, mesh=mesh)
     print 'Number of degrees of freedom: ', M.size(0)
 
-
     # Set up RHS
     b = N.zeros(M.size(0), dtype=N.complex128)
+        
     dofnos, rhs_contrib = calc_pointsource_contrib(V, source_coord, source_value)
 
     rhs_contrib = 1j*k_0*Z0*rhs_contrib

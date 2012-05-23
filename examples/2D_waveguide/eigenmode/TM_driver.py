@@ -62,10 +62,9 @@ es.set_sigma(sigma)
 eigs_w, eigs_v = es.solve_problem(10)
 
 # Output the results
-res = N.array(sorted(eigs_w)[0:])
+#res = N.array(sorted(eigs_w)[0:])
+res = N.array(sorted(1/eigs_w+sigma)[0:]) #HAVE TO CORRECT FOR THE SPECTRUM SHIFT
 res = N.sqrt(res)/N.pi
-print res
-
 
 
 def k_mnl ( abd, m, n, l, normalize = False):
@@ -104,6 +103,9 @@ for m in range(steps):
             ids.append((m,n,l))
             values.append(k_mnl ( abd, m, n, l, True ))
 
+import warnings
+warnings.simplefilter("ignore", N.ComplexWarning)
+    
 r = 0;
 errors = N.zeros_like(res)
 print "mnl, analytical, calculated, relative error"

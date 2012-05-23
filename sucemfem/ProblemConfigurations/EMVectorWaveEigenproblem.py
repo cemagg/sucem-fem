@@ -24,8 +24,16 @@ from sucemfem import Materials
 from sucemfem import BoundaryConditions 
 from sucemfem import SystemMatrices
 
-from scipy.sparse.linalg.eigen.arpack import speigs
+#from scipy.sparse.linalg.eigen.arpack import speigs
+#from scipy.sparse.linalg.eigen.arpack import eigs
+
+from scipy.sparse.linalg import arpack
+#from scipy.sparse.linalg import eigs
+
+
 from EMProblem import EMProblem
+
+import numpy as np
 
 class CombineForms(Forms.CombineGalerkinForms):
     def get_forms(self):
@@ -70,13 +78,28 @@ class DefaultEigenSolver(object):
         lu.parameters["reuse_factorization"] = True
         lu.parameters["report"] = False
         bb = dolfin.Vector(M.size(0))
-        xx = dolfin.Vector(M.size(0))
+        xx = dolfin.Vector(M.size(0))        
         def sigma_solve(b):
             bb[:] = b
-            lu.solve(xx, bb)
+            lu.solve(xx, bb)                                    
             return xx[:]
-        M_matvec = lambda x: M*x
-        eigs_w, eigs_v = speigs.ARPACK_gen_eigs(
-            M_matvec, sigma_solve, M.size(0), self.sigma, nev, ncv=ncv)
-
+        M_matvec = lambda x: M*x                    
+              
+        #speigs in ARPACK has been removed in scipy 0.9/0.10
+        #eigs is now in scipy.sparse.linalg.arpack
+        #therefore force M_matvec to have "shape" and "dtype" attributes to comply with "eigs" requirements
+        #also perform the sigma_solve function for spectrum shift to sigma
+        class RM:
+            def __init__(self, M):
+                self.M = M
+                self.shape = (M.size(0), M.size(1))
+                self.dtype = np.dtype('d')                              
+            def matvec(self, x):                                
+                return sigma_solve(self.M*x)
+                               
+#        eigs_w, eigs_v = speigs.ARPACK_gen_eigs(
+#            M_matvec, sigma_solve, M.size(0), self.sigma, nev, ncv=ncv)
+                                            
+        eigs_w, eigs_v= arpack.eigs(RM(M), k=nev, sigma=self.sigma, which='LM', ncv=ncv)
+      
         return eigs_w, eigs_v.T

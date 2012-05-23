@@ -40,12 +40,19 @@ class SystemSolverBase ( object ):
         @keyword preconditioner_type: A string indicating the type of preconditioner to be used.
             (default: None)
         """
+        
         self._logging_data = { 'time': [], 'id': [], 'res': [] }
+        
         self._user_callbacks = []
+                        
         self._timestamp( 'init' )
+        
         self._A = A
+                
         self.set_preconditioner ( preconditioner_type )
+                
         self._callback_count = 0
+        
     def _call_solver (self):
         """
         A stub routine that is to be implemented by an inherited class depending on the solver being used.
@@ -108,11 +115,10 @@ class SystemSolverBase ( object ):
             M = None
         elif M_type.lower() == 'diagonal':
             M = scipy.sparse.spdiags(1./self._A.diagonal(), 0, self._A.shape[0], self._A.shape[1])
-        elif M_type.lower() == 'ilu':
-            self._M_data = scipy.sparse.linalg.spilu (
-                self._A.tocsc(), drop_tol=1e-8, fill_factor=1  )
-            M = scipy.sparse.linalg.LinearOperator (
-                self._A.shape, self._M_data.solve )
+        elif M_type.lower() == 'ilu':            
+            self._M_data = scipy.sparse.linalg.spilu (self._A.tocsc(), drop_tol=1e-8, fill_factor=10)
+#            self._M_data = scipy.sparse.linalg.spilu (self._A.tocsc(), drop_tol=1e-8, fill_factor=1)                         
+            M = scipy.sparse.linalg.LinearOperator (self._A.shape, self._M_data.solve)
         else:
             print "Warning: Preconditioner type '%s' not recognised. Not using preconditioner." % M_type
             M = None 
@@ -233,13 +239,14 @@ class SystemSolverBase ( object ):
 class BiCGStabSolver ( SystemSolverBase ):
     """
     An iterative Stabilised BICG solver using scipy.
-    """
+    """    
     def _call_solver (self):
         """Solves the linear system (self._A)x = self._b and returns the solution vector.
         
         @return: The solution to the linear system.
-        """
+        """      
         return scipy.sparse.linalg.bicgstab(self._A, self._b, M=self._M, callback=self._callback )
+
 
 class GMRESSolver ( SystemSolverBase ):
     """
@@ -308,8 +315,9 @@ def solve_sparse_system ( A, b, preconditioner_type='ilu' ):
     @param b: the RHS vector
     @param preconditioner_type: Preconditioner type string
     """
-    
+                    
     solver = BiCGStabSolver ( A, preconditioner_type )
+#    solver = BiCGStabSolver ( A ) #removed preconditioner -> 2D Waveguide works!    
     x = solver.solve(b)
     return x
     
