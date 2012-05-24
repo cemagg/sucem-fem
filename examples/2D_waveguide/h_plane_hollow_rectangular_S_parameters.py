@@ -23,8 +23,9 @@
 """
 import numpy as N
 import pylab as P
-from dolfin import *
 import scipy.sparse
+from dolfin import *
+
 import csv
 
 import sys
@@ -208,14 +209,16 @@ bc = DirichletBC(V, zero, pec)
 #Define the sinusoidal part of the excitation function
 mode_functions = {}
 for m in range(M):
-    mode_functions[m] = Expression('sin(m*pi/a*x[1])', {'pi':N.pi, 'm':m+1, 'a':a})
-
+#    mode_functions[m] = Expression('sin(m*pi/a*x[1])', {'pi':N.pi, 'm':m+1, 'a':a})
+    mode_functions[m] = Expression('sin(m*pi/a*x[1])', pi=N.pi, m=m+1, a=a)          
 
 
 #Define a function for the cutoff squared
 #k_o_squared = CutoffSquared(DG)
 #k_o_squared.set_frequency(0.0)
-k_o_squared = Expression("value", {"value" : 0.0})
+
+#k_o_squared = Expression("value", {"value" : 0.0})
+k_o_squared = Expression("value", value=0.0)
 
 c_m = {}
 
@@ -316,9 +319,12 @@ for i in range(len(f_range)):
     
     print "Solving (sparse)"
     t = Timer("Sparse Solve")
-    BE = solve_sparse_system ( LHS, RHS )
+    
+    BE = solve_sparse_system (LHS, RHS)
+
     t.stop()
     print "Done"
+    
     results[0,i] = f
     
     for k in range(num_ports):

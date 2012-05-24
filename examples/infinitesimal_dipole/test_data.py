@@ -46,3 +46,5 @@ E_1 = E_data['E_vals_1_re'] + 1j*E_data['E_vals_1_im']
 E_2 = E_data['E_vals_2_re'] + 1j*E_data['E_vals_2_im']
 r_1 = E_data['test_pts_1']
 r_2 = E_data['test_pts_2']
+
+print('Done')

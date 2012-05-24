@@ -62,13 +62,11 @@ es.set_sigma(sigma)
 
 # Solve the eigenproblem
 eigs_w, eigs_v = es.solve_problem(10)
-
+     
 # Output the results
-res = N.array(sorted(eigs_w)[0:])
+#res = N.array(sorted(eigs_w)[0:])
+res = N.array(sorted(1/eigs_w+sigma)[0:]) #HAVE TO CORRECT FOR THE SPECTRUM SHIFT
 res = N.sqrt(res)/N.pi
-print res
-
-
 
 def k_mnl ( abd, m, n, l, normalize = False):
     """
@@ -105,16 +103,18 @@ for m in range(steps):
         if i.count(0) < 2:
             ids.append((m,n,l))
             values.append(k_mnl ( abd, m, n, l, True ))
+            
+import warnings
+warnings.simplefilter("ignore", N.ComplexWarning)
 
 r = 0;
 errors = N.zeros_like(res)
 print "mnl, analytical, calculated, relative error"
 for i in N.argsort(values).tolist():
     if r < len(res):
-        errors[r] = N.linalg.norm( res[r] - values[i])/N.linalg.norm( values[i] )
+        errors[r] = N.linalg.norm( res[r] - values[i])/N.linalg.norm( values[i] )        
         print "%d%d%d, " % (ids[i]), "%9.3f, %10.3f, %.2e" % (
-            values[i], res[r], errors[r] )
-        
+            values[i], res[r], errors[r] )        
         r += 1
     else:
         break;
